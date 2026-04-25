@@ -617,17 +617,12 @@ body,
   background:linear-gradient(180deg,#171717,#111);
   border-color:rgba(98,191,74,.42);
   box-shadow:0 18px 42px rgba(0,0,0,.34),0 0 0 1px rgba(98,191,74,.18);
-  animation:draftDragShake .18s ease-in-out infinite;
+  transform:scale(.992);
 }
 .p-table-row.drag-over{
   border-top:2px solid var(--green);
   background:linear-gradient(90deg,rgba(98,191,74,.12),rgba(17,17,17,.98) 46%);
   box-shadow:inset 0 1px 0 rgba(155,255,93,.2);
-}
-@keyframes draftDragShake{
-  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
-  25%{transform:translate3d(.5px,-.5px,0) rotate(-.18deg)}
-  75%{transform:translate3d(-.5px,.5px,0) rotate(.18deg)}
 }
 @keyframes draftDropPulse{
   0%{box-shadow:0 0 0 0 rgba(98,191,74,.28)}
@@ -2551,21 +2546,18 @@ header::before{
   .p-table-row.mobile-dragging{
     opacity:.92;
     z-index:20;
-    transform:translate3d(0,var(--drag-y,0px),0) scale(.985) rotate(.22deg);
+    pointer-events:none;
+    transition:none!important;
+    transform:translate3d(0,var(--drag-y,0px),0) scale(.99);
     border-color:rgba(98,191,74,.55)!important;
     box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(98,191,74,.22)!important;
-    animation:draftMobileDragShake .2s ease-in-out infinite;
   }
   .p-table-row.mobile-drag-over{
-    border-top:3px solid var(--green)!important;
+    border-color:rgba(98,191,74,.38)!important;
     background:linear-gradient(135deg,rgba(98,191,74,.16),rgba(17,17,17,.98) 52%)!important;
     box-shadow:inset 0 1px 0 rgba(155,255,93,.18),0 10px 28px rgba(0,0,0,.22)!important;
   }
   .p-table-row.mobile-drag-placed{animation:draftDropPulse .42s ease-out}
-  @keyframes draftMobileDragShake{
-    0%,100%{filter:brightness(1.02)}
-    50%{filter:brightness(1.12)}
-  }
 }
 </style>
 
@@ -4587,12 +4579,46 @@ function pulsePlacedRow(kind,id){
   row.classList.add('drag-placed','mobile-drag-placed');
   setTimeout(()=>row.classList.remove('drag-placed','mobile-drag-placed'),460);
 }
+function getMobileDataArray(kind){
+  if(kind==='participants') return DB.participants;
+  if(kind==='prospects') return DB.prospects;
+  return DB.orgs;
+}
+function animateRowReorder(parent, mutate, heldRow, currentY){
+  const rows=[...parent.querySelectorAll('.p-table-row')];
+  const first=new Map(rows.map(row=>[row,row.getBoundingClientRect()]));
+  const heldTop=heldRow.getBoundingClientRect().top;
+  mutate();
+  const heldAfterTop=heldRow.getBoundingClientRect().top;
+  if(_mobileDrag){
+    _mobileDrag.startY += heldAfterTop - heldTop;
+    heldRow.style.setProperty('--drag-y',(currentY - _mobileDrag.startY)+'px');
+  }
+  rows.forEach(row=>{
+    if(row===heldRow) return;
+    const a=first.get(row);
+    const b=row.getBoundingClientRect();
+    const dy=a.top-b.top;
+    if(Math.abs(dy)>1 && row.animate){
+      row.animate(
+        [{transform:`translate3d(0,${dy}px,0)`},{transform:'translate3d(0,0,0)'}],
+        {duration:190,easing:'cubic-bezier(.2,.8,.2,1)'}
+      );
+    }
+  });
+}
 function startMobileRowDrag(row,x,y){
   const kind=getMobileRowKind(row);
   const id=+row.dataset.id;
   if(!kind || !id) return;
+  const parent=row.parentElement;
+  if(!parent) return;
+  const arr=getMobileDataArray(kind);
+  const visibleSlots=[...parent.querySelectorAll('.p-table-row')]
+    .map(r=>arr.findIndex(x=>x.id===+r.dataset.id))
+    .filter(i=>i>-1);
   hideCtx();
-  _mobileDrag={kind,id,row,target:null,startX:x,startY:y};
+  _mobileDrag={kind,id,row,parent,target:null,startX:x,startY:y,changed:false,visibleSlots};
   _touchCtxSuppressClick=true;
   document.body.classList.add('mobile-row-dragging','touch-context-open');
   row.classList.add('mobile-dragging');
@@ -4602,34 +4628,46 @@ function startMobileRowDrag(row,x,y){
 }
 function updateMobileRowDrag(x,y){
   if(!_mobileDrag) return;
-  const dy=Math.max(-180,Math.min(180,y-_mobileDrag.startY));
+  const dy=y-_mobileDrag.startY;
   _mobileDrag.row?.style.setProperty('--drag-y',dy+'px');
   const container=getMobileRowContainer(_mobileDrag.kind);
+  const parent=_mobileDrag.parent;
   const el=document.elementFromPoint(x,y);
   const target=el?.closest?.('.p-table-row');
   container?.querySelectorAll('.mobile-drag-over').forEach(r=>r.classList.remove('mobile-drag-over'));
-  if(target && target!==_mobileDrag.row && target.closest(`#${container?.id}`)){
+  if(target && target!==_mobileDrag.row && target.parentElement===parent){
     _mobileDrag.target=target;
     target.classList.add('mobile-drag-over');
+    const rows=[...parent.querySelectorAll('.p-table-row')];
+    const from=rows.indexOf(_mobileDrag.row);
+    const to=rows.indexOf(target);
+    if(from>-1 && to>-1 && from!==to){
+      animateRowReorder(parent,()=>{
+        parent.insertBefore(_mobileDrag.row, to>from ? target.nextSibling : target);
+      },_mobileDrag.row,y);
+      _mobileDrag.changed=true;
+    }
   } else {
     _mobileDrag.target=null;
   }
 }
 function finishMobileRowDrag(){
   if(!_mobileDrag) return;
-  const {kind,id,target,row}= _mobileDrag;
+  const {kind,id,row,parent,changed,visibleSlots}= _mobileDrag;
   row?.classList.remove('mobile-dragging');
   row?.style.removeProperty('--drag-y');
   document.querySelectorAll('.mobile-drag-over').forEach(r=>r.classList.remove('mobile-drag-over'));
   document.body.classList.remove('mobile-row-dragging','touch-context-open');
-  if(target){
-    const targetId=+target.dataset.id;
-    const arr=kind==='participants' ? DB.participants : kind==='prospects' ? DB.prospects : DB.orgs;
-    const from=arr.findIndex(x=>x.id===id);
-    const to=arr.findIndex(x=>x.id===targetId);
-    if(from>-1 && to>-1 && from!==to){
-      const [moved]=arr.splice(from,1);
-      arr.splice(to,0,moved);
+  if(changed){
+    const arr=getMobileDataArray(kind);
+    const byId=new Map(arr.map(item=>[item.id,item]));
+    const ordered=[...parent.querySelectorAll('.p-table-row')]
+      .map(r=>byId.get(+r.dataset.id))
+      .filter(Boolean);
+    visibleSlots.forEach((pos,i)=>{
+      if(ordered[i]) arr[pos]=ordered[i];
+    });
+    if(ordered.length){
       save();
       renderMobileRowKind(kind);
       pulsePlacedRow(kind,id);
