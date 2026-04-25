@@ -1635,13 +1635,18 @@ header::before{
 
 /* ── CLUB BOARD ───────────────────────────────────────────── */
 .club-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;margin-bottom:18px;padding:26px 0 8px;border-bottom:1px solid rgba(98,191,74,.18)}
-.club-title{font-family:var(--font-main);font-size:clamp(54px,8vw,120px);line-height:.82;letter-spacing:-.065em;font-weight:900;text-transform:uppercase;color:var(--white)}
+.club-title{font-family:var(--font-main);font-size:clamp(54px,8vw,120px);line-height:.82;letter-spacing:.018em;font-weight:900;text-transform:uppercase;color:var(--white)}
 .club-title span{color:var(--green)}
 .club-sub{margin-top:12px;color:var(--gray1);font-size:12px;letter-spacing:.13em;text-transform:uppercase;line-height:1.45}
 .club-count{min-width:150px;text-align:right}
 .club-count-num{font-family:var(--font-main);font-size:58px;line-height:.9;font-weight:900;color:var(--green);letter-spacing:-.05em}
 .club-count-lbl{margin-top:8px;color:var(--gray2);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
-.club-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding-bottom:42px}
+.club-section{margin-top:24px}
+.club-section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.club-section-title{font-family:var(--font-main);font-size:28px;line-height:.95;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--white)}
+.club-section-count{font-size:10px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;color:var(--gray2)}
+.club-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.club-section:last-child .club-grid{padding-bottom:42px}
 .club-card{position:relative;min-height:230px;border-radius:16px;overflow:hidden;background:#111;border:1px solid rgba(255,255,255,.08);cursor:pointer;box-shadow:0 18px 42px rgba(0,0,0,.24);transform:translateY(8px);opacity:0;animation:clubIn .55s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .18s,border-color .18s,box-shadow .18s}
 .club-card:hover{transform:translateY(-3px);border-color:rgba(98,191,74,.42);box-shadow:0 22px 54px rgba(0,0,0,.34),0 0 0 1px rgba(98,191,74,.12)}
 .club-card img{width:100%;height:100%;min-height:230px;object-fit:cover;display:block;filter:saturate(.96) contrast(1.03)}
@@ -1653,6 +1658,7 @@ header::before{
 .club-meta{display:flex;gap:6px;flex-wrap:wrap}
 .club-chip{display:inline-flex;align-items:center;min-height:22px;padding:5px 8px;border-radius:999px;background:rgba(17,17,17,.72);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px);font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:var(--gray1)}
 .club-chip.green{color:var(--green-lt);border-color:rgba(98,191,74,.28);background:rgba(25,53,22,.72)}
+.club-chip.org-chip{color:#FFD782;border-color:rgba(255,215,130,.34);background:rgba(74,54,20,.72)}
 .club-empty{padding:46px 18px;border:1px dashed rgba(255,255,255,.13);border-radius:18px;color:var(--gray1);text-align:center;background:rgba(255,255,255,.025)}
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
@@ -1661,6 +1667,8 @@ header::before{
   .club-count{text-align:left;min-width:0}
   .club-count-num{font-size:42px}
   .club-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .club-section{margin-top:20px}
+  .club-section-title{font-size:22px}
   .club-card{min-height:210px;border-radius:14px}
   .club-card img{min-height:210px}
   .club-name{font-size:15px}
@@ -2826,7 +2834,7 @@ header::before{
       <div class="club-count-lbl">в составе</div>
     </div>
   </div>
-  <div class="club-grid" id="club-grid"></div>
+  <div id="club-board"></div>
 </div>
 
 </main>
@@ -4080,37 +4088,68 @@ function openOrgDossier(id){
 // ─── CLUB ──────────────────────────────────────────────────
 function clubItems(){
   const participants=(DB.participants||[]).map(p=>({...p,_type:'participant'}));
-  const orgs=(DB.orgs||[]).filter(o=>o.photo).map(o=>({...o,_type:'org'}));
-  return [...participants,...orgs];
+  const orgs=(DB.orgs||[]).map(o=>({...o,_type:'org'}));
+  return {participants,orgs,all:[...participants,...orgs]};
+}
+let clubCountAnimFrame=null;
+function animateClubCount(to){
+  const el=document.getElementById('club-count');
+  if(!el) return;
+  cancelAnimationFrame(clubCountAnimFrame);
+  const from=0;
+  const start=performance.now();
+  const duration=760;
+  const tick=now=>{
+    const t=Math.min(1,(now-start)/duration);
+    const eased=1-Math.pow(1-t,3);
+    el.textContent=Math.round(from+(to-from)*eased);
+    if(t<1) clubCountAnimFrame=requestAnimationFrame(tick);
+  };
+  clubCountAnimFrame=requestAnimationFrame(tick);
+}
+function renderClubCard(item,i){
+  const card=document.createElement('button');
+  card.type='button';
+  card.className='club-card '+(item._type==='org'?'org':'');
+  card.style.animationDelay=Math.min(i*38,520)+'ms';
+  card.innerHTML=`
+    ${item.photo ? `<img src="${item.photo}" alt="">` : `<div class="dossier-photo">${makeInitials(item.name)}</div>`}
+    <div class="club-info">
+      <div class="club-name">${esc(item.name)}</div>
+      <div class="club-meta">
+        <span class="club-chip ${item._type==='org'?'org-chip':'green'}">${item._type==='org'?'Организатор':'Ведущий'}</span>
+      </div>
+    </div>`;
+  card.addEventListener('click',()=> item._type==='org' ? openOrgDossier(item.id) : openParticipantDossier(item.id));
+  return card;
+}
+function renderClubSection(board,title,items,offset=0){
+  const section=document.createElement('section');
+  section.className='club-section';
+  section.innerHTML=`
+    <div class="club-section-head">
+      <div class="club-section-title">${title}</div>
+      <div class="club-section-count">${items.length} в составе</div>
+    </div>
+    <div class="club-grid"></div>
+  `;
+  const grid=section.querySelector('.club-grid');
+  items.forEach((item,i)=>grid.appendChild(renderClubCard(item,offset+i)));
+  board.appendChild(section);
 }
 function renderClub(){
-  const grid=document.getElementById('club-grid');
+  const board=document.getElementById('club-board');
   const count=document.getElementById('club-count');
-  if(!grid || !count) return;
-  const items=clubItems();
-  count.textContent=items.length;
-  if(!items.length){
-    grid.innerHTML='<div class="club-empty">Добавь фото участникам и организаторам — здесь появится клубная доска.</div>';
+  if(!board || !count) return;
+  const groups=clubItems();
+  animateClubCount(groups.all.length);
+  if(!groups.all.length){
+    board.innerHTML='<div class="club-empty">Добавь участников и организаторов — здесь появится клубная доска.</div>';
     return;
   }
-  grid.innerHTML='';
-  items.forEach((item,i)=>{
-    const card=document.createElement('button');
-    card.type='button';
-    card.className='club-card '+(item.top?'top ':'')+(item._type==='org'?'org':'');
-    card.style.animationDelay=Math.min(i*38,520)+'ms';
-    card.innerHTML=`
-      ${item.photo ? `<img src="${item.photo}" alt="">` : `<div class="dossier-photo">${makeInitials(item.name)}</div>`}
-      <div class="club-info">
-        <div class="club-name">${esc(item.name)}</div>
-        <div class="club-meta">
-          <span class="club-chip ${item._type==='org'?'':'green'}">${item._type==='org'?'Орг':'Участник'}</span>
-          ${item.top ? '<span class="club-chip green">Топ</span>' : ''}
-        </div>
-      </div>`;
-    card.addEventListener('click',()=> item._type==='org' ? openOrgDossier(item.id) : openParticipantDossier(item.id));
-    grid.appendChild(card);
-  });
+  board.innerHTML='';
+  renderClubSection(board,'Ведущие',groups.participants,0);
+  renderClubSection(board,'Организаторы',groups.orgs,groups.participants.length);
 }
 
 // ─── MODAL ──────────────────────────────────────────────────
