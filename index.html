@@ -2476,6 +2476,35 @@ header::before{
   }
 }
 
+
+/* ── FIX38: keep dashboard classic, portrait-first photos in mobile dossiers ── */
+@media(max-width:760px){
+  .modal.dossier .dossier-photo{
+    width:min(100%, 360px)!important;
+    aspect-ratio:4/5!important;
+    height:auto!important;
+    max-height:none!important;
+    margin:0 auto!important;
+    border-radius:22px!important;
+  }
+
+  .modal.dossier .dossier-photo img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+    object-position:center top!important;
+  }
+
+  .modal.dossier .dossier-media{
+    align-items:center!important;
+  }
+
+  .modal.dossier .dossier-photo-actions{
+    left:12px!important;
+    right:12px!important;
+    bottom:12px!important;
+  }
+}
 </style>
 
 <!-- PWA / iPhone app mode -->
