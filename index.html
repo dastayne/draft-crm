@@ -2545,10 +2545,17 @@ header::before{
   }
   .p-table-row.mobile-dragging{
     opacity:.92;
-    z-index:20;
+    position:fixed!important;
+    left:var(--drag-left,0px)!important;
+    top:var(--drag-top,0px)!important;
+    width:var(--drag-width,auto)!important;
+    height:var(--drag-height,auto)!important;
+    margin:0!important;
+    z-index:220;
     pointer-events:none;
     transition:none!important;
     transform:translate3d(0,var(--drag-y,0px),0) scale(.99);
+    will-change:transform;
     border-color:rgba(98,191,74,.55)!important;
     box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(98,191,74,.22)!important;
   }
@@ -2556,6 +2563,15 @@ header::before{
     border-color:rgba(98,191,74,.38)!important;
     background:linear-gradient(135deg,rgba(98,191,74,.16),rgba(17,17,17,.98) 52%)!important;
     box-shadow:inset 0 1px 0 rgba(155,255,93,.18),0 10px 28px rgba(0,0,0,.22)!important;
+  }
+  .mobile-drag-placeholder{
+    display:block;
+    height:var(--ph-height,72px);
+    margin-bottom:10px;
+    border:1px dashed rgba(98,191,74,.42);
+    border-radius:18px;
+    background:linear-gradient(135deg,rgba(98,191,74,.10),rgba(255,255,255,.025));
+    box-shadow:inset 0 0 0 1px rgba(155,255,93,.05);
   }
   .p-table-row.mobile-drag-placed{animation:draftDropPulse .42s ease-out}
 }
@@ -4584,28 +4600,34 @@ function getMobileDataArray(kind){
   if(kind==='prospects') return DB.prospects;
   return DB.orgs;
 }
-function animateRowReorder(parent, mutate, heldRow, currentY){
-  const rows=[...parent.querySelectorAll('.p-table-row')];
+function animateRowReorder(parent, mutate, heldRow){
+  const rows=[...parent.children].filter(el=>
+    el!==heldRow && (el.classList.contains('p-table-row') || el.classList.contains('mobile-drag-placeholder'))
+  );
   const first=new Map(rows.map(row=>[row,row.getBoundingClientRect()]));
-  const heldTop=heldRow.getBoundingClientRect().top;
   mutate();
-  const heldAfterTop=heldRow.getBoundingClientRect().top;
-  if(_mobileDrag){
-    _mobileDrag.startY += heldAfterTop - heldTop;
-    heldRow.style.setProperty('--drag-y',(currentY - _mobileDrag.startY)+'px');
-  }
   rows.forEach(row=>{
-    if(row===heldRow) return;
     const a=first.get(row);
     const b=row.getBoundingClientRect();
     const dy=a.top-b.top;
     if(Math.abs(dy)>1 && row.animate){
       row.animate(
         [{transform:`translate3d(0,${dy}px,0)`},{transform:'translate3d(0,0,0)'}],
-        {duration:190,easing:'cubic-bezier(.2,.8,.2,1)'}
+        {duration:260,easing:'cubic-bezier(.22,1,.36,1)'}
       );
     }
   });
+}
+function clearMobileDragRowStyles(row){
+  row.classList.remove('mobile-dragging');
+  ['--drag-y','--drag-left','--drag-top','--drag-width','--drag-height'].forEach(p=>row.style.removeProperty(p));
+  row.style.position='';
+  row.style.left='';
+  row.style.top='';
+  row.style.width='';
+  row.style.height='';
+  row.style.margin='';
+  row.style.zIndex='';
 }
 function startMobileRowDrag(row,x,y){
   const kind=getMobileRowKind(row);
@@ -4613,16 +4635,27 @@ function startMobileRowDrag(row,x,y){
   if(!kind || !id) return;
   const parent=row.parentElement;
   if(!parent) return;
+  const rect=row.getBoundingClientRect();
+  const cs=getComputedStyle(row);
+  const placeholder=document.createElement('div');
+  placeholder.className='mobile-drag-placeholder';
+  placeholder.style.setProperty('--ph-height',rect.height+'px');
+  placeholder.style.marginBottom=cs.marginBottom;
+  parent.insertBefore(placeholder,row.nextSibling);
   const arr=getMobileDataArray(kind);
   const visibleSlots=[...parent.querySelectorAll('.p-table-row')]
     .map(r=>arr.findIndex(x=>x.id===+r.dataset.id))
     .filter(i=>i>-1);
   hideCtx();
-  _mobileDrag={kind,id,row,parent,target:null,startX:x,startY:y,changed:false,visibleSlots};
+  _mobileDrag={kind,id,row,parent,placeholder,startX:x,startY:y,grabY:y-rect.top,changed:false,visibleSlots};
   _touchCtxSuppressClick=true;
   document.body.classList.add('mobile-row-dragging','touch-context-open');
   row.classList.add('mobile-dragging');
   row.style.setProperty('--drag-y','0px');
+  row.style.setProperty('--drag-left',rect.left+'px');
+  row.style.setProperty('--drag-top',rect.top+'px');
+  row.style.setProperty('--drag-width',rect.width+'px');
+  row.style.setProperty('--drag-height',rect.height+'px');
   window.getSelection?.().removeAllRanges?.();
   if(navigator.vibrate) navigator.vibrate(10);
 }
@@ -4630,34 +4663,33 @@ function updateMobileRowDrag(x,y){
   if(!_mobileDrag) return;
   const dy=y-_mobileDrag.startY;
   _mobileDrag.row?.style.setProperty('--drag-y',dy+'px');
-  const container=getMobileRowContainer(_mobileDrag.kind);
-  const parent=_mobileDrag.parent;
-  const el=document.elementFromPoint(x,y);
-  const target=el?.closest?.('.p-table-row');
-  container?.querySelectorAll('.mobile-drag-over').forEach(r=>r.classList.remove('mobile-drag-over'));
-  if(target && target!==_mobileDrag.row && target.parentElement===parent){
-    _mobileDrag.target=target;
-    target.classList.add('mobile-drag-over');
-    const rows=[...parent.querySelectorAll('.p-table-row')];
-    const from=rows.indexOf(_mobileDrag.row);
-    const to=rows.indexOf(target);
-    if(from>-1 && to>-1 && from!==to){
-      animateRowReorder(parent,()=>{
-        parent.insertBefore(_mobileDrag.row, to>from ? target.nextSibling : target);
-      },_mobileDrag.row,y);
-      _mobileDrag.changed=true;
+  const {parent,placeholder,row,grabY}= _mobileDrag;
+  const draggedRect=row.getBoundingClientRect();
+  const centerY=y-grabY+(draggedRect.height/2);
+  const rows=[...parent.querySelectorAll('.p-table-row')].filter(r=>r!==row);
+  let beforeNode=null;
+  for(const candidate of rows){
+    const r=candidate.getBoundingClientRect();
+    if(centerY < r.top + r.height/2){
+      beforeNode=candidate;
+      break;
     }
-  } else {
-    _mobileDrag.target=null;
   }
+  if(beforeNode===placeholder || placeholder.nextSibling===beforeNode) return;
+  if(!beforeNode && placeholder.nextSibling===null) return;
+  animateRowReorder(parent,()=>{
+    parent.insertBefore(placeholder,beforeNode);
+  },row);
+  _mobileDrag.changed=true;
 }
 function finishMobileRowDrag(){
   if(!_mobileDrag) return;
-  const {kind,id,row,parent,changed,visibleSlots}= _mobileDrag;
-  row?.classList.remove('mobile-dragging');
-  row?.style.removeProperty('--drag-y');
+  const {kind,id,row,parent,placeholder,changed,visibleSlots}= _mobileDrag;
   document.querySelectorAll('.mobile-drag-over').forEach(r=>r.classList.remove('mobile-drag-over'));
   document.body.classList.remove('mobile-row-dragging','touch-context-open');
+  parent.insertBefore(row,placeholder);
+  placeholder.remove();
+  clearMobileDragRowStyles(row);
   if(changed){
     const arr=getMobileDataArray(kind);
     const byId=new Map(arr.map(item=>[item.id,item]));
