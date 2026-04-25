@@ -2505,6 +2505,39 @@ header::before{
     bottom:12px!important;
   }
 }
+@media (hover:none) and (pointer:coarse){
+  .p-list,
+  .p-table-view,
+  .p-table-row,
+  .p-table-row *:not(input):not(textarea):not(select){
+    -webkit-user-select:none!important;
+    user-select:none!important;
+    -webkit-touch-callout:none!important;
+    -webkit-user-drag:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .p-table-row{touch-action:pan-y}
+  body.touch-context-open{
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+  }
+  body.mobile-row-dragging{
+    overflow:hidden;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+  }
+  .p-table-row.mobile-dragging{
+    opacity:.72;
+    transform:scale(.985);
+    border-color:rgba(98,191,74,.55)!important;
+    box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(98,191,74,.22)!important;
+  }
+  .p-table-row.mobile-drag-over{
+    border-top:3px solid var(--green)!important;
+  }
+}
 </style>
 
 <!-- PWA / iPhone app mode -->
@@ -2811,7 +2844,10 @@ function normalizeDB(){
   if(!Array.isArray(DB.participants)) DB.participants = [];
   if(!Array.isArray(DB.prospects)) DB.prospects = [];
   if(!Array.isArray(DB.orgs)) DB.orgs = [];
-  [DB.participants, DB.prospects, DB.orgs].forEach(arr => arr.forEach(x => { if(typeof x.top === 'undefined') x.top = false; }));
+  [DB.participants, DB.prospects, DB.orgs].forEach(arr => arr.forEach(x => {
+    if(typeof x.top === 'undefined') x.top = false;
+    if(typeof x.photo === 'undefined') x.photo = '';
+  }));
   _pid = Math.max(0,...DB.participants.map(x=>+x.id||0),0)+1;
   _oid = Math.max(0,...DB.orgs.map(x=>+x.id||0),0)+1;
   _prid = Math.max(0,...DB.prospects.map(x=>+x.id||0),0)+1;
@@ -2824,7 +2860,12 @@ function saveLocal(){
 }
 function save(){
   saveLocal();
+  markPendingCloudSave();
   scheduleCloudSave();
+}
+function nextRecordId(arr){
+  const maxId=Math.max(0,...(arr||[]).map(x=>+x.id||0),0);
+  return Math.max(maxId+1, Date.now()+Math.floor(Math.random()*1000));
 }
 
 // ─── HEADER ─────────────────────────────────────────────────
@@ -3013,6 +3054,7 @@ let participantEditMode = false;
 let prospectEditMode = false;
 let orgEditMode = false;
 let photoTargetId = null;
+let photoTargetType = 'participant';
 let dragSrcIdx = null;
 let dragSrcProspectIdx = null;
 let dragSrcOrgIdx = null;
@@ -3072,7 +3114,7 @@ function syncParticipantModeUI(){
   btn.classList.toggle('active', participantEditMode);
   btn.textContent = participantEditMode ? '✓ Готово' : '✎ Редактирование';
   note.textContent = participantEditMode
-    ? 'Клик по строке — редактировать · статусы и перетаскивание активны'
+    ? 'Тап — редактировать · зажми и потяни — переставить'
     : 'Клик по строке — открыть досье';
 }
 
@@ -3336,17 +3378,37 @@ function deleteP(id){
 }
 
 // ─── PHOTO / CROP EDITOR ─────────────────────────────────────
-function triggerPhoto(id){
+function getPhotoEntity(type,id){
+  const list = type === 'org' ? DB.orgs : DB.participants;
+  return list.find(x=>x.id===id);
+}
+function refreshPhotoEntity(entity,type){
+  if(type === 'org') renderOrgs();
+  else renderParticipants();
+  updateAnalytics();
+  const overlayOpen=document.getElementById('overlay')?.classList.contains('open');
+  if(overlayOpen && _modalEdit && _modalEdit.id===entity.id){
+    if(type === 'org'){
+      if(_modalType==='dossier') openOrgDossier(entity.id);
+      else if(_modalType==='org') openModal('org', entity);
+    } else {
+      if(_modalType==='dossier') openParticipantDossier(entity.id);
+      else if(_modalType==='participant') openModal('participant', entity);
+    }
+  }
+}
+function triggerPhoto(id,type='participant'){
   photoTargetId=id;
+  photoTargetType=type;
   const inp=document.getElementById('photo-input');
   inp.value='';
   inp.click();
 }
 
-function deletePhoto(id){
-  const p=DB.participants.find(x=>x.id===id);
+function deletePhoto(id,type='participant'){
+  const p=getPhotoEntity(type,id);
   if(!p || !p.photo){ toast('Фото уже нет'); return; }
-  if(!confirm('Удалить фото участника?')) return;
+  if(!confirm('Удалить фото?')) return;
   p.photo='';
   save();
   if(syncReady && syncClient){
@@ -3354,13 +3416,7 @@ function deletePhoto(id){
     setSyncStatus('Сохраняю','syncing');
     pushCloudNow(false);
   }
-  renderParticipants();
-  updateAnalytics();
-  const overlayOpen=document.getElementById('overlay')?.classList.contains('open');
-  if(overlayOpen && _modalEdit && _modalEdit.id===p.id){
-    if(_modalType==='dossier') openParticipantDossier(p.id);
-    else if(_modalType==='participant') openModal('participant', p);
-  }
+  refreshPhotoEntity(p,type);
   toast('Фото удалено');
 }
 
@@ -3494,7 +3550,8 @@ function saveCrop(){
   const k=out.width/srcCv.width;
   ctx.drawImage(img,cropState.x*k,cropState.y*k,img.width*cropState.scale*k,img.height*cropState.scale*k);
   const data=out.toDataURL('image/jpeg',0.82);
-  const p=DB.participants.find(x=>x.id===photoTargetId);
+  const targetType=photoTargetType || 'participant';
+  const p=getPhotoEntity(targetType,photoTargetId);
   if(p){
     p.photo=data;
     save();
@@ -3503,15 +3560,9 @@ function saveCrop(){
       setSyncStatus('Сохраняю','syncing');
       pushCloudNow(false);
     }
-    renderParticipants();
-    updateAnalytics();
     document.getElementById('crop-overlay').classList.remove('open');
     document.getElementById('photo-input').value='';
-    const overlayOpen=document.getElementById('overlay').classList.contains('open');
-    if(overlayOpen && _modalEdit && _modalEdit.id===p.id){
-      if(_modalType==='dossier') openParticipantDossier(p.id);
-      else if(_modalType==='participant') openModal('participant', p);
-    }
+    refreshPhotoEntity(p,targetType);
     toast('Фото сохранено и отправляется в синк');
   } else {
     cancelCrop();
@@ -3566,7 +3617,7 @@ function syncProspectModeUI(){
   btn.classList.toggle('active', prospectEditMode);
   btn.textContent = prospectEditMode ? '✓ Готово' : '✎ Редактирование';
   note.textContent = prospectEditMode
-    ? 'Клик по карточке — редактировать · статусы и перетаскивание активны'
+    ? 'Тап — редактировать · зажми и потяни — переставить'
     : 'Клик по строке — открыть досье';
 }
 function handleProspectRow(id){
@@ -3681,7 +3732,7 @@ function movePrToP(id){
   const p=DB.prospects.find(x=>x.id===id); if(!p)return;
   const tgt=DB.settings.targetCount||40;
   if(DB.participants.length>=tgt){toast('Места заполнены!');return;}
-  DB.participants.push({id:_pid++,name:p.name,phone:'',instagram:p.contact||'',amount:0,status:'',comment:p.comment||'',photo:'',top:!!p.top});
+  DB.participants.push({id:nextRecordId(DB.participants),name:p.name,phone:'',instagram:p.contact||'',amount:0,status:'',comment:p.comment||'',photo:'',top:!!p.top});
   DB.prospects=DB.prospects.filter(x=>x.id!==id);
   save(); renderProspects(); renderParticipants(); updateAnalytics();
   toast(`${p.name} добавлен в участники`);
@@ -3766,7 +3817,7 @@ function syncOrgModeUI(){
   btn.classList.toggle('active', orgEditMode);
   btn.textContent = orgEditMode ? '✓ Готово' : '✎ Редактирование';
   note.textContent = orgEditMode
-    ? 'Клик по строке — редактировать · уведомления и перетаскивание активны'
+    ? 'Тап — редактировать · зажми и потяни — переставить'
     : 'Клик по строке — открыть досье';
 }
 function handleOrgRow(id){
@@ -3818,7 +3869,7 @@ function renderOrgs(){
     row.innerHTML=`
       <div class="td-num"><span class="td-drag ${orgEditMode?'':'hidden'}" title="Перетащи для перестановки">⠿</span>${orgEditMode?'':i+1}</div>
       <div class="td-person">
-        <div class="p-avatar">${makeInitials(o.name)}</div>
+        <div class="p-avatar">${avatarContent(o)}</div>
         <div class="td-name">
           <div class="td-name-main">${esc(o.name)}</div>
           <div class="td-name-sub">Организатор #${DB.orgs.indexOf(o)+1}</div>
@@ -3887,11 +3938,17 @@ function openOrgDossier(id){
   document.getElementById('overlay').classList.add('open');
   const modal=document.querySelector('.modal');
   modal.classList.add('dossier');
-  document.getElementById('modal-title').textContent='Досье организаторанизатора';
+  document.getElementById('modal-title').textContent='Досье организатора';
   document.getElementById('modal-body').innerHTML=`
     <div class="dossier-wrap">
       <div class="dossier-media">
-        <div class="dossier-photo">${makeInitials(o.name)}</div>
+        <div class="dossier-photo-wrap">
+          <div class="dossier-photo">${o.photo ? `<img src="${o.photo}" alt="">` : makeInitials(o.name)}</div>
+          <div class="dossier-photo-actions">
+            <button class="dossier-photo-btn" onclick="event.stopPropagation();triggerPhoto(${o.id},'org')">${o.photo ? 'Сменить фото' : 'Загрузить фото'}</button>
+            ${o.photo ? `<button class="dossier-photo-btn photo-delete-btn" onclick="event.stopPropagation();deletePhoto(${o.id},'org')">Удалить</button>` : ''}
+          </div>
+        </div>
         <div class="dossier-media-foot">
           <div class="dossier-side-tag">Организатор #${idx}</div>
           <div class="dossier-side-tag">${o.notified?'Уведомлён':'Не уведомлён'}</div>
@@ -3943,7 +4000,7 @@ function openModal(type, existing=null){
   document.getElementById('modal-cancel-btn').textContent='Отмена';
   document.getElementById('modal-cancel-btn').style.display='inline-flex';
   document.getElementById('modal-save-btn').style.display='inline-flex';
-  const titles={participant:'Новый участник',prospect:'Потенциальный',org:'Новый организаторанизатор'};
+  const titles={participant:'Новый участник',prospect:'Потенциальный',org:'Новый организатор'};
   document.getElementById('modal-title').textContent=existing?'Редактировать':titles[type];
 
   if(type==='participant'){
@@ -3999,6 +4056,16 @@ function openModal(type, existing=null){
     const p=existing||{};
     document.getElementById('modal-body').innerHTML=`
       <div class="form-grid">
+        <div class="fg full"><label>Фото</label>
+          <div class="edit-photo-box">
+            <div class="edit-photo-preview">${p.photo ? `<img src="${p.photo}" alt="">` : makeInitials(p.name||'') || '📷'}</div>
+            <div class="edit-photo-info">
+              <div class="edit-photo-title">${p.id ? (p.photo ? 'Фото загружено' : 'Фото пока нет') : 'Сначала сохрани организатора'}</div>
+              <div class="edit-photo-note">${p.id ? 'Фото появится в списке и досье организатора.' : 'После сохранения открой редактирование и загрузи фото.'}</div>
+            </div>
+            ${p.id ? `<div class="edit-photo-actions"><button class="btn btn-sm btn-ghost" type="button" onclick="event.stopPropagation();triggerPhoto(${p.id},'org')">${p.photo ? 'Сменить фото' : 'Загрузить фото'}</button>${p.photo ? `<button class="btn btn-sm btn-danger" type="button" onclick="event.stopPropagation();deletePhoto(${p.id},'org')">Удалить фото</button>` : ''}</div>` : ''}
+          </div>
+        </div>
         <div class="fg full"><label>Имя</label><input id="f-name" value="${esc(p.name||'')}" placeholder="Имя" autofocus></div>
         <div class="fg"><label>Телефон</label><input id="f-phone" value="${esc(p.phone||'')}" placeholder="+7..."></div>
         <div class="fg"><label>Instagram</label><input id="f-ig" value="${esc(p.instagram||'')}" placeholder="@username"></div>
@@ -4020,18 +4087,18 @@ function saveModal(){
     else {
       const tgt=DB.settings.targetCount||40;
       if(DB.participants.length>=tgt){toast('Места заполнены!');return;}
-      DB.participants.push({id:_pid++,photo:'',...d});
+      DB.participants.push({id:nextRecordId(DB.participants),photo:'',...d});
     }
     save();renderParticipants();
   } else if(_modalType==='prospect'){
     const d={name,contact:v('f-contact'),status:v('f-pstatus'),top:v('f-top')==='1',comment:v('f-comment')};
     if(_modalEdit){ Object.assign(DB.prospects.find(x=>x.id===_modalEdit.id),d); }
-    else { DB.prospects.push({id:_prid++,...d}); }
+    else { DB.prospects.push({id:nextRecordId(DB.prospects),...d}); }
     save();renderProspects();
   } else if(_modalType==='org'){
     const d={name,phone:v('f-phone'),instagram:v('f-ig'),notified:v('f-notif')==='1',comment:v('f-comment')};
     if(_modalEdit){ Object.assign(DB.orgs.find(x=>x.id===_modalEdit.id),d); }
-    else { DB.orgs.push({id:_oid++,...d}); }
+    else { DB.orgs.push({id:nextRecordId(DB.orgs),photo:'',...d}); }
     save();renderOrgs();
   }
   closeModal(); updateAnalytics(); toast('Сохранено ✓');
@@ -4042,6 +4109,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 
 // ─── CLOUD SYNC / BACKUP ───────────────────────────────────
 const SYNC_KEY = 'draft_mm_sync_config_v1';
+const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
   anonKey: 'sb_publishable_ujpC3zRG3h-e0FEYq6dNdA_qT8AV-lP',
@@ -4060,7 +4128,45 @@ let syncChannel = null;
 let syncReady = false;
 let syncApplyingRemote = false;
 let syncSaveTimer = null;
+let syncReconnectTimer = null;
+let syncConnecting = false;
 let syncLastHash = '';
+
+function markPendingCloudSave(){ try{ localStorage.setItem(PENDING_SYNC_KEY,'1'); }catch{} }
+function clearPendingCloudSave(){ try{ localStorage.removeItem(PENDING_SYNC_KEY); }catch{} }
+function hasPendingCloudSave(){ try{ return localStorage.getItem(PENDING_SYNC_KEY)==='1'; }catch{ return false; } }
+function scheduleCloudReconnect(){
+  if(!syncConfig) return;
+  clearTimeout(syncReconnectTimer);
+  syncReconnectTimer=setTimeout(()=>initCloudSync(true),700);
+}
+function mergeArrayById(remoteArr=[], localArr=[]){
+  const result=(Array.isArray(remoteArr)?remoteArr:[]).map(x=>deep(x));
+  const pos=new Map(result.map((x,i)=>[String(x.id),i]));
+  (Array.isArray(localArr)?localArr:[]).forEach(item=>{
+    const key=String(item.id);
+    if(pos.has(key)){
+      result[pos.get(key)]={...result[pos.get(key)],...deep(item)};
+    } else {
+      result.push(deep(item));
+    }
+  });
+  return result;
+}
+function mergeCloudState(remote, local){
+  const base=remote && typeof remote==='object' ? remote : {};
+  const mine=local && typeof local==='object' ? local : {};
+  return {
+    settings:{...(base.settings||{}),...(mine.settings||{})},
+    participants:mergeArrayById(base.participants,mine.participants),
+    orgs:mergeArrayById(base.orgs,mine.orgs),
+    prospects:mergeArrayById(base.prospects,mine.prospects)
+  };
+}
+function localHasExtraRecords(remote, local){
+  const count=(obj,key)=>Array.isArray(obj?.[key]) ? obj[key].length : 0;
+  return ['participants','prospects','orgs'].some(key=>count(local,key)>count(remote,key));
+}
 
 function setSyncStatus(text, state='local'){
   const el=document.getElementById('sync-status');
@@ -4100,6 +4206,10 @@ function clearSyncSetup(){
 async function initCloudSync(force=false){
   if(!syncConfig){ setSyncStatus('Локально','local'); return; }
   if(!window.supabase){ setSyncStatus('Нет SDK','error'); toast('Supabase SDK не загрузился'); return; }
+  if(syncConnecting) return;
+  syncConnecting=true;
+  const localBeforeSync=deep(DB);
+  const hadPendingLocal=hasPendingCloudSave();
   try{
     setSyncStatus('Синк...','syncing');
     if(syncChannel && syncClient) await syncClient.removeChannel(syncChannel);
@@ -4108,24 +4218,35 @@ async function initCloudSync(force=false){
     const {data,error} = await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
     if(error) throw error;
     if(data?.data){
+      const pendingNow=hadPendingLocal || hasPendingCloudSave() || localHasExtraRecords(data.data, localBeforeSync);
+      const localForMerge=pendingNow ? deep(DB) : localBeforeSync;
       syncApplyingRemote=true;
-      DB = data.data;
+      DB = pendingNow ? mergeCloudState(data.data, localForMerge) : data.data;
       normalizeDB(); saveLocal(); refreshAll();
       syncApplyingRemote=false;
       syncLastHash = hashData(DB);
-      toast('Данные подтянулись из облака');
+      if(pendingNow){
+        await pushCloudNow(true);
+        toast('Локальные изменения слиты с облаком');
+      } else {
+        toast('Данные подтянулись из облака');
+      }
     } else {
       await pushCloudNow(true);
       toast('Создал облачную базу из текущих данных');
     }
     syncReady=true;
+    clearTimeout(syncReconnectTimer);
     setSyncStatus('Онлайн','online');
     subscribeCloudChanges();
   } catch(err){
     console.error(err);
+    syncApplyingRemote=false;
     syncReady=false;
     setSyncStatus('Ошибка','error');
     toast('Синк не подключился: '+(err?.message||'проверь настройки'));
+  } finally {
+    syncConnecting=false;
   }
 }
 
@@ -4153,10 +4274,15 @@ function subscribeCloudChanges(){
 }
 
 function scheduleCloudSave(){
-  if(syncApplyingRemote || !syncConfig || !syncReady || !syncClient) return;
+  if(syncApplyingRemote || !syncConfig) return;
+  if(!syncReady || !syncClient){
+    setSyncStatus('В очереди','syncing');
+    scheduleCloudReconnect();
+    return;
+  }
   clearTimeout(syncSaveTimer);
   setSyncStatus('Сохраняю','syncing');
-  syncSaveTimer=setTimeout(()=>pushCloudNow(false),420);
+  syncSaveTimer=setTimeout(()=>pushCloudNow(false),180);
 }
 async function pushCloudNow(silent=false){
   if(!syncConfig || !syncClient) return;
@@ -4164,9 +4290,26 @@ async function pushCloudNow(silent=false){
   syncLastHash=h;
   const payload={id:syncConfig.rowId,data:deep(DB),updated_at:new Date().toISOString()};
   const {error}=await syncClient.from('draft_crm_state').upsert(payload,{onConflict:'id'});
-  if(error){ console.error(error); setSyncStatus('Ошибка','error'); if(!silent) toast('Не сохранилось в облако'); return; }
+  if(error){
+    console.error(error);
+    markPendingCloudSave();
+    setSyncStatus('Ошибка','error');
+    if(!silent) toast('Не сохранилось в облако, попробую ещё раз при подключении');
+    return;
+  }
+  clearPendingCloudSave();
   setSyncStatus('Онлайн','online');
 }
+
+window.addEventListener('online',()=>{
+  if(syncConfig) initCloudSync(true);
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible' && syncConfig && hasPendingCloudSave()){
+    if(syncReady && syncClient) pushCloudNow(true);
+    else initCloudSync(true);
+  }
+});
 
 function exportData(){
   const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
@@ -4269,7 +4412,10 @@ function showCtx(x,y,items){
   });
 }
 
-function hideCtx(){ document.getElementById('ctx').style.display='none'; }
+function hideCtx(){
+  document.getElementById('ctx').style.display='none';
+  document.body.classList.remove('touch-context-open');
+}
 document.addEventListener('click',hideCtx);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
@@ -4303,6 +4449,7 @@ document.addEventListener('keydown',e=>{
 let _touchCtxTimer = null;
 let _touchCtxSuppressClick = false;
 let _touchCtxStart = {x:0,y:0};
+let _mobileDrag = null;
 
 function showMobileRowContext(row, x, y){
   if(!row) return;
@@ -4336,6 +4483,73 @@ function shouldSkipLongPress(el){
   return !!el.closest('button,a,input,textarea,select,.ctx,.modal,.crop-modal');
 }
 
+function getMobileRowKind(row){
+  if(row.closest('#p-list')) return 'participants';
+  if(row.closest('#pr-list')) return 'prospects';
+  if(row.closest('#o-list')) return 'orgs';
+  return '';
+}
+function isMobileRowEditMode(row){
+  const kind=getMobileRowKind(row);
+  return (kind==='participants' && participantEditMode) ||
+         (kind==='prospects' && prospectEditMode) ||
+         (kind==='orgs' && orgEditMode);
+}
+function getMobileRowContainer(kind){
+  return document.getElementById(kind==='participants' ? 'p-list' : kind==='prospects' ? 'pr-list' : 'o-list');
+}
+function renderMobileRowKind(kind){
+  if(kind==='participants') renderParticipants();
+  if(kind==='prospects') renderProspects();
+  if(kind==='orgs') renderOrgs();
+}
+function startMobileRowDrag(row,x,y){
+  const kind=getMobileRowKind(row);
+  const id=+row.dataset.id;
+  if(!kind || !id) return;
+  hideCtx();
+  _mobileDrag={kind,id,row,target:null,startX:x,startY:y};
+  _touchCtxSuppressClick=true;
+  document.body.classList.add('mobile-row-dragging','touch-context-open');
+  row.classList.add('mobile-dragging');
+  window.getSelection?.().removeAllRanges?.();
+  if(navigator.vibrate) navigator.vibrate(10);
+}
+function updateMobileRowDrag(x,y){
+  if(!_mobileDrag) return;
+  const container=getMobileRowContainer(_mobileDrag.kind);
+  const el=document.elementFromPoint(x,y);
+  const target=el?.closest?.('.p-table-row');
+  container?.querySelectorAll('.mobile-drag-over').forEach(r=>r.classList.remove('mobile-drag-over'));
+  if(target && target!==_mobileDrag.row && target.closest(`#${container?.id}`)){
+    _mobileDrag.target=target;
+    target.classList.add('mobile-drag-over');
+  } else {
+    _mobileDrag.target=null;
+  }
+}
+function finishMobileRowDrag(){
+  if(!_mobileDrag) return;
+  const {kind,id,target,row}= _mobileDrag;
+  row?.classList.remove('mobile-dragging');
+  document.querySelectorAll('.mobile-drag-over').forEach(r=>r.classList.remove('mobile-drag-over'));
+  document.body.classList.remove('mobile-row-dragging','touch-context-open');
+  if(target){
+    const targetId=+target.dataset.id;
+    const arr=kind==='participants' ? DB.participants : kind==='prospects' ? DB.prospects : DB.orgs;
+    const from=arr.findIndex(x=>x.id===id);
+    const to=arr.findIndex(x=>x.id===targetId);
+    if(from>-1 && to>-1 && from!==to){
+      const [moved]=arr.splice(from,1);
+      arr.splice(to,0,moved);
+      save();
+      renderMobileRowKind(kind);
+      toast('Порядок обновлён');
+    }
+  }
+  _mobileDrag=null;
+}
+
 document.addEventListener('touchstart', e=>{
   if(e.touches.length !== 1) return;
   if(shouldSkipLongPress(e.target)) return;
@@ -4344,39 +4558,79 @@ document.addEventListener('touchstart', e=>{
   const t = e.touches[0];
   _touchCtxStart = {x:t.clientX,y:t.clientY};
   clearTimeout(_touchCtxTimer);
+  document.body.classList.add('touch-context-open');
+  window.getSelection?.().removeAllRanges?.();
   _touchCtxTimer = setTimeout(()=>{
-    _touchCtxSuppressClick = true;
-    if(navigator.vibrate) navigator.vibrate(12);
-    showMobileRowContext(row, _touchCtxStart.x, _touchCtxStart.y);
-  },520);
+    if(isMobileRowEditMode(row)){
+      startMobileRowDrag(row, _touchCtxStart.x, _touchCtxStart.y);
+    } else {
+      _touchCtxSuppressClick = true;
+      if(navigator.vibrate) navigator.vibrate(12);
+      showMobileRowContext(row, _touchCtxStart.x, _touchCtxStart.y);
+    }
+  }, isMobileRowEditMode(row) ? 260 : 520);
 },{passive:true});
 
 document.addEventListener('touchmove', e=>{
-  if(!_touchCtxTimer || !e.touches.length) return;
+  if(!e.touches.length) return;
   const t=e.touches[0];
+  if(_mobileDrag){
+    e.preventDefault();
+    updateMobileRowDrag(t.clientX,t.clientY);
+    window.getSelection?.().removeAllRanges?.();
+    return;
+  }
+  if(!_touchCtxTimer) return;
   const dx=Math.abs(t.clientX-_touchCtxStart.x);
   const dy=Math.abs(t.clientY-_touchCtxStart.y);
   if(dx>10 || dy>10){
     clearTimeout(_touchCtxTimer);
     _touchCtxTimer=null;
+    document.body.classList.remove('touch-context-open');
   }
-},{passive:true});
+},{passive:false});
 
 document.addEventListener('touchend', ()=>{
   clearTimeout(_touchCtxTimer);
   _touchCtxTimer=null;
+  if(_mobileDrag){
+    finishMobileRowDrag();
+    setTimeout(()=>{_touchCtxSuppressClick=false;},420);
+    return;
+  }
+  if(!document.getElementById('ctx')?.style.display || document.getElementById('ctx')?.style.display==='none'){
+    document.body.classList.remove('touch-context-open');
+  }
   if(_touchCtxSuppressClick){
     setTimeout(()=>{_touchCtxSuppressClick=false;},420);
   }
 },{passive:true});
 
+document.addEventListener('touchcancel', ()=>{
+  clearTimeout(_touchCtxTimer);
+  _touchCtxTimer=null;
+  finishMobileRowDrag();
+  document.body.classList.remove('touch-context-open');
+},{passive:true});
+
 document.addEventListener('click', e=>{
   if(_touchCtxSuppressClick){
+    if(e.target.closest?.('.ctx')){
+      _touchCtxSuppressClick=false;
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
     _touchCtxSuppressClick=false;
   }
 },true);
+
+document.addEventListener('selectionchange',()=>{
+  if(_touchCtxTimer || _touchCtxSuppressClick || _mobileDrag || document.body.classList.contains('touch-context-open')){
+    const sel=window.getSelection?.();
+    if(sel?.rangeCount) sel.removeAllRanges();
+  }
+});
 
 // ─── TOAST ──────────────────────────────────────────────────
 function toast(msg){
