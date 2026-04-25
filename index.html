@@ -4988,7 +4988,11 @@ function syncModalScrollLock(){
   } else if(!shouldLock && document.body.classList.contains('modal-lock')){
     document.body.classList.remove('modal-lock');
     document.body.style.top = '';
-    window.scrollTo(0, _pageLockY || 0);
+    const html=document.documentElement;
+    const prevScrollBehavior=html.style.scrollBehavior;
+    html.style.scrollBehavior='auto';
+    window.scrollTo({top:_pageLockY || 0,left:0,behavior:'instant'});
+    requestAnimationFrame(()=>{ html.style.scrollBehavior=prevScrollBehavior; });
   }
 }
 ['overlay','crop-overlay'].forEach(id=>{
