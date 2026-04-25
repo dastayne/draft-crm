@@ -2247,6 +2247,46 @@ header::before{
   }
 }
 
+
+
+/* ── FIX34: mobile organizers show notified status, hide comments ── */
+@media(max-width:760px){
+  .table-orgs .p-table-row{
+    grid-template-columns:20px minmax(0,1fr) 112px!important;
+  }
+
+  /* org row structure after role removal:
+     1 number · 2 person · 3 notified · 4 comment */
+  .table-orgs .p-table-row > div:nth-child(3){
+    display:flex!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    min-width:0!important;
+  }
+
+  .table-orgs .p-table-row > div:nth-child(4){
+    display:none!important;
+  }
+
+  .table-orgs .p-table-row .notify-btn{
+    width:112px!important;
+    min-width:112px!important;
+    max-width:112px!important;
+  }
+}
+
+@media(max-width:390px){
+  .table-orgs .p-table-row{
+    grid-template-columns:18px minmax(0,1fr) 104px!important;
+  }
+
+  .table-orgs .p-table-row .notify-btn{
+    width:104px!important;
+    min-width:104px!important;
+    max-width:104px!important;
+  }
+}
+
 </style>
 
 <!-- PWA / iPhone app mode -->
@@ -3091,6 +3131,11 @@ function deletePhoto(id){
   if(!confirm('Удалить фото участника?')) return;
   p.photo='';
   save();
+  if(syncReady && syncClient){
+    clearTimeout(syncSaveTimer);
+    setSyncStatus('Сохраняю','syncing');
+    pushCloudNow(false);
+  }
   renderParticipants();
   updateAnalytics();
   const overlayOpen=document.getElementById('overlay')?.classList.contains('open');
@@ -3223,18 +3268,23 @@ function saveCrop(){
   if(!img || !photoTargetId){ cancelCrop(); return; }
   const srcCv=document.getElementById('crop-canvas');
   const out=document.createElement('canvas');
-  out.width=1200; out.height=1500;
+  out.width=720; out.height=900;
   const ctx=out.getContext('2d');
   ctx.fillStyle='#050505'; ctx.fillRect(0,0,out.width,out.height);
   ctx.imageSmoothingEnabled=true;
   ctx.imageSmoothingQuality='high';
   const k=out.width/srcCv.width;
   ctx.drawImage(img,cropState.x*k,cropState.y*k,img.width*cropState.scale*k,img.height*cropState.scale*k);
-  const data=out.toDataURL('image/jpeg',0.98);
+  const data=out.toDataURL('image/jpeg',0.82);
   const p=DB.participants.find(x=>x.id===photoTargetId);
   if(p){
     p.photo=data;
     save();
+    if(syncReady && syncClient){
+      clearTimeout(syncSaveTimer);
+      setSyncStatus('Сохраняю','syncing');
+      pushCloudNow(false);
+    }
     renderParticipants();
     updateAnalytics();
     document.getElementById('crop-overlay').classList.remove('open');
@@ -3244,7 +3294,7 @@ function saveCrop(){
       if(_modalType==='dossier') openParticipantDossier(p.id);
       else if(_modalType==='participant') openModal('participant', p);
     }
-    toast('Кадр фото сохранён');
+    toast('Фото сохранено и отправляется в синк');
   } else {
     cancelCrop();
   }
@@ -3260,7 +3310,7 @@ function resizeImg(src,maxW){
       const ctx=cv.getContext('2d');
       ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
       ctx.drawImage(img,0,0,cv.width,cv.height);
-      res(cv.toDataURL('image/jpeg',0.98));
+      res(cv.toDataURL('image/jpeg',0.82));
     };
     img.src=src;
   });
