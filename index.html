@@ -74,8 +74,23 @@ header::before{
   pointer-events:none;line-height:.92;letter-spacing:-0.01em;text-transform:none;
   transform:scaleX(.95);transform-origin:right center;
 }
-.logo{display:inline-block;font-family:'Ekran Draft',var(--font-main);font-size:112px;line-height:.9;letter-spacing:-0.01em;font-weight:700;text-transform:none;margin:0 0 14px;transform:scaleX(.95);transform-origin:left center}
-.logo .dot{color:var(--green)}
+.logo{display:inline-flex;font-family:'Ekran Draft',var(--font-main);font-size:112px;line-height:.9;letter-spacing:-0.01em;font-weight:700;text-transform:none;margin:0 0 14px;transform:scaleX(.95);transform-origin:left center}
+.logo span{display:inline-block;animation:logoLetterFlow 5.6s cubic-bezier(.22,1,.36,1) infinite;will-change:transform,filter,color}
+.logo span:nth-child(1){animation-delay:0s}
+.logo span:nth-child(2){animation-delay:.08s}
+.logo span:nth-child(3){animation-delay:.16s}
+.logo span:nth-child(4){animation-delay:.24s}
+.logo span:nth-child(5){animation-delay:.32s}
+.logo .dot{color:var(--green);animation-name:logoLetterFlow,logoDotGlow;animation-duration:5.6s,5.6s;animation-timing-function:cubic-bezier(.22,1,.36,1),ease-in-out;animation-iteration-count:infinite,infinite}
+@keyframes logoLetterFlow{
+  0%,70%,100%{transform:translateY(0) skewX(0deg);filter:brightness(1)}
+  8%{transform:translateY(-5px) skewX(-1.5deg);filter:brightness(1.16)}
+  15%{transform:translateY(0) skewX(0deg);filter:brightness(1)}
+}
+@keyframes logoDotGlow{
+  0%,70%,100%{text-shadow:none}
+  10%{text-shadow:0 0 22px rgba(98,191,74,.42)}
+}
 .event-meta{display:block;font-size:12px;line-height:1.35;color:var(--gray1);letter-spacing:2px;margin:0;text-transform:uppercase;white-space:normal}
 .header-right{text-align:right;position:relative;z-index:1}
 .hdr-date{font-family:var(--font-main);font-size:26px;color:var(--white);letter-spacing:2px;text-transform:uppercase}
@@ -1240,6 +1255,7 @@ header::before{
 }
 
 @media (prefers-reduced-motion: reduce){
+  .logo span,
   .prog-section::before,
   .status-bar-section::before,
   .finance-section::before,
@@ -1648,11 +1664,13 @@ header::before{
 .club-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .club-section:last-child .club-grid{padding-bottom:42px}
 .club-card{position:relative;min-height:230px;border-radius:16px;overflow:hidden;background:#111;border:1px solid rgba(255,255,255,.08);cursor:pointer;box-shadow:0 18px 42px rgba(0,0,0,.24);transform:translateY(8px);opacity:0;animation:clubIn .55s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .18s,border-color .18s,box-shadow .18s}
+#club-board.club-board-ready .club-card{opacity:1;animation:none}
 .club-card:hover{transform:translateY(-3px);border-color:rgba(98,191,74,.42);box-shadow:0 22px 54px rgba(0,0,0,.34),0 0 0 1px rgba(98,191,74,.12)}
 .club-card img{width:100%;height:100%;min-height:230px;object-fit:cover;display:block;filter:saturate(.96) contrast(1.03)}
 .club-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 38%,rgba(0,0,0,.72) 100%);pointer-events:none}
 .club-card.top{border-color:rgba(98,191,74,.34);box-shadow:0 18px 42px rgba(0,0,0,.25),0 0 32px rgba(98,191,74,.08)}
 .club-card.org{border-color:rgba(255,255,255,.13)}
+.club-card.org:hover{border-color:rgba(255,215,130,.46);box-shadow:0 22px 54px rgba(0,0,0,.34),0 0 0 1px rgba(255,215,130,.14),0 0 28px rgba(255,215,130,.08)}
 .club-info{position:absolute;left:12px;right:12px;bottom:12px;z-index:1;display:flex;flex-direction:column;gap:7px}
 .club-name{font-size:18px;line-height:1.05;font-weight:850;color:var(--white);letter-spacing:-.02em;text-shadow:0 2px 14px rgba(0,0,0,.55)}
 .club-meta{display:flex;gap:6px;flex-wrap:wrap}
@@ -1672,6 +1690,7 @@ header::before{
   .club-card{min-height:210px;border-radius:14px}
   .club-card img{min-height:210px}
   .club-name{font-size:15px}
+  .club-card{animation-duration:.34s}
 }
 
 
@@ -2633,7 +2652,7 @@ header::before{
 
 <header>
   <div>
-    <div class="logo">драф<span class="dot">т</span></div>
+    <div class="logo"><span>д</span><span>р</span><span>а</span><span>ф</span><span class="dot">т</span></div>
     <div class="event-meta">Мастермайнд для ведущих · Асторис</div>
   </div>
   <div class="header-right">
@@ -3033,9 +3052,10 @@ function stats(){
   const total   = p.length;
   const money   = p.filter(x=>x.status==='paid').reduce((a,x)=>a+x.amount,0);
   const avgPx   = paid ? Math.round(money/paid) : 6000;
+  const potentialMoney = p.filter(x=>x.status!=='paid' && x.status!=='canceled').reduce((a,x)=>a+(+x.amount||avgPx),0);
   const tgt     = s.targetCount||40;
   const tgtM    = s.targetMoney || (avgPx * tgt);
-  return {paid,waiting,canceled,empty,total,money,avgPx,tgt,tgtM};
+  return {paid,waiting,canceled,empty,total,money,potentialMoney,avgPx,tgt,tgtM};
 }
 
 function updateAnalytics(){
@@ -3048,8 +3068,8 @@ function updateAnalytics(){
   document.getElementById('kpi-money-sub').textContent= 'Цель: '+s.tgtM.toLocaleString('ru-RU')+' ₽';
   document.getElementById('kpi-paid').textContent   = s.paid;
   document.getElementById('kpi-paid-sub').textContent= s.waiting ? `Ждут: ${s.waiting}` : (s.paid ? 'Все определились' : '');
-  document.getElementById('kpi-orgs').textContent   = o.length+' / 20';
-  document.getElementById('kpi-orgs-sub').textContent= `Уведомлены: ${notif}`;
+  document.getElementById('kpi-orgs').textContent   = o.length;
+  document.getElementById('kpi-orgs-sub').textContent= '';
 
   // Goals display
   document.getElementById('g-count-val').textContent = s.tgt;
@@ -3108,7 +3128,7 @@ function updateAnalytics(){
       <div class="fin-track"><div class="fin-fill" style="background:var(--border2);width:100%"></div></div>
     </div>
     <div class="fin-big">${mPct}%</div>
-    <div class="fin-note">Средний чек: ${s.avgPx.toLocaleString('ru-RU')} ₽ · Осталось: ${Math.max(0,s.tgtM-s.money).toLocaleString('ru-RU')} ₽</div>
+    <div class="fin-note">Средний чек: ${s.avgPx.toLocaleString('ru-RU')} ₽ · Осталось до цели: ${Math.max(0,s.tgtM-s.money).toLocaleString('ru-RU')} ₽ · Ещё оплатят: ${s.potentialMoney.toLocaleString('ru-RU')} ₽</div>
   `;
   setTimeout(()=>{ const f=document.getElementById('ff-money'); if(f) f.style.width=mPct+'%'; },250);
 
@@ -4092,6 +4112,7 @@ function clubItems(){
   return {participants,orgs,all:[...participants,...orgs]};
 }
 let clubCountAnimFrame=null;
+let clubLastSignature='';
 function animateClubCount(to){
   const el=document.getElementById('club-count');
   if(!el) return;
@@ -4120,7 +4141,10 @@ function renderClubCard(item,i){
         <span class="club-chip ${item._type==='org'?'org-chip':'green'}">${item._type==='org'?'Организатор':'Ведущий'}</span>
       </div>
     </div>`;
-  card.addEventListener('click',()=> item._type==='org' ? openOrgDossier(item.id) : openParticipantDossier(item.id));
+  card.addEventListener('click',()=>{
+    document.getElementById('club-board')?.classList.add('club-board-ready');
+    item._type==='org' ? openOrgDossier(item.id) : openParticipantDossier(item.id);
+  });
   return card;
 }
 function renderClubSection(board,title,items,offset=0){
@@ -4142,6 +4166,14 @@ function renderClub(){
   const count=document.getElementById('club-count');
   if(!board || !count) return;
   const groups=clubItems();
+  const signature=groups.all.map(x=>`${x._type}:${x.id}:${x.name}:${!!x.photo}`).join('|');
+  const sameBoard=signature===clubLastSignature && board.children.length;
+  if(sameBoard){
+    count.textContent=String(groups.all.length);
+    return;
+  }
+  clubLastSignature=signature;
+  board.classList.remove('club-board-ready');
   animateClubCount(groups.all.length);
   if(!groups.all.length){
     board.innerHTML='<div class="club-empty">Добавь участников и организаторов — здесь появится клубная доска.</div>';
@@ -4150,6 +4182,7 @@ function renderClub(){
   board.innerHTML='';
   renderClubSection(board,'Ведущие',groups.participants,0);
   renderClubSection(board,'Организаторы',groups.orgs,groups.participants.length);
+  setTimeout(()=>board.classList.add('club-board-ready'),720);
 }
 
 // ─── MODAL ──────────────────────────────────────────────────
