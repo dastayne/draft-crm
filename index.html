@@ -1629,8 +1629,42 @@ header::before{
 .sync-mini-btn:hover{background:var(--green);border-color:var(--green);color:#081308;text-decoration:none}
 .sync-mini-btn.ghost{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.025);color:var(--gray1)}
 .sync-mini-btn.ghost:hover{border-color:var(--white);color:var(--white);background:rgba(255,255,255,.055)}
+.sync-menu-btn{width:30px;min-width:30px;padding:0;font-size:15px;letter-spacing:0}
 @keyframes syncPulse{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
 @media(max-width:760px){.sync-panel{justify-content:flex-start;gap:6px;margin-top:10px}.sync-pill,.sync-mini-btn{min-height:34px;padding:9px 11px;font-size:9px;letter-spacing:.06em}}
+
+/* ── CLUB BOARD ───────────────────────────────────────────── */
+.club-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;margin-bottom:18px;padding:26px 0 8px;border-bottom:1px solid rgba(98,191,74,.18)}
+.club-title{font-family:var(--font-main);font-size:clamp(54px,8vw,120px);line-height:.82;letter-spacing:-.065em;font-weight:900;text-transform:uppercase;color:var(--white)}
+.club-title span{color:var(--green)}
+.club-sub{margin-top:12px;color:var(--gray1);font-size:12px;letter-spacing:.13em;text-transform:uppercase;line-height:1.45}
+.club-count{min-width:150px;text-align:right}
+.club-count-num{font-family:var(--font-main);font-size:58px;line-height:.9;font-weight:900;color:var(--green);letter-spacing:-.05em}
+.club-count-lbl{margin-top:8px;color:var(--gray2);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.club-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding-bottom:42px}
+.club-card{position:relative;min-height:230px;border-radius:16px;overflow:hidden;background:#111;border:1px solid rgba(255,255,255,.08);cursor:pointer;box-shadow:0 18px 42px rgba(0,0,0,.24);transform:translateY(8px);opacity:0;animation:clubIn .55s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .18s,border-color .18s,box-shadow .18s}
+.club-card:hover{transform:translateY(-3px);border-color:rgba(98,191,74,.42);box-shadow:0 22px 54px rgba(0,0,0,.34),0 0 0 1px rgba(98,191,74,.12)}
+.club-card img{width:100%;height:100%;min-height:230px;object-fit:cover;display:block;filter:saturate(.96) contrast(1.03)}
+.club-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 38%,rgba(0,0,0,.72) 100%);pointer-events:none}
+.club-card.top{border-color:rgba(98,191,74,.34);box-shadow:0 18px 42px rgba(0,0,0,.25),0 0 32px rgba(98,191,74,.08)}
+.club-card.org{border-color:rgba(255,255,255,.13)}
+.club-info{position:absolute;left:12px;right:12px;bottom:12px;z-index:1;display:flex;flex-direction:column;gap:7px}
+.club-name{font-size:18px;line-height:1.05;font-weight:850;color:var(--white);letter-spacing:-.02em;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.club-meta{display:flex;gap:6px;flex-wrap:wrap}
+.club-chip{display:inline-flex;align-items:center;min-height:22px;padding:5px 8px;border-radius:999px;background:rgba(17,17,17,.72);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px);font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:var(--gray1)}
+.club-chip.green{color:var(--green-lt);border-color:rgba(98,191,74,.28);background:rgba(25,53,22,.72)}
+.club-empty{padding:46px 18px;border:1px dashed rgba(255,255,255,.13);border-radius:18px;color:var(--gray1);text-align:center;background:rgba(255,255,255,.025)}
+@keyframes clubIn{to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){
+  .club-hero{grid-template-columns:1fr;gap:14px;padding-top:6px}
+  .club-title{font-size:58px}
+  .club-count{text-align:left;min-width:0}
+  .club-count-num{font-size:42px}
+  .club-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .club-card{min-height:210px;border-radius:14px}
+  .club-card img{min-height:210px}
+  .club-name{font-size:15px}
+}
 
 
 /* ── FIX29 MOBILE: COMPACT TABLE ROWS + FIXED MODALS ─────────────────────── */
@@ -2599,9 +2633,7 @@ header::before{
     <div class="hdr-days" id="hdr-days"></div>
     <div class="sync-panel">
       <span class="sync-pill local" id="sync-status" title="Статус синхронизации">Локально</span>
-      <button class="sync-mini-btn" type="button" onclick="openSyncSetup()">Синк</button>
-      <button class="sync-mini-btn ghost" type="button" onclick="exportData()">Бэкап</button>
-      <button class="sync-mini-btn ghost" type="button" onclick="importData()">Импорт</button>
+      <button class="sync-mini-btn ghost sync-menu-btn" type="button" title="Синхронизация и бэкапы" onclick="openSyncMenu(event)">⋯</button>
     </div>
   </div>
 </header>
@@ -2611,6 +2643,7 @@ header::before{
   <button class="tab" onclick="switchTab('participants',this)">Участники <span class="badge" id="badge-p">0</span></button>
   <button class="tab" onclick="switchTab('prospects',this)">Потенциально <span class="badge muted" id="badge-pr">0</span></button>
   <button class="tab" onclick="switchTab('orgs',this)">Организаторы <span class="badge muted" id="badge-o">0</span></button>
+  <button class="tab" onclick="switchTab('club',this)">Клуб</button>
 </nav>
 
 <main>
@@ -2781,6 +2814,21 @@ header::before{
   <div class="p-list" id="o-list"></div>
 </div>
 
+<!-- ── CLUB ── -->
+<div class="view" id="view-club">
+  <div class="club-hero">
+    <div>
+      <div class="club-title">Клуб<span>.</span></div>
+      <div class="club-sub">люди, которые уже внутри драфта</div>
+    </div>
+    <div class="club-count">
+      <div class="club-count-num" id="club-count">0</div>
+      <div class="club-count-lbl">в составе</div>
+    </div>
+  </div>
+  <div class="club-grid" id="club-grid"></div>
+</div>
+
 </main>
 
 <!-- ── MODAL ── -->
@@ -2935,6 +2983,7 @@ function switchTab(name, btn){
   if(name==='participants') renderParticipants();
   if(name==='prospects') renderProspects();
   if(name==='orgs') renderOrgs();
+  if(name==='club') renderClub();
 }
 
 // ─── INSTAGRAM ──────────────────────────────────────────────
@@ -3059,6 +3108,7 @@ function updateAnalytics(){
   document.getElementById('badge-p').textContent  = DB.participants.length;
   document.getElementById('badge-pr').textContent = DB.prospects.length;
   document.getElementById('badge-o').textContent  = DB.orgs.length;
+  renderClub();
 }
 
 // ─── GOALS EDIT ─────────────────────────────────────────────
@@ -4027,6 +4077,42 @@ function openOrgDossier(id){
   document.getElementById('modal-save-btn').style.display='none';
 }
 
+// ─── CLUB ──────────────────────────────────────────────────
+function clubItems(){
+  const participants=(DB.participants||[]).map(p=>({...p,_type:'participant'}));
+  const orgs=(DB.orgs||[]).filter(o=>o.photo).map(o=>({...o,_type:'org'}));
+  return [...participants,...orgs];
+}
+function renderClub(){
+  const grid=document.getElementById('club-grid');
+  const count=document.getElementById('club-count');
+  if(!grid || !count) return;
+  const items=clubItems();
+  count.textContent=items.length;
+  if(!items.length){
+    grid.innerHTML='<div class="club-empty">Добавь фото участникам и организаторам — здесь появится клубная доска.</div>';
+    return;
+  }
+  grid.innerHTML='';
+  items.forEach((item,i)=>{
+    const card=document.createElement('button');
+    card.type='button';
+    card.className='club-card '+(item.top?'top ':'')+(item._type==='org'?'org':'');
+    card.style.animationDelay=Math.min(i*38,520)+'ms';
+    card.innerHTML=`
+      ${item.photo ? `<img src="${item.photo}" alt="">` : `<div class="dossier-photo">${makeInitials(item.name)}</div>`}
+      <div class="club-info">
+        <div class="club-name">${esc(item.name)}</div>
+        <div class="club-meta">
+          <span class="club-chip ${item._type==='org'?'':'green'}">${item._type==='org'?'Орг':'Участник'}</span>
+          ${item.top ? '<span class="club-chip green">Топ</span>' : ''}
+        </div>
+      </div>`;
+    card.addEventListener('click',()=> item._type==='org' ? openOrgDossier(item.id) : openParticipantDossier(item.id));
+    grid.appendChild(card);
+  });
+}
+
 // ─── MODAL ──────────────────────────────────────────────────
 let _modalType='', _modalEdit=null;
 function openModal(type, existing=null){
@@ -4225,7 +4311,7 @@ function setSyncStatus(text, state='local'){
   el.className='sync-pill '+state;
 }
 function hashData(data){ try{return JSON.stringify(data)}catch{return String(Date.now())} }
-function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); renderProspects(); renderOrgs(); }
+function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); renderProspects(); renderOrgs(); renderClub(); }
 function canUseSupabase(){ return !!(window.supabase && syncConfig?.url && syncConfig?.anonKey && syncConfig?.rowId); }
 function makeSyncClient(){ if(!canUseSupabase()) return null; return window.supabase.createClient(syncConfig.url, syncConfig.anonKey); }
 
@@ -4242,6 +4328,18 @@ function openSyncSetup(){
   syncConfig=clean;
   localStorage.setItem(SYNC_KEY, JSON.stringify(syncConfig));
   initCloudSync(true);
+}
+function openSyncMenu(e){
+  e.preventDefault();
+  e.stopPropagation();
+  const r=e.currentTarget.getBoundingClientRect();
+  showCtx(r.left,r.bottom+4,[
+    {label:'↻ Обновить сейчас', fn:()=>pollCloudNow(false)},
+    {label:'⚙ Настроить синк', fn:()=>openSyncSetup()},
+    {sep:true},
+    {label:'↓ Скачать бэкап', fn:()=>exportData()},
+    {label:'↑ Импорт бэкапа', fn:()=>importData()},
+  ]);
 }
 function clearSyncSetup(){
   if(!confirm('Отключить облачную синхронизацию на этом устройстве? Данные в Supabase не удалятся.')) return;
@@ -4363,7 +4461,7 @@ function scheduleCloudSave(){
   }
   clearTimeout(syncSaveTimer);
   setSyncStatus('Сохраняю','syncing');
-  syncSaveTimer=setTimeout(()=>pushCloudNow(false),180);
+  syncSaveTimer=setTimeout(()=>pushCloudNow(false),90);
 }
 async function pushCloudNow(silent=false){
   if(!syncConfig || !syncClient) return;
@@ -4700,10 +4798,15 @@ function finishMobileRowDrag(){
       if(ordered[i]) arr[pos]=ordered[i];
     });
     if(ordered.length){
-      save();
-      renderMobileRowKind(kind);
       pulsePlacedRow(kind,id);
-      toast('Порядок обновлён');
+      requestAnimationFrame(()=>{
+        setTimeout(()=>{
+          save();
+          renderMobileRowKind(kind);
+          pulsePlacedRow(kind,id);
+          toast('Порядок обновлён');
+        },80);
+      });
     }
   }
   _mobileDrag=null;
