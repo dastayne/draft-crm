@@ -1602,7 +1602,7 @@ header::before{
 
 
 
-/* ── FIX27 CLOUD SYNC / PWA CONTROLS ─────────────────────── */
+/* ── FIX28 CLOUD SYNC AUTO-CONNECT / PWA CONTROLS ─────────────────────── */
 .sync-panel{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
 .sync-pill{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:7px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(17,17,17,.72);color:var(--gray1);font-size:10px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;line-height:1;backdrop-filter:blur(10px)}
 .sync-pill::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gray2);box-shadow:0 0 0 3px rgba(255,255,255,.035)}
@@ -1616,6 +1616,325 @@ header::before{
 .sync-mini-btn.ghost:hover{border-color:var(--white);color:var(--white);background:rgba(255,255,255,.055)}
 @keyframes syncPulse{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
 @media(max-width:760px){.sync-panel{justify-content:flex-start;gap:6px;margin-top:10px}.sync-pill,.sync-mini-btn{min-height:34px;padding:9px 11px;font-size:9px;letter-spacing:.06em}}
+
+
+/* ── FIX29 MOBILE: COMPACT TABLE ROWS + FIXED MODALS ─────────────────────── */
+@media(max-width:760px){
+  body.modal-lock{
+    position:fixed;
+    left:0;right:0;width:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  .overlay.open,
+  .crop-overlay.open{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    align-items:stretch;
+    justify-content:center;
+    padding:0;
+    touch-action:none;
+  }
+
+  .modal,
+  .modal.dossier{
+    position:relative;
+    width:100vw;
+    max-width:100vw;
+    height:100dvh;
+    max-height:100dvh;
+    margin:0;
+    border-radius:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    padding-top:calc(22px + env(safe-area-inset-top));
+  }
+
+  .modal-close{
+    position:fixed!important;
+    top:calc(12px + env(safe-area-inset-top));
+    right:12px;
+    z-index:9999;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:rgba(25,25,25,.92);
+    border:1px solid rgba(255,255,255,.10);
+    backdrop-filter:blur(12px);
+    box-shadow:0 12px 34px rgba(0,0,0,.34);
+  }
+
+  .modal.dossier .modal-title{
+    top:0;
+    padding-top:calc(18px + env(safe-area-inset-top));
+    padding-right:62px;
+  }
+
+  .dossier-photo{max-height:34dvh}
+  .dossier-body{padding-bottom:calc(34px + env(safe-area-inset-bottom))}
+  .modal-actions{bottom:calc(-18px - env(safe-area-inset-bottom));}
+
+  .p-list{
+    gap:0;
+    background:var(--s1);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .p-table-view{width:100%;overflow:visible;}
+  .p-table-head{display:none!important}
+
+  .table-participants .p-table-row,
+  .table-prospects .p-table-row,
+  .table-orgs .p-table-row,
+  .p-table-row{
+    min-height:58px;
+    margin:0;
+    padding:8px 10px;
+    border-radius:0;
+    border:none;
+    border-bottom:1px solid rgba(255,255,255,.065);
+    box-shadow:none;
+    background:#111;
+    overflow:visible;
+    gap:8px;
+    align-items:center;
+  }
+
+  .p-table-row:last-child{border-bottom:none}
+  .p-table-row:hover{background:#151515}
+  .p-table-row.top-row{
+    background:linear-gradient(90deg,rgba(98,191,74,.15),rgba(98,191,74,.045) 56%,#111);
+    border-left:2px solid var(--green);
+    border-color:rgba(255,255,255,.065);
+  }
+  .p-table-row.top-row::after{display:none}
+
+  .table-participants .p-table-row{grid-template-columns:24px minmax(0,1fr) 70px 92px!important}
+  .table-prospects .p-table-row{grid-template-columns:24px minmax(0,1fr) 84px 94px!important}
+  .table-orgs .p-table-row{grid-template-columns:24px minmax(0,1fr) 78px 96px!important}
+
+  .p-table-row > div:not(.td-num):not(.td-person){
+    display:flex;
+    padding:0;
+    border:none;
+    background:transparent;
+    border-radius:0;
+    justify-content:flex-start;
+    min-width:0;
+    width:auto;
+    position:static;
+  }
+  .p-table-row > div:not(.td-num):not(.td-person)::before{display:none!important;content:none!important}
+
+  .td-num{
+    position:static;
+    width:24px;
+    min-width:24px;
+    text-align:center;
+    font-size:10px;
+    color:var(--gray2);
+  }
+  .td-drag{font-size:14px}
+
+  .td-person{padding:0;gap:9px;min-width:0;}
+  .p-table-row .p-avatar{width:34px;height:34px;font-size:11px;box-shadow:none;}
+  .td-name-main{font-size:13px;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0;}
+  .td-name-sub{font-size:10px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .table-participants .p-table-row > div:nth-child(3),
+  .table-participants .p-table-row > div:nth-child(4),
+  .table-participants .p-table-row > div:nth-child(7),
+  .table-prospects .p-table-row > div:nth-child(3),
+  .table-prospects .p-table-row > div:nth-child(4),
+  .table-prospects .p-table-row > div:nth-child(6),
+  .table-orgs .p-table-row > div:nth-child(3),
+  .table-orgs .p-table-row > div:nth-child(6){display:none!important;}
+
+  .td-money{font-size:12px;line-height:1;white-space:nowrap;text-align:right;justify-content:flex-end!important;color:var(--white);}
+  .td-money.zero{font-size:11px;color:var(--gray2)}
+
+  .p-table-row .p-status-btn,
+  .p-table-row .notify-btn,
+  .p-table-row .role-pill,
+  .row-action-btn{
+    min-height:28px;
+    max-width:100%;
+    padding:6px 8px;
+    font-size:9px;
+    line-height:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .p-table-row .p-status-btn{width:100%;justify-content:center;text-align:center;}
+  .row-action-btn.primary{width:100%;min-height:30px;font-size:9px;padding:6px 7px;}
+  .role-pill{max-width:78px;display:inline-flex;justify-content:center}
+  .notify-btn{width:100%;justify-content:center;text-align:center}
+  .empty-state{background:var(--s1);border-radius:16px;}
+}
+
+@media(max-width:390px){
+  .table-participants .p-table-row{grid-template-columns:22px minmax(0,1fr) 62px 82px!important}
+  .table-prospects .p-table-row{grid-template-columns:22px minmax(0,1fr) 74px 82px!important}
+  .table-orgs .p-table-row{grid-template-columns:22px minmax(0,1fr) 70px 82px!important}
+  .p-table-row{gap:6px;padding:8px}
+  .p-table-row .p-status-btn,.p-table-row .notify-btn,.p-table-row .role-pill,.row-action-btn{font-size:8px;padding-left:6px;padding-right:6px}
+}
+
+
+
+/* ── FIX30: refined status pills + custom icons ── */
+.p-status-btn,
+.status-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  white-space:nowrap;
+}
+
+.status-ui{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  min-width:0;
+}
+.status-label{
+  display:block;
+  min-width:0;
+  white-space:nowrap;
+  line-height:1;
+}
+.status-ico{
+  width:18px;
+  height:18px;
+  min-width:18px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.status-ico svg{
+  width:10px;
+  height:10px;
+  display:block;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.status-ico.dot svg{fill:currentColor;stroke:none}
+
+.p-status-btn{
+  min-height:34px;
+  min-width:118px;
+  padding:8px 14px;
+  border:1px solid transparent;
+  font-size:12px;
+  font-weight:760;
+  letter-spacing:.01em;
+  line-height:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+.p-status-btn.paid    {background:linear-gradient(180deg,rgba(98,191,74,.22),rgba(20,44,18,.88));color:var(--green-lt);border-color:rgba(144,217,123,.30)}
+.p-status-btn.waiting {background:linear-gradient(180deg,rgba(196,155,58,.22),rgba(45,35,13,.88));color:var(--amber);border-color:rgba(196,155,58,.30)}
+.p-status-btn.canceled{background:linear-gradient(180deg,rgba(191,74,74,.22),rgba(44,18,18,.88));color:var(--red);border-color:rgba(191,74,74,.30)}
+.p-status-btn.empty   {background:linear-gradient(180deg,#171717,#111111);color:var(--gray1);border-color:var(--border2)}
+.p-status-btn .status-ico.paid,
+.status-chip .status-ico.paid{background:rgba(98,191,74,.14);border-color:rgba(144,217,123,.28);color:var(--green-lt)}
+.p-status-btn .status-ico.waiting,
+.status-chip .status-ico.waiting,
+.p-status-btn .status-ico.sent,
+.status-chip .status-ico.sent{background:rgba(196,155,58,.14);border-color:rgba(196,155,58,.28);color:var(--amber)}
+.p-status-btn .status-ico.canceled,
+.status-chip .status-ico.canceled,
+.p-status-btn .status-ico.no,
+.status-chip .status-ico.no{background:rgba(191,74,74,.14);border-color:rgba(191,74,74,.28);color:var(--red)}
+.p-status-btn .status-ico.empty,
+.status-chip .status-ico.empty,
+.p-status-btn .status-ico.replied,
+.status-chip .status-ico.replied{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10);color:var(--gray1)}
+.p-status-btn .status-ico.replied,
+.status-chip .status-ico.replied{background:rgba(98,191,74,.10);border-color:rgba(144,217,123,.18);color:#b9f5aa}
+.status-chip{
+  gap:0;
+  padding:8px 12px;
+  font-size:13px;
+  font-weight:740;
+}
+.status-chip.big{font-size:14px;padding:9px 13px}
+.status-chip.big .status-ico{width:20px;height:20px;min-width:20px}
+.status-chip.big .status-ico svg{width:11px;height:11px}
+
+@media(max-width:760px){
+  .table-participants .p-table-row{grid-template-columns:22px minmax(0,1fr) 78px 116px!important}
+  .table-prospects .p-table-row{grid-template-columns:22px minmax(0,1fr) 96px 96px!important}
+  .table-orgs .p-table-row{grid-template-columns:22px minmax(0,1fr) 96px 86px!important}
+  .p-table-row .p-status-btn,
+  .p-table-row .notify-btn,
+  .p-table-row .role-pill,
+  .row-action-btn{
+    min-height:32px;
+    padding:7px 10px;
+    font-size:10px;
+  }
+  .p-table-row .p-status-btn{
+    min-width:110px;
+    overflow:visible;
+  }
+  .p-table-row .p-status-btn .status-ui{gap:7px}
+  .p-table-row .p-status-btn .status-ico{width:16px;height:16px;min-width:16px}
+  .p-table-row .p-status-btn .status-ico svg{width:9px;height:9px}
+}
+
+@media(max-width:390px){
+  .table-participants .p-table-row{grid-template-columns:22px minmax(0,1fr) 70px 104px!important}
+  .table-prospects .p-table-row{grid-template-columns:22px minmax(0,1fr) 86px 90px!important}
+  .table-orgs .p-table-row{grid-template-columns:22px minmax(0,1fr) 86px 82px!important}
+  .p-table-row .p-status-btn,
+  .p-table-row .notify-btn,
+  .p-table-row .role-pill,
+  .row-action-btn{
+    min-height:30px;
+    padding:6px 8px;
+    font-size:9px;
+  }
+  .p-table-row .p-status-btn{min-width:100px}
+  .p-table-row .p-status-btn .status-ui{gap:6px}
+}
+
+
+
+/* ── FIX32: cleaner editor selects, no cheap emoji dropdowns ── */
+.fg select{
+  font-weight:680;
+  color:var(--white);
+  border-color:rgba(255,255,255,.12);
+  background-color:#0d0d0d;
+}
+.fg select:focus{
+  border-color:rgba(98,191,74,.72);
+  box-shadow:0 0 0 3px rgba(98,191,74,.09);
+}
+.fg select option{
+  color:var(--white);
+  background:#151515;
+  font-weight:600;
+}
 
 </style>
 
@@ -1652,7 +1971,7 @@ header::before{
   <button class="tab active" onclick="switchTab('analytics',this)">Аналитика</button>
   <button class="tab" onclick="switchTab('participants',this)">Участники <span class="badge" id="badge-p">0</span></button>
   <button class="tab" onclick="switchTab('prospects',this)">Потенциально <span class="badge muted" id="badge-pr">0</span></button>
-  <button class="tab" onclick="switchTab('orgs',this)">Орги <span class="badge muted" id="badge-o">0</span></button>
+  <button class="tab" onclick="switchTab('orgs',this)">Организаторы <span class="badge muted" id="badge-o">0</span></button>
 </nav>
 
 <main>
@@ -1663,7 +1982,7 @@ header::before{
     <div class="kpi"><div class="kpi-num" id="kpi-reg">—</div><div class="kpi-lbl">Зарегистрировано</div><div class="kpi-sub" id="kpi-reg-sub"></div></div>
     <div class="kpi"><div class="kpi-num w" id="kpi-money">—</div><div class="kpi-lbl">Собрано</div><div class="kpi-sub" id="kpi-money-sub"></div></div>
     <div class="kpi"><div class="kpi-num" id="kpi-paid">—</div><div class="kpi-lbl">Оплатили</div><div class="kpi-sub" id="kpi-paid-sub"></div></div>
-    <div class="kpi"><div class="kpi-num w" id="kpi-orgs">—</div><div class="kpi-lbl">Орги</div><div class="kpi-sub" id="kpi-orgs-sub"></div></div>
+    <div class="kpi"><div class="kpi-num w" id="kpi-orgs">—</div><div class="kpi-lbl">Организаторы</div><div class="kpi-sub" id="kpi-orgs-sub"></div></div>
   </div>
 
   <div class="goals-bar">
@@ -1798,7 +2117,7 @@ header::before{
 <!-- ── ORGS ── -->
 <div class="view" id="view-orgs">
   <div class="sec-header">
-    <div class="sec-title">Орги <span id="o-cnt"></span></div>
+    <div class="sec-title">Организаторы <span id="o-cnt"></span></div>
     <div class="sec-actions">
       <span class="sec-actions-note" id="o-mode-note">Клик по строке — открыть досье</span>
       <div class="search-wrap">
@@ -2137,17 +2456,31 @@ function avatarContent(p){
 function initials(p){ return makeInitials(p.name); }
 
 function statusClass(s){return s||'empty'}
-function statusLabel(s){
-  return {paid:'✅ Оплачено',waiting:'⏳ Ожидает',canceled:'❌ Отменено','':'· Без статуса'}[s||''];
-}
 function statusShort(s){
   return {paid:'Оплачено',waiting:'Ожидает',canceled:'Отменено','':'Без статуса'}[s||''];
+}
+function statusIconSvg(kind='empty'){
+  const map = {
+    paid:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.2l2.6 2.6 6.4-6.4"/></svg>',
+    waiting:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6"></circle><path d="M8 5.1v3.4l2 1.4"/></svg>',
+    canceled:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5 5 11"/></svg>',
+    empty:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.2"/></svg>',
+    sent:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.4 8 12.6 3.8 9.3 12.2 7.6 8.9 3.4 8Z"/></svg>',
+    replied:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.8 4.8H6.3c-1.7 0-3 1.3-3 3v.3"></path><path d="M5.3 10.4 3 8.1l2.3-2.3"></path><path d="M6.4 11.2h4.2c1.4 0 2.4-1 2.4-2.4V7.9"></path></svg>'
+  };
+  return map[kind] || map.empty;
+}
+function statusInline(kind, label){
+  return `<span class="status-ui"><span class="status-ico ${kind}" aria-hidden="true">${statusIconSvg(kind)}</span><span class="status-label">${label}</span></span>`;
+}
+function statusLabel(s){
+  const cls = statusClass(s);
+  return statusInline(cls, statusShort(s));
 }
 
 function statusChip(s, extra=''){
   const cls = statusClass(s);
-  const icon = {paid:'✓',waiting:'⌛',canceled:'×',empty:'·'}[cls] || '·';
-  return `<span class="status-chip ${cls} ${extra}"><span>${icon}</span><span>${statusShort(s)}</span></span>`;
+  return `<span class="status-chip ${cls} ${extra}">${statusInline(cls, statusShort(s))}</span>`;
 }
 
 function toggleParticipantEditMode(){
@@ -2217,7 +2550,7 @@ function deleteProspect(id){
   save(); renderProspects(); updateAnalytics(); toast('Удалено');
 }
 function deleteOrg(id){
-  if(!confirm('Удалить орга?'))return;
+  if(!confirm('Удалить организатора?'))return;
   DB.orgs=DB.orgs.filter(x=>x.id!==id);
   save(); renderOrgs(); updateAnalytics(); toast('Удалено');
 }
@@ -2619,18 +2952,20 @@ function resizeImg(src,maxW){
 function prospectStatusClass(s){
   return {'':'empty','sent':'waiting','replied':'paid','yes':'paid','no':'canceled'}[s||''] || 'empty';
 }
-function prospectStatusLabel(s){
-  return {'':'· Не писал','sent':'✉️ Написал','replied':'💬 Ответил','yes':'✅ Согласился','no':'❌ Отказался'}[s||''];
-}
 function prospectStatusText(s){
-  return prospectStatusLabel(s).replace(/[✅❌✉️💬·]/g,'').trim() || 'Не писал';
+  return {'':'Не писал','sent':'Написал','replied':'Ответил','yes':'Согласился','no':'Отказался'}[s||''] || 'Не писал';
+}
+function prospectStatusIcon(s){
+  return {'':'empty','sent':'sent','replied':'replied','yes':'paid','no':'canceled'}[s||''] || 'empty';
+}
+function prospectStatusLabel(s){
+  return statusInline(prospectStatusIcon(s), prospectStatusText(s));
 }
 
 function prospectStatusChip(s, extra=''){
   const cls = prospectStatusClass(s);
   const txt = prospectStatusText(s);
-  const icon = {'sent':'✉','replied':'↩','yes':'✓','no':'×','':'·'}[s||''] || '·';
-  return `<span class="status-chip ${cls} ${extra}"><span>${icon}</span><span>${txt}</span></span>`;
+  return `<span class="status-chip ${cls} ${extra}">${statusInline(prospectStatusIcon(s), txt)}</span>`;
 }
 function toggleProspectEditMode(){
   prospectEditMode = !prospectEditMode;
@@ -2646,7 +2981,7 @@ function syncProspectModeUI(){
   btn.textContent = prospectEditMode ? '✓ Готово' : '✎ Редактирование';
   note.textContent = prospectEditMode
     ? 'Клик по карточке — редактировать · статусы и перетаскивание активны'
-    : 'Клик по карточке — открыть досье';
+    : 'Клик по строке — открыть досье';
 }
 function handleProspectRow(id){
   if(prospectEditMode) editProspect(id);
@@ -2836,7 +3171,7 @@ function toggleOrgEditMode(){
   orgEditMode = !orgEditMode;
   syncOrgModeUI();
   renderOrgs();
-  toast(orgEditMode ? 'Редактирование оргов включено' : 'Режим просмотра включён');
+  toast(orgEditMode ? 'Редактирование организаторов включено' : 'Режим просмотра включён');
 }
 function syncOrgModeUI(){
   const btn=document.getElementById('o-edit-toggle');
@@ -2845,8 +3180,8 @@ function syncOrgModeUI(){
   btn.classList.toggle('active', orgEditMode);
   btn.textContent = orgEditMode ? '✓ Готово' : '✎ Редактирование';
   note.textContent = orgEditMode
-    ? 'Клик по карточке — редактировать · уведомления и перетаскивание активны'
-    : 'Клик по карточке — открыть досье';
+    ? 'Клик по строке — редактировать · уведомления и перетаскивание активны'
+    : 'Клик по строке — открыть досье';
 }
 function handleOrgRow(id){
   if(orgEditMode) openModal('org', DB.orgs.find(x=>x.id===id));
@@ -2869,7 +3204,7 @@ function renderOrgs(){
   syncOrgModeUI();
 
   if(!list.length){
-    container.innerHTML=`<div class="empty-state"><div class="empty-ico">🎙️</div>Оргов пока нет</div>`;
+    container.innerHTML=`<div class="empty-state"><div class="empty-ico">🎙️</div>Организаторов пока нет</div>`;
     document.getElementById('badge-o').textContent=DB.orgs.length;
     return;
   }
@@ -2900,7 +3235,7 @@ function renderOrgs(){
         <div class="p-avatar">${makeInitials(o.name)}</div>
         <div class="td-name">
           <div class="td-name-main">${esc(o.name)}</div>
-          <div class="td-name-sub">Орг #${DB.orgs.indexOf(o)+1}</div>
+          <div class="td-name-sub">Организатор #${DB.orgs.indexOf(o)+1}</div>
         </div>
       </div>
       <div class="td-contact">${contact}</div>
@@ -2967,13 +3302,13 @@ function openOrgDossier(id){
   document.getElementById('overlay').classList.add('open');
   const modal=document.querySelector('.modal');
   modal.classList.add('dossier');
-  document.getElementById('modal-title').textContent='Досье орга';
+  document.getElementById('modal-title').textContent='Досье организатора';
   document.getElementById('modal-body').innerHTML=`
     <div class="dossier-wrap">
       <div class="dossier-media">
         <div class="dossier-photo">${makeInitials(o.name)}</div>
         <div class="dossier-media-foot">
-          <div class="dossier-side-tag">Орг #${idx}</div>
+          <div class="dossier-side-tag">Организатор #${idx}</div>
           <div class="dossier-side-tag">${o.notified?'Уведомлён':'Не уведомлён'}</div>
         </div>
       </div>
@@ -2984,7 +3319,7 @@ function openOrgDossier(id){
             <div class="dossier-sub">${o.role ? esc(o.role) : 'Роль пока не заполнена'}</div>
           </div>
           <div class="dossier-kpi">
-            <div class="dk dk-status ${o.notified?'paid':'empty'}"><div class="dk-lbl">Статус</div><div class="dk-val"><span class="status-chip ${o.notified?'paid':'empty'} big"><span>${o.notified?'✓':'·'}</span><span>${o.notified?'Уведомлён':'Нет'}</span></span></div></div>
+            <div class="dk dk-status ${o.notified?'paid':'empty'}"><div class="dk-lbl">Статус</div><div class="dk-val"><span class="status-chip ${o.notified?'paid':'empty'} big">${statusInline(o.notified?'paid':'empty', o.notified?'Уведомлён':'Нет')}</span></div></div>
             <div class="dk"><div class="dk-lbl">Позиция</div><div class="dk-val">${idx} / ${DB.orgs.length}</div></div>
           </div>
         </div>
@@ -3027,7 +3362,7 @@ function openModal(type, existing=null){
   document.getElementById('modal-cancel-btn').textContent='Отмена';
   document.getElementById('modal-cancel-btn').style.display='inline-flex';
   document.getElementById('modal-save-btn').style.display='inline-flex';
-  const titles={participant:'Новый участник',prospect:'Потенциальный',org:'Новый орг'};
+  const titles={participant:'Новый участник',prospect:'Потенциальный',org:'Новый организатор'};
   document.getElementById('modal-title').textContent=existing?'Редактировать':titles[type];
 
   if(type==='participant'){
@@ -3049,10 +3384,10 @@ function openModal(type, existing=null){
         <div class="fg"><label>Instagram</label><input id="f-ig" value="${esc(p.instagram||'')}" placeholder="@username или ссылка"></div>
         <div class="fg"><label>Сумма ₽</label><input id="f-amt" type="number" value="${p.amount||''}" placeholder="6000"></div>
         <div class="fg"><label>Статус</label><select id="f-status">
-          <option value=""       ${!p.status?'selected':''}>· Не указан</option>
-          <option value="paid"   ${p.status==='paid'?'selected':''}>✅ Оплачено</option>
-          <option value="waiting"${p.status==='waiting'?'selected':''}>⏳ Ожидает</option>
-          <option value="canceled"${p.status==='canceled'?'selected':''}>❌ Отменено</option>
+          <option value=""       ${!p.status?'selected':''}>Не указан</option>
+          <option value="paid"   ${p.status==='paid'?'selected':''}>Оплачено</option>
+          <option value="waiting"${p.status==='waiting'?'selected':''}>Ожидает</option>
+          <option value="canceled"${p.status==='canceled'?'selected':''}>Отменено</option>
         </select></div>
         <div class="fg"><label>Тег</label><select id="f-top">
           <option value="0" ${!p.top?'selected':''}>Участник</option>
@@ -3067,11 +3402,11 @@ function openModal(type, existing=null){
         <div class="fg full"><label>Имя</label><input id="f-name" value="${esc(p.name||'')}" placeholder="Имя ведущего" autofocus></div>
         <div class="fg full"><label>Контакт (телефон / Instagram)</label><input id="f-contact" value="${esc(p.contact||'')}" placeholder="@username или телефон"></div>
         <div class="fg"><label>Статус</label><select id="f-pstatus">
-          <option value=""       ${!p.status?'selected':''}>· Не писал</option>
-          <option value="sent"   ${p.status==='sent'?'selected':''}>✉️ Написал</option>
-          <option value="replied"${p.status==='replied'?'selected':''}>💬 Ответил</option>
-          <option value="yes"    ${p.status==='yes'?'selected':''}>✅ Согласился</option>
-          <option value="no"     ${p.status==='no'?'selected':''}>❌ Отказался</option>
+          <option value=""       ${!p.status?'selected':''}>Не писал</option>
+          <option value="sent"   ${p.status==='sent'?'selected':''}>Написал</option>
+          <option value="replied"${p.status==='replied'?'selected':''}>Ответил</option>
+          <option value="yes"    ${p.status==='yes'?'selected':''}>Согласился</option>
+          <option value="no"     ${p.status==='no'?'selected':''}>Отказался</option>
         </select></div>
         <div class="fg"><label>Тег</label><select id="f-top">
           <option value="0" ${!p.top?'selected':''}>Участник</option>
@@ -3088,8 +3423,8 @@ function openModal(type, existing=null){
         <div class="fg"><label>Instagram</label><input id="f-ig" value="${esc(p.instagram||'')}" placeholder="@username"></div>
         <div class="fg full"><label>Роль</label><input id="f-role" value="${esc(p.role||'')}" placeholder="Фотограф, координатор..."></div>
         <div class="fg"><label>Уведомлён о времени</label><select id="f-notif">
-          <option value="0" ${!p.notified?'selected':''}>❌ Не уведомлён</option>
-          <option value="1" ${p.notified?'selected':''}>✅ Уведомлён</option>
+          <option value="0" ${!p.notified?'selected':''}>Не уведомлён</option>
+          <option value="1" ${p.notified?'selected':''}>Уведомлён</option>
         </select></div>
         <div class="fg full"><label>Комментарий</label><textarea id="f-comment">${esc(p.comment||'')}</textarea></div>
       </div>`;
@@ -3127,7 +3462,19 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 
 // ─── CLOUD SYNC / BACKUP ───────────────────────────────────
 const SYNC_KEY = 'draft_mm_sync_config_v1';
-let syncConfig = (()=>{ try{return JSON.parse(localStorage.getItem(SYNC_KEY)||'null')||null}catch{return null} })();
+const EMBEDDED_SYNC_CONFIG = {
+  url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
+  anonKey: 'sb_publishable_ujpC3zRG3h-e0FEYq6dNdA_qT8AV-lP',
+  rowId: 'main'
+};
+let syncConfig = (()=>{
+  try{
+    const saved = JSON.parse(localStorage.getItem(SYNC_KEY)||'null');
+    return saved?.url && saved?.anonKey && saved?.rowId ? saved : {...EMBEDDED_SYNC_CONFIG};
+  } catch {
+    return {...EMBEDDED_SYNC_CONFIG};
+  }
+})();
 let syncClient = null;
 let syncChannel = null;
 let syncReady = false;
@@ -3458,6 +3805,31 @@ function toast(msg){
   document.body.appendChild(t);
   setTimeout(()=>t.remove(),2600);
 }
+
+
+// ─── FIX29 MOBILE SCROLL LOCK FOR MODALS ─────────────────────
+let _pageLockY = 0;
+function syncModalScrollLock(){
+  const overlayOpen = document.getElementById('overlay')?.classList.contains('open');
+  const cropOpen = document.getElementById('crop-overlay')?.classList.contains('open');
+  const shouldLock = !!(overlayOpen || cropOpen);
+  if(shouldLock && !document.body.classList.contains('modal-lock')){
+    _pageLockY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.top = `-${_pageLockY}px`;
+    document.body.classList.add('modal-lock');
+  } else if(!shouldLock && document.body.classList.contains('modal-lock')){
+    document.body.classList.remove('modal-lock');
+    document.body.style.top = '';
+    window.scrollTo(0, _pageLockY || 0);
+  }
+}
+['overlay','crop-overlay'].forEach(id=>{
+  const node=document.getElementById(id);
+  if(node){
+    new MutationObserver(syncModalScrollLock).observe(node,{attributes:true,attributeFilter:['class']});
+  }
+});
+window.addEventListener('orientationchange',()=>setTimeout(syncModalScrollLock,120));
 
 // ─── INIT ───────────────────────────────────────────────────
 updateAnalytics();
