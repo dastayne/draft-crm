@@ -697,7 +697,7 @@ body,
 
 .table-orgs .p-table-head,
 .table-orgs .p-table-row{
-  grid-template-columns:44px minmax(220px,1.2fr) minmax(190px,1fr) minmax(140px,.75fr) 135px minmax(160px,.9fr);
+  grid-template-columns:44px minmax(240px,1.25fr) minmax(210px,1fr) 150px minmax(180px,.9fr);
 }
 
 .td-num{
@@ -1936,6 +1936,317 @@ header::before{
   font-weight:600;
 }
 
+
+
+/* ── FIX33: mobile dossier, organizers, compact mobile rows ── */
+
+/* Mobile dossier: no sticky/floating title/footer weirdness */
+@media(max-width:760px){
+  .overlay.open{
+    align-items:stretch!important;
+    justify-content:stretch!important;
+  }
+
+  .modal.dossier{
+    width:100vw!important;
+    max-width:100vw!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    border-radius:0!important;
+    border-left:none!important;
+    border-right:none!important;
+    border-top:none!important;
+    border-bottom:none!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding:0!important;
+    padding-bottom:calc(22px + env(safe-area-inset-bottom))!important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .modal.dossier .modal-title{
+    position:static!important;
+    top:auto!important;
+    z-index:auto!important;
+    padding:20px 56px 16px 18px!important;
+    margin:0!important;
+    border-bottom:1px solid rgba(255,255,255,.08)!important;
+    background:transparent!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    font-size:28px!important;
+    line-height:1.05!important;
+  }
+
+  .modal.dossier .modal-close{
+    position:fixed!important;
+    top:calc(12px + env(safe-area-inset-top))!important;
+    right:12px!important;
+    z-index:1200!important;
+    width:44px!important;
+    height:44px!important;
+    border-radius:999px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:rgba(20,20,20,.86)!important;
+    border:1px solid rgba(255,255,255,.13)!important;
+    color:rgba(255,255,255,.72)!important;
+    box-shadow:0 10px 26px rgba(0,0,0,.36)!important;
+    backdrop-filter:blur(12px)!important;
+    -webkit-backdrop-filter:blur(12px)!important;
+  }
+
+  .modal.dossier .modal-actions{
+    display:none!important;
+  }
+
+  .modal.dossier .dossier-wrap{
+    min-height:0!important;
+  }
+
+  .modal.dossier .dossier-body{
+    padding:18px!important;
+    overflow:visible!important;
+  }
+
+  .modal.dossier .dossier-media{
+    padding:18px!important;
+  }
+
+  .modal.dossier .dossier-head{
+    gap:14px!important;
+    margin-bottom:14px!important;
+  }
+
+  .modal.dossier .dossier-kpi{
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+  }
+
+  .modal.dossier .dk{
+    min-height:82px!important;
+  }
+
+  .modal.dossier .dossier-grid{
+    gap:10px!important;
+    margin-top:12px!important;
+  }
+
+  .modal.dossier .dossier-item{
+    min-height:86px!important;
+    border-radius:16px!important;
+  }
+}
+
+/* Organizers: use the same refined status pill language */
+.notify-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  min-height:34px;
+  min-width:122px;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid transparent;
+  font-size:11px;
+  font-weight:760;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.notify-btn.yes{
+  background:linear-gradient(180deg,rgba(98,191,74,.22),rgba(20,44,18,.88));
+  color:var(--green-lt);
+  border-color:rgba(144,217,123,.30);
+}
+
+.notify-btn.no{
+  background:linear-gradient(180deg,#171717,#111111);
+  color:var(--gray1);
+  border-color:var(--border2);
+}
+
+/* Hide role visually everywhere in organizers list/filter area */
+#view-orgs #o-sort option[value="role"]{display:none}
+
+/* Mobile tables: more room for names, stable numbers */
+@media(max-width:760px){
+  .p-list{
+    border-radius:16px!important;
+  }
+
+  .p-table-view{
+    min-width:0!important;
+    width:100%!important;
+    overflow:visible!important;
+  }
+
+  .p-table-head{
+    display:none!important;
+  }
+
+  .p-table-row{
+    width:100%!important;
+    gap:8px!important;
+    padding:10px 10px!important;
+    min-height:70px!important;
+    align-items:center!important;
+  }
+
+  .td-num{
+    min-width:20px!important;
+    width:20px!important;
+    padding:0!important;
+    text-align:center!important;
+    justify-self:center!important;
+    align-self:center!important;
+    font-size:11px!important;
+    line-height:1!important;
+    color:rgba(255,255,255,.34)!important;
+  }
+
+  .td-person{
+    gap:9px!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+
+  .p-table-row .p-avatar{
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    font-size:12px!important;
+  }
+
+  .td-name{
+    min-width:0!important;
+    flex:1!important;
+  }
+
+  .td-name-main{
+    max-width:100%!important;
+    font-size:14px!important;
+    line-height:1.1!important;
+    font-weight:760!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .td-name-sub{
+    font-size:10px!important;
+    margin-top:3px!important;
+    line-height:1.1!important;
+  }
+
+  .td-money{
+    font-size:13px!important;
+    text-align:right!important;
+    justify-self:end!important;
+    padding:0!important;
+    min-width:58px!important;
+    max-width:64px!important;
+  }
+
+  .td-money.zero{
+    font-size:13px!important;
+  }
+
+  .p-table-row .p-status-btn,
+  .p-table-row .notify-btn{
+    min-width:108px!important;
+    max-width:108px!important;
+    min-height:32px!important;
+    padding:7px 9px!important;
+    font-size:9.5px!important;
+    justify-self:end!important;
+  }
+
+  .p-table-row .p-status-btn .status-ui,
+  .p-table-row .notify-btn .status-ui{
+    gap:6px!important;
+  }
+
+  .p-table-row .p-status-btn .status-ico,
+  .p-table-row .notify-btn .status-ico{
+    width:16px!important;
+    height:16px!important;
+    min-width:16px!important;
+  }
+
+  .p-table-row .p-status-btn .status-ico svg,
+  .p-table-row .notify-btn .status-ico svg{
+    width:8.5px!important;
+    height:8.5px!important;
+  }
+
+  .table-participants .p-table-row{
+    grid-template-columns:20px minmax(0,1fr) 62px 108px!important;
+  }
+
+  .table-prospects .p-table-row{
+    grid-template-columns:20px minmax(0,1fr) 92px 92px!important;
+  }
+
+  .table-orgs .p-table-row{
+    grid-template-columns:20px minmax(0,1fr) 108px!important;
+  }
+
+  .table-participants .p-table-row > div:nth-child(3),
+  .table-participants .p-table-row > div:nth-child(4),
+  .table-participants .p-table-row > div:nth-child(7),
+  .table-prospects .p-table-row > div:nth-child(3),
+  .table-prospects .p-table-row > div:nth-child(4),
+  .table-prospects .p-table-row > div:nth-child(6),
+  .table-orgs .p-table-row > div:nth-child(3),
+  .table-orgs .p-table-row > div:nth-child(4),
+  .table-orgs .p-table-row > div:nth-child(6){
+    display:none!important;
+  }
+}
+
+@media(max-width:390px){
+  .table-participants .p-table-row{
+    grid-template-columns:18px minmax(0,1fr) 54px 102px!important;
+    gap:7px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+
+  .td-num{
+    min-width:18px!important;
+    width:18px!important;
+  }
+
+  .p-table-row .p-avatar{
+    width:36px!important;
+    height:36px!important;
+    min-width:36px!important;
+  }
+
+  .td-name-main{
+    font-size:13.5px!important;
+  }
+
+  .td-money{
+    min-width:52px!important;
+    max-width:56px!important;
+    font-size:12px!important;
+  }
+
+  .p-table-row .p-status-btn,
+  .p-table-row .notify-btn{
+    min-width:100px!important;
+    max-width:100px!important;
+    font-size:9px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+}
+
 </style>
 
 <!-- PWA / iPhone app mode -->
@@ -2137,7 +2448,6 @@ header::before{
     <select id="o-sort" onchange="renderOrgs()">
       <option value="manual">Порядок вручную</option>
       <option value="name">Имя А–Я</option>
-      <option value="role">Роль</option>
     </select>
   </div>
   <div class="p-list" id="o-list"></div>
@@ -2483,6 +2793,14 @@ function statusChip(s, extra=''){
   return `<span class="status-chip ${cls} ${extra}">${statusInline(cls, statusShort(s))}</span>`;
 }
 
+function notifyLabel(isOn){
+  return statusInline(isOn ? 'paid' : 'empty', isOn ? 'Уведомлён' : 'Не уведомлён');
+}
+function notifyChip(isOn, extra=''){
+  const cls = isOn ? 'paid' : 'empty';
+  return `<span class="status-chip ${cls} ${extra}">${statusInline(isOn ? 'paid' : 'empty', isOn ? 'Уведомлён' : 'Нет')}</span>`;
+}
+
 function toggleParticipantEditMode(){
   participantEditMode = !participantEditMode;
   syncParticipantModeUI();
@@ -2541,7 +2859,7 @@ function sortItems(list,type,sort){
     const order={'yes':0,'replied':1,'sent':2,'':3,'no':4};
     arr.sort((a,b)=>(order[a.status||'']??9)-(order[b.status||'']??9)||byName(a,b));
   }
-  if(type==='orgs' && sort==='role') arr.sort((a,b)=>(a.role||'').localeCompare(b.role||'','ru')||byName(a,b));
+  
   return arr;
 }
 function deleteProspect(id){
@@ -3192,7 +3510,7 @@ function renderOrgs(){
   const fNotif=getVal('o-filter-notified','all');
   const sort=getVal('o-sort','manual');
   let list=DB.orgs.filter(o=>{
-    const qOk=!q||o.name.toLowerCase().includes(q)||(o.phone||'').toLowerCase().includes(q)||(o.instagram||'').toLowerCase().includes(q)||(o.role||'').toLowerCase().includes(q)||(o.comment||'').toLowerCase().includes(q);
+    const qOk=!q||o.name.toLowerCase().includes(q)||(o.phone||'').toLowerCase().includes(q)||(o.instagram||'').toLowerCase().includes(q)||(o.comment||'').toLowerCase().includes(q);
     const notifOk=fNotif==='all'||(fNotif==='yes'&&o.notified)||(fNotif==='no'&&!o.notified);
     return qOk&&notifOk;
   });
@@ -3213,7 +3531,7 @@ function renderOrgs(){
   wrap.className='p-table-view table-orgs';
   wrap.innerHTML=`
     <div class="p-table-head">
-      <div>#</div><div>Имя</div><div>Контакт</div><div>Роль</div><div>Уведомлён</div><div>Комментарий</div>
+      <div>#</div><div>Имя</div><div>Контакт</div><div>Уведомлён</div><div>Комментарий</div>
     </div>
   `;
 
@@ -3227,8 +3545,8 @@ function renderOrgs(){
 
     const contact = [o.phone?`<span class="meta-text">${esc(o.phone)}</span>`:'', parseIG(o.instagram)?igButton(o.instagram,'sm'):(o.instagram?`<span class="meta-text">${esc(o.instagram)}</span>`:'')].filter(Boolean).join(' ') || '—';
     const notifyMarkup = orgEditMode
-      ? `<button class="notify-btn ${o.notified?'yes':'no'}" onclick="event.stopPropagation();toggleNotif(${o.id})">${o.notified?'✅ Уведомлён':'❌ Не уведомлён'}</button>`
-      : `<div class="notify-btn ${o.notified?'yes':'no'}">${o.notified?'✅ Уведомлён':'❌ Не уведомлён'}</div>`;
+      ? `<button class="notify-btn ${o.notified?'yes':'no'}" onclick="event.stopPropagation();toggleNotif(${o.id})">${notifyLabel(o.notified)}</button>`
+      : `<div class="notify-btn ${o.notified?'yes':'no'}">${notifyLabel(o.notified)}</div>`;
     row.innerHTML=`
       <div class="td-num"><span class="td-drag ${orgEditMode?'':'hidden'}" title="Перетащи для перестановки">⠿</span>${orgEditMode?'':i+1}</div>
       <div class="td-person">
@@ -3239,7 +3557,6 @@ function renderOrgs(){
         </div>
       </div>
       <div class="td-contact">${contact}</div>
-      <div class="td-role">${o.role?`<span class="role-pill">${esc(o.role)}</span>`:'—'}</div>
       <div>${notifyMarkup}</div>
       <div class="td-comment">${o.comment?esc(o.comment):'—'}</div>
     `;
@@ -3283,7 +3600,7 @@ function renderOrgs(){
 function toggleNotif(id){
   const o=DB.orgs.find(x=>x.id===id); if(!o)return;
   o.notified=!o.notified; save(); renderOrgs(); updateAnalytics();
-  toast(o.notified?'Уведомлён ✅':'Снято уведомление');
+  toast(o.notified?'Уведомлён':'Снято уведомление');
 }
 function ctxOrg(e,id){
   e.preventDefault();
@@ -3302,7 +3619,7 @@ function openOrgDossier(id){
   document.getElementById('overlay').classList.add('open');
   const modal=document.querySelector('.modal');
   modal.classList.add('dossier');
-  document.getElementById('modal-title').textContent='Досье организатора';
+  document.getElementById('modal-title').textContent='Досье организаторанизатора';
   document.getElementById('modal-body').innerHTML=`
     <div class="dossier-wrap">
       <div class="dossier-media">
@@ -3316,7 +3633,7 @@ function openOrgDossier(id){
         <div class="dossier-head">
           <div>
             <div class="dossier-name">${esc(o.name)}</div>
-            <div class="dossier-sub">${o.role ? esc(o.role) : 'Роль пока не заполнена'}</div>
+            <div class="dossier-sub">Организатор мастермайнда</div>
           </div>
           <div class="dossier-kpi">
             <div class="dk dk-status ${o.notified?'paid':'empty'}"><div class="dk-lbl">Статус</div><div class="dk-val"><span class="status-chip ${o.notified?'paid':'empty'} big">${statusInline(o.notified?'paid':'empty', o.notified?'Уведомлён':'Нет')}</span></div></div>
@@ -3333,12 +3650,8 @@ function openOrgDossier(id){
             <div class="dossier-item-val ${o.instagram?'':'muted'}">${o.instagram ? igButton(o.instagram,'big') : 'Не заполнено'}</div>
           </div>
           <div class="dossier-item">
-            <div class="dossier-item-lbl">Роль</div>
-            <div class="dossier-item-val ${o.role?'':'muted'}">${o.role ? esc(o.role) : 'Не заполнено'}</div>
-          </div>
-          <div class="dossier-item">
             <div class="dossier-item-lbl">Уведомление</div>
-            <div class="dossier-item-val">${o.notified?'✅ Уведомлён':'❌ Не уведомлён'}</div>
+            <div class="dossier-item-val">${notifyChip(o.notified)}</div>
           </div>
           <div class="dossier-item full">
             <div class="dossier-item-lbl">Комментарий</div>
@@ -3362,7 +3675,7 @@ function openModal(type, existing=null){
   document.getElementById('modal-cancel-btn').textContent='Отмена';
   document.getElementById('modal-cancel-btn').style.display='inline-flex';
   document.getElementById('modal-save-btn').style.display='inline-flex';
-  const titles={participant:'Новый участник',prospect:'Потенциальный',org:'Новый организатор'};
+  const titles={participant:'Новый участник',prospect:'Потенциальный',org:'Новый организаторанизатор'};
   document.getElementById('modal-title').textContent=existing?'Редактировать':titles[type];
 
   if(type==='participant'){
@@ -3421,7 +3734,6 @@ function openModal(type, existing=null){
         <div class="fg full"><label>Имя</label><input id="f-name" value="${esc(p.name||'')}" placeholder="Имя" autofocus></div>
         <div class="fg"><label>Телефон</label><input id="f-phone" value="${esc(p.phone||'')}" placeholder="+7..."></div>
         <div class="fg"><label>Instagram</label><input id="f-ig" value="${esc(p.instagram||'')}" placeholder="@username"></div>
-        <div class="fg full"><label>Роль</label><input id="f-role" value="${esc(p.role||'')}" placeholder="Фотограф, координатор..."></div>
         <div class="fg"><label>Уведомлён о времени</label><select id="f-notif">
           <option value="0" ${!p.notified?'selected':''}>Не уведомлён</option>
           <option value="1" ${p.notified?'selected':''}>Уведомлён</option>
@@ -3449,7 +3761,7 @@ function saveModal(){
     else { DB.prospects.push({id:_prid++,...d}); }
     save();renderProspects();
   } else if(_modalType==='org'){
-    const d={name,phone:v('f-phone'),instagram:v('f-ig'),role:v('f-role'),notified:v('f-notif')==='1',comment:v('f-comment')};
+    const d={name,phone:v('f-phone'),instagram:v('f-ig'),notified:v('f-notif')==='1',comment:v('f-comment')};
     if(_modalEdit){ Object.assign(DB.orgs.find(x=>x.id===_modalEdit.id),d); }
     else { DB.orgs.push({id:_oid++,...d}); }
     save();renderOrgs();
