@@ -612,8 +612,28 @@ body,
 .p-table-row.top-row{background:linear-gradient(90deg,rgba(98,191,74,.16),rgba(98,191,74,.045) 46%,transparent);border-left:2px solid var(--green)}
 .p-table-row.top-row:hover{background:linear-gradient(90deg,rgba(98,191,74,.22),rgba(98,191,74,.07) 46%,#151515)}
 .p-table-row:last-child{border-bottom:none}
-.p-table-row.dragging{opacity:.45;background:var(--s2)}
-.p-table-row.drag-over{border-top:2px solid var(--green)}
+.p-table-row.dragging{
+  opacity:.86;
+  background:linear-gradient(180deg,#171717,#111);
+  border-color:rgba(98,191,74,.42);
+  box-shadow:0 18px 42px rgba(0,0,0,.34),0 0 0 1px rgba(98,191,74,.18);
+  animation:draftDragShake .18s ease-in-out infinite;
+}
+.p-table-row.drag-over{
+  border-top:2px solid var(--green);
+  background:linear-gradient(90deg,rgba(98,191,74,.12),rgba(17,17,17,.98) 46%);
+  box-shadow:inset 0 1px 0 rgba(155,255,93,.2);
+}
+@keyframes draftDragShake{
+  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
+  25%{transform:translate3d(.5px,-.5px,0) rotate(-.18deg)}
+  75%{transform:translate3d(-.5px,.5px,0) rotate(.18deg)}
+}
+@keyframes draftDropPulse{
+  0%{box-shadow:0 0 0 0 rgba(98,191,74,.28)}
+  100%{box-shadow:0 0 0 12px rgba(98,191,74,0)}
+}
+.p-table-row.drag-placed{animation:draftDropPulse .42s ease-out}
 
 .list-controls{
   display:flex;
@@ -2529,13 +2549,22 @@ header::before{
     -webkit-touch-callout:none;
   }
   .p-table-row.mobile-dragging{
-    opacity:.72;
-    transform:scale(.985);
+    opacity:.92;
+    z-index:20;
+    transform:translate3d(0,var(--drag-y,0px),0) scale(.985) rotate(.22deg);
     border-color:rgba(98,191,74,.55)!important;
     box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(98,191,74,.22)!important;
+    animation:draftMobileDragShake .2s ease-in-out infinite;
   }
   .p-table-row.mobile-drag-over{
     border-top:3px solid var(--green)!important;
+    background:linear-gradient(135deg,rgba(98,191,74,.16),rgba(17,17,17,.98) 52%)!important;
+    box-shadow:inset 0 1px 0 rgba(155,255,93,.18),0 10px 28px rgba(0,0,0,.22)!important;
+  }
+  .p-table-row.mobile-drag-placed{animation:draftDropPulse .42s ease-out}
+  @keyframes draftMobileDragShake{
+    0%,100%{filter:brightness(1.02)}
+    50%{filter:brightness(1.12)}
   }
 }
 </style>
@@ -3256,7 +3285,7 @@ function renderParticipants(){
         const [moved]=DB.participants.splice(dragSrcIdx,1);
         DB.participants.splice(tgtIdx,0,moved);
         dragSrcIdx=null;
-        save(); renderParticipants();
+        save(); renderParticipants(); pulsePlacedRow('participants',moved.id);
       });
     }
 
@@ -3709,7 +3738,7 @@ function renderProspects(){
         const [moved]=DB.prospects.splice(dragSrcProspectIdx,1);
         DB.prospects.splice(tgtIdx,0,moved);
         dragSrcProspectIdx=null;
-        save(); renderProspects();
+        save(); renderProspects(); pulsePlacedRow('prospects',moved.id);
       });
     }
 
@@ -3903,7 +3932,7 @@ function renderOrgs(){
         const [moved]=DB.orgs.splice(dragSrcOrgIdx,1);
         DB.orgs.splice(tgtIdx,0,moved);
         dragSrcOrgIdx=null;
-        save(); renderOrgs();
+        save(); renderOrgs(); pulsePlacedRow('orgs',moved.id);
       });
     }
 
@@ -4110,6 +4139,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // ─── CLOUD SYNC / BACKUP ───────────────────────────────────
 const SYNC_KEY = 'draft_mm_sync_config_v1';
 const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
+const SYNC_POLL_MS = 4500;
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
   anonKey: 'sb_publishable_ujpC3zRG3h-e0FEYq6dNdA_qT8AV-lP',
@@ -4129,7 +4159,9 @@ let syncReady = false;
 let syncApplyingRemote = false;
 let syncSaveTimer = null;
 let syncReconnectTimer = null;
+let syncPollTimer = null;
 let syncConnecting = false;
+let syncPolling = false;
 let syncLastHash = '';
 
 function markPendingCloudSave(){ try{ localStorage.setItem(PENDING_SYNC_KEY,'1'); }catch{} }
@@ -4139,6 +4171,21 @@ function scheduleCloudReconnect(){
   if(!syncConfig) return;
   clearTimeout(syncReconnectTimer);
   syncReconnectTimer=setTimeout(()=>initCloudSync(true),700);
+}
+function applyRemoteState(next,{silent=false}={}){
+  if(!next) return false;
+  const h=hashData(next);
+  if(h===syncLastHash) return false;
+  syncApplyingRemote=true;
+  DB=next;
+  normalizeDB();
+  saveLocal();
+  refreshAll();
+  syncApplyingRemote=false;
+  syncLastHash=h;
+  setSyncStatus('Онлайн','online');
+  if(!silent) toast('Обновлено с другого устройства');
+  return true;
 }
 function mergeArrayById(remoteArr=[], localArr=[]){
   const result=(Array.isArray(remoteArr)?remoteArr:[]).map(x=>deep(x));
@@ -4163,11 +4210,6 @@ function mergeCloudState(remote, local){
     prospects:mergeArrayById(base.prospects,mine.prospects)
   };
 }
-function localHasExtraRecords(remote, local){
-  const count=(obj,key)=>Array.isArray(obj?.[key]) ? obj[key].length : 0;
-  return ['participants','prospects','orgs'].some(key=>count(local,key)>count(remote,key));
-}
-
 function setSyncStatus(text, state='local'){
   const el=document.getElementById('sync-status');
   if(!el)return;
@@ -4198,6 +4240,7 @@ function clearSyncSetup(){
   localStorage.removeItem(SYNC_KEY);
   syncConfig=null; syncReady=false;
   if(syncChannel && syncClient) syncClient.removeChannel(syncChannel);
+  clearTimeout(syncPollTimer);
   syncChannel=null; syncClient=null;
   setSyncStatus('Локально','local');
   toast('Синхронизация отключена');
@@ -4218,7 +4261,7 @@ async function initCloudSync(force=false){
     const {data,error} = await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
     if(error) throw error;
     if(data?.data){
-      const pendingNow=hadPendingLocal || hasPendingCloudSave() || localHasExtraRecords(data.data, localBeforeSync);
+      const pendingNow=hadPendingLocal || hasPendingCloudSave();
       const localForMerge=pendingNow ? deep(DB) : localBeforeSync;
       syncApplyingRemote=true;
       DB = pendingNow ? mergeCloudState(data.data, localForMerge) : data.data;
@@ -4239,6 +4282,7 @@ async function initCloudSync(force=false){
     clearTimeout(syncReconnectTimer);
     setSyncStatus('Онлайн','online');
     subscribeCloudChanges();
+    startCloudPolling();
   } catch(err){
     console.error(err);
     syncApplyingRemote=false;
@@ -4257,20 +4301,49 @@ function subscribeCloudChanges(){
     .on('postgres_changes', {event:'*', schema:'public', table:'draft_crm_state', filter:'id=eq.'+syncConfig.rowId}, payload => {
       const next = payload?.new?.data;
       if(!next) return;
-      const h=hashData(next);
-      if(h===syncLastHash) return;
-      syncApplyingRemote=true;
-      DB=next;
-      normalizeDB(); saveLocal(); refreshAll();
-      syncApplyingRemote=false;
-      syncLastHash=h;
-      setSyncStatus('Онлайн','online');
-      toast('Обновлено с другого устройства');
+      if(hasPendingCloudSave()) return;
+      applyRemoteState(next);
     })
     .subscribe(status=>{
       if(status==='SUBSCRIBED') setSyncStatus('Онлайн','online');
-      if(status==='CHANNEL_ERROR' || status==='TIMED_OUT') setSyncStatus('Сбой','error');
+      if(status==='CHANNEL_ERROR' || status==='TIMED_OUT'){
+        setSyncStatus('Сбой','error');
+        scheduleCloudReconnect();
+      }
     });
+}
+
+function startCloudPolling(){
+  clearTimeout(syncPollTimer);
+  if(!syncConfig) return;
+  syncPollTimer=setTimeout(async()=>{
+    await pollCloudNow(true);
+    startCloudPolling();
+  },SYNC_POLL_MS);
+}
+
+async function pollCloudNow(silent=true){
+  if(syncPolling || !syncConfig) return;
+  if(!syncClient){
+    if(!syncConnecting) initCloudSync(true);
+    return;
+  }
+  if(document.visibilityState && document.visibilityState !== 'visible') return;
+  syncPolling=true;
+  try{
+    if(hasPendingCloudSave()){
+      await pushCloudNow(true);
+      return;
+    }
+    const {data,error}=await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
+    if(error) throw error;
+    if(data?.data) applyRemoteState(data.data,{silent});
+  } catch(err){
+    console.error(err);
+    setSyncStatus('Сбой','error');
+  } finally {
+    syncPolling=false;
+  }
 }
 
 function scheduleCloudSave(){
@@ -4304,10 +4377,14 @@ async function pushCloudNow(silent=false){
 window.addEventListener('online',()=>{
   if(syncConfig) initCloudSync(true);
 });
+window.addEventListener('focus',()=>{
+  if(syncConfig) pollCloudNow(true);
+});
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible' && syncConfig && hasPendingCloudSave()){
-    if(syncReady && syncClient) pushCloudNow(true);
+  if(document.visibilityState==='visible' && syncConfig){
+    if(syncReady && syncClient) pollCloudNow(true);
     else initCloudSync(true);
+    startCloudPolling();
   }
 });
 
@@ -4503,6 +4580,13 @@ function renderMobileRowKind(kind){
   if(kind==='prospects') renderProspects();
   if(kind==='orgs') renderOrgs();
 }
+function pulsePlacedRow(kind,id){
+  const container=getMobileRowContainer(kind);
+  const row=container?.querySelector?.(`.p-table-row[data-id="${id}"]`);
+  if(!row) return;
+  row.classList.add('drag-placed','mobile-drag-placed');
+  setTimeout(()=>row.classList.remove('drag-placed','mobile-drag-placed'),460);
+}
 function startMobileRowDrag(row,x,y){
   const kind=getMobileRowKind(row);
   const id=+row.dataset.id;
@@ -4512,11 +4596,14 @@ function startMobileRowDrag(row,x,y){
   _touchCtxSuppressClick=true;
   document.body.classList.add('mobile-row-dragging','touch-context-open');
   row.classList.add('mobile-dragging');
+  row.style.setProperty('--drag-y','0px');
   window.getSelection?.().removeAllRanges?.();
   if(navigator.vibrate) navigator.vibrate(10);
 }
 function updateMobileRowDrag(x,y){
   if(!_mobileDrag) return;
+  const dy=Math.max(-180,Math.min(180,y-_mobileDrag.startY));
+  _mobileDrag.row?.style.setProperty('--drag-y',dy+'px');
   const container=getMobileRowContainer(_mobileDrag.kind);
   const el=document.elementFromPoint(x,y);
   const target=el?.closest?.('.p-table-row');
@@ -4532,6 +4619,7 @@ function finishMobileRowDrag(){
   if(!_mobileDrag) return;
   const {kind,id,target,row}= _mobileDrag;
   row?.classList.remove('mobile-dragging');
+  row?.style.removeProperty('--drag-y');
   document.querySelectorAll('.mobile-drag-over').forEach(r=>r.classList.remove('mobile-drag-over'));
   document.body.classList.remove('mobile-row-dragging','touch-context-open');
   if(target){
@@ -4544,6 +4632,7 @@ function finishMobileRowDrag(){
       arr.splice(to,0,moved);
       save();
       renderMobileRowKind(kind);
+      pulsePlacedRow(kind,id);
       toast('Порядок обновлён');
     }
   }
