@@ -1691,7 +1691,7 @@ header::before{
   gap:20px;
   align-items:center;
 }
-.randomizer-metrics{display:flex;gap:2px;min-width:360px}
+.randomizer-metrics{display:flex;gap:2px;min-width:240px}
 .randomizer-metric{
   min-width:112px;
   padding:13px 14px 12px;
@@ -1765,17 +1765,13 @@ header::before{
 .randomizer-members{display:flex;flex-direction:column;gap:8px}
 .randomizer-member{
   display:grid;
-  grid-template-columns:34px minmax(0,1fr) auto;
+  grid-template-columns:34px minmax(0,1fr);
   gap:10px;
   align-items:center;
   min-height:48px;
   padding:7px 8px;
   background:rgba(255,255,255,.025);
   border:1px solid rgba(255,255,255,.055);
-}
-.randomizer-member.top{
-  background:linear-gradient(90deg,rgba(98,191,74,.13),rgba(255,255,255,.025));
-  border-color:rgba(98,191,74,.23);
 }
 .randomizer-avatar{
   width:34px;
@@ -1811,20 +1807,6 @@ header::before{
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.randomizer-badge{
-  display:inline-flex;
-  align-items:center;
-  min-height:22px;
-  padding:5px 7px;
-  border-radius:999px;
-  border:1px solid rgba(98,191,74,.28);
-  background:rgba(25,53,22,.5);
-  color:var(--green-lt);
-  font-size:9px;
-  font-weight:850;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-}
 .randomizer-empty{
   grid-column:1/-1;
   padding:52px 18px;
@@ -1832,6 +1814,66 @@ header::before{
   border:1px dashed rgba(255,255,255,.13);
   color:var(--gray1);
   text-align:center;
+}
+body.presentation-mode{
+  background:#050505;
+}
+body.presentation-mode header,
+body.presentation-mode nav,
+body.presentation-mode .randomizer-header .sec-actions,
+body.presentation-mode .randomizer-panel,
+body.presentation-mode .toast,
+body.presentation-mode .ctx{
+  display:none!important;
+}
+body.presentation-mode main{
+  padding:34px 42px 42px;
+  min-height:100vh;
+}
+body.presentation-mode .view{display:none!important}
+body.presentation-mode #view-randomizer{display:block!important;animation:none}
+body.presentation-mode .randomizer-header{
+  display:flex;
+  margin-bottom:24px;
+  border-bottom:1px solid rgba(98,191,74,.24);
+  padding-bottom:18px;
+}
+body.presentation-mode .sec-title{
+  font-size:clamp(48px,5vw,84px);
+}
+body.presentation-mode .randomizer-grid{
+  min-height:calc(100vh - 170px);
+  gap:10px;
+}
+body.presentation-mode .randomizer-team{
+  min-height:0;
+  border-radius:18px;
+  padding:24px;
+}
+body.presentation-mode .randomizer-team-title{
+  font-size:clamp(20px,1.7vw,30px);
+}
+body.presentation-mode .randomizer-team-meta{
+  font-size:12px;
+}
+body.presentation-mode .randomizer-members{
+  gap:12px;
+}
+body.presentation-mode .randomizer-member{
+  min-height:64px;
+  grid-template-columns:46px minmax(0,1fr);
+  padding:9px 10px;
+}
+body.presentation-mode .randomizer-avatar{
+  width:46px;
+  height:46px;
+  font-size:14px;
+}
+body.presentation-mode .randomizer-member-name{
+  font-size:clamp(16px,1.35vw,22px);
+}
+body.presentation-mode .randomizer-member-sub{
+  display:none;
 }
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
@@ -2832,8 +2874,8 @@ header::before{
   <button class="tab" onclick="switchTab('participants',this)">Участники <span class="badge" id="badge-p">0</span></button>
   <button class="tab" onclick="switchTab('prospects',this)">Потенциально <span class="badge muted" id="badge-pr">0</span></button>
   <button class="tab" onclick="switchTab('orgs',this)">Организаторы <span class="badge muted" id="badge-o">0</span></button>
-  <button class="tab" onclick="switchTab('randomizer',this)">Рандомайзер</button>
   <button class="tab" onclick="switchTab('club',this)">Клуб</button>
+  <button class="tab" onclick="switchTab('randomizer',this)">Рандомайзер</button>
 </nav>
 
 <main>
@@ -3010,6 +3052,8 @@ header::before{
     <div class="sec-title">Рандомайзер <span id="rnd-cnt"></span></div>
     <div class="sec-actions">
       <span class="sec-actions-note" id="rnd-note">4 команды · только участники</span>
+      <button class="btn btn-ghost btn-sm" onclick="openRandomizerPresentation()">На экран</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetRandomizer()">Сброс</button>
       <button class="btn btn-solid btn-sm" onclick="randomizeTeams()">↻ Собрать команды</button>
     </div>
   </div>
@@ -3018,10 +3062,6 @@ header::before{
       <div class="randomizer-metric">
         <div class="randomizer-metric-val" id="rnd-total">0</div>
         <div class="randomizer-metric-lbl">Ведущие</div>
-      </div>
-      <div class="randomizer-metric">
-        <div class="randomizer-metric-val" id="rnd-top">0</div>
-        <div class="randomizer-metric-lbl">Топы</div>
       </div>
       <div class="randomizer-metric">
         <div class="randomizer-metric-val" id="rnd-teams">4</div>
@@ -4353,13 +4393,12 @@ function setRandomizerStatus(text,state=''){
 function randomizerMemberMarkup(p){
   const idx=DB.participants.indexOf(p)+1;
   return `
-    <div class="randomizer-member ${p.top?'top':''}">
+    <div class="randomizer-member">
       <div class="randomizer-avatar">${p.photo ? `<img src="${p.photo}" alt="">` : makeInitials(p.name)}</div>
       <div>
         <div class="randomizer-member-name">${esc(p.name)}</div>
         <div class="randomizer-member-sub">Участник #${idx || '—'}</div>
       </div>
-      ${p.top ? '<span class="randomizer-badge">Топ</span>' : ''}
     </div>
   `;
 }
@@ -4370,7 +4409,6 @@ function renderRandomizer(){
   if(!board) return;
   document.getElementById('rnd-cnt').innerHTML=`<span style="color:var(--green)">${pool.length}</span>`;
   document.getElementById('rnd-total').textContent=pool.length;
-  document.getElementById('rnd-top').textContent=tops.length;
   document.getElementById('rnd-teams').textContent=RANDOMIZER_TEAM_COUNT;
 
   const byId=new Map(pool.map(p=>[String(p.id),p]));
@@ -4381,7 +4419,7 @@ function renderRandomizer(){
   if(!hasTeams){
     board.innerHTML='<div class="randomizer-empty">Команды ещё не собраны</div>';
     if(tops.length<RANDOMIZER_TEAM_COUNT){
-      setRandomizerStatus(`Нужно минимум ${RANDOMIZER_TEAM_COUNT} топа. Сейчас: ${tops.length}.`,'warn');
+      setRandomizerStatus('Недостаточно отмеченных участников для условий раскладки.','warn');
     } else {
       setRandomizerStatus('Готов к сборке команд','ok');
     }
@@ -4392,7 +4430,7 @@ function renderRandomizer(){
     <div class="randomizer-team">
       <div class="randomizer-team-head">
         <div class="randomizer-team-title">Команда ${i+1}</div>
-        <div class="randomizer-team-meta">${team.length} чел · топов ${randomizerTopCount(team)}</div>
+        <div class="randomizer-team-meta">${team.length} чел</div>
       </div>
       <div class="randomizer-members">
         ${team.map(randomizerMemberMarkup).join('')}
@@ -4430,8 +4468,8 @@ function randomizeTeams(){
 
   const topUnits=shuffled(units.filter(unit=>unit.members.some(p=>p.top)));
   if(topUnits.length<RANDOMIZER_TEAM_COUNT){
-    setRandomizerStatus(`Топов должно хватать на ${RANDOMIZER_TEAM_COUNT} разные команды. Сейчас топ-групп: ${topUnits.length}.`,'warn');
-    toast('Не хватает топов для честного расклада');
+    setRandomizerStatus('Недостаточно отмеченных участников для условий раскладки.','warn');
+    toast('Не хватает отмеченных участников');
     return;
   }
 
@@ -4459,6 +4497,38 @@ function randomizeTeams(){
   renderRandomizer();
   toast('Команды собраны');
 }
+function resetRandomizer(){
+  DB.randomizer={teams:[],createdAt:''};
+  save();
+  renderRandomizer();
+  toast('Расклад сброшен');
+}
+function openRandomizerPresentation(){
+  const url=new URL(window.location.href);
+  url.searchParams.set('present','randomizer');
+  url.hash='';
+  const win=window.open(url.toString(),'draft-randomizer-screen','popup=yes,width=1600,height=900');
+  if(!win) toast('Браузер заблокировал новое окно');
+}
+function applyPresentationMode(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('present')!=='randomizer') return false;
+  document.body.classList.add('presentation-mode');
+  document.title='Рандомайзер · драфт';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-randomizer')?.classList.add('active');
+  renderRandomizer();
+  return true;
+}
+window.addEventListener('storage', e=>{
+  if(e.key!==KEY || !e.newValue) return;
+  try{
+    DB=JSON.parse(e.newValue);
+    normalizeDB();
+    refreshAll();
+  } catch {}
+});
 
 // ─── CLUB ──────────────────────────────────────────────────
 function clubItems(){
@@ -5458,6 +5528,7 @@ renderParticipants();
 renderProspects();
 renderOrgs();
 renderRandomizer();
+applyPresentationMode();
 initCloudSync();
 </script>
 </body>
