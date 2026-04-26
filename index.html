@@ -1875,6 +1875,141 @@ body.presentation-mode .randomizer-member-name{
 body.presentation-mode .randomizer-member-sub{
   display:none;
 }
+body.mode-gate-active{
+  min-height:100vh;
+  overflow:hidden;
+}
+body.mode-gate-active header,
+body.mode-gate-active nav,
+body.mode-gate-active main,
+body.mode-gate-active .toast,
+body.mode-gate-active .ctx{
+  display:none!important;
+}
+.mode-gate{
+  display:none;
+  min-height:100vh;
+  padding:48px 56px;
+  background:
+    radial-gradient(circle at 84% 8%,rgba(98,191,74,.12),transparent 34%),
+    linear-gradient(180deg,#0b0b0b,#050505);
+}
+body.mode-gate-active .mode-gate{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:44px;
+}
+.mode-gate-logo{
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:clamp(78px,10vw,148px);
+  line-height:.85;
+  color:var(--white);
+  letter-spacing:-.01em;
+  transform:scaleX(.95);
+  transform-origin:left center;
+}
+.mode-gate-logo span{color:var(--green)}
+.mode-gate-sub{
+  margin-top:16px;
+  color:var(--gray1);
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.mode-gate-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(260px,1fr));
+  gap:2px;
+  max-width:980px;
+}
+.mode-card{
+  text-align:left;
+  min-height:220px;
+  padding:28px;
+  background:rgba(17,17,17,.92);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--white);
+  transition:transform .18s,border-color .18s,background .18s;
+}
+.mode-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(98,191,74,.48);
+  background:rgba(20,28,19,.94);
+}
+.mode-card-kicker{
+  color:var(--green-lt);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+.mode-card-title{
+  font-size:34px;
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:-.03em;
+  text-transform:uppercase;
+}
+.mode-card-text{
+  margin-top:14px;
+  max-width:360px;
+  color:var(--gray1);
+  font-size:13px;
+  line-height:1.45;
+}
+body.event-mode header{
+  padding:26px 44px 18px;
+}
+body.event-mode header .logo{
+  font-size:64px;
+  margin-bottom:8px;
+}
+body.event-mode nav{
+  display:none;
+}
+body.event-mode main{
+  padding:30px 44px 44px;
+}
+body.event-mode .view{
+  display:none!important;
+}
+body.event-mode #view-randomizer{
+  display:block!important;
+}
+.event-exit-btn{
+  display:none;
+}
+body.event-mode .event-exit-btn{
+  display:inline-flex;
+}
+.randomizer-grid.reveal .randomizer-team{
+  animation:teamReveal .42s cubic-bezier(.18,.8,.24,1) both;
+}
+.randomizer-grid.reveal .randomizer-team:nth-child(2){animation-delay:.08s}
+.randomizer-grid.reveal .randomizer-team:nth-child(3){animation-delay:.16s}
+.randomizer-grid.reveal .randomizer-team:nth-child(4){animation-delay:.24s}
+.randomizer-grid.reveal .randomizer-member{
+  opacity:0;
+  transform:translateY(10px);
+  animation:memberReveal .42s cubic-bezier(.18,.8,.24,1) forwards;
+}
+.randomizer-grid.reveal .randomizer-member:nth-child(1){animation-delay:.18s}
+.randomizer-grid.reveal .randomizer-member:nth-child(2){animation-delay:.24s}
+.randomizer-grid.reveal .randomizer-member:nth-child(3){animation-delay:.30s}
+.randomizer-grid.reveal .randomizer-member:nth-child(4){animation-delay:.36s}
+.randomizer-grid.reveal .randomizer-member:nth-child(5){animation-delay:.42s}
+.randomizer-grid.reveal .randomizer-member:nth-child(6){animation-delay:.48s}
+.randomizer-grid.reveal .randomizer-member:nth-child(n+7){animation-delay:.54s}
+@keyframes teamReveal{
+  from{opacity:0;transform:translateY(18px);filter:brightness(.8)}
+  to{opacity:1;transform:translateY(0);filter:brightness(1)}
+}
+@keyframes memberReveal{
+  to{opacity:1;transform:translateY(0)}
+}
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
   .club-hero{grid-template-columns:1fr;gap:14px;padding-top:6px}
@@ -1889,12 +2024,18 @@ body.presentation-mode .randomizer-member-sub{
   .club-name{font-size:15px}
   .club-card{animation-duration:.34s}
   .randomizer-panel{grid-template-columns:1fr;padding:14px;gap:14px}
-  .randomizer-metrics{min-width:0;width:100%;display:grid;grid-template-columns:repeat(3,1fr)}
+  .randomizer-metrics{min-width:0;width:100%;display:grid;grid-template-columns:repeat(2,1fr)}
   .randomizer-metric{min-width:0;padding:11px 10px}
   .randomizer-metric-val{font-size:24px}
   .randomizer-status{justify-content:flex-start;text-align:left}
   .randomizer-grid{grid-template-columns:1fr;gap:8px}
   .randomizer-team{min-height:0;border-radius:14px;padding:14px}
+  .mode-gate{padding:28px 18px}
+  .mode-gate-actions{grid-template-columns:1fr}
+  .mode-card{min-height:170px;padding:22px}
+  .mode-card-title{font-size:28px}
+  body.event-mode header{padding:22px 18px 14px}
+  body.event-mode main{padding:22px 14px calc(88px + env(safe-area-inset-bottom))}
 }
 
 
@@ -2852,7 +2993,26 @@ body.presentation-mode .randomizer-member-sub{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
-<body>
+<body class="mode-gate-active">
+
+<div class="mode-gate" id="mode-gate">
+  <div>
+    <div class="mode-gate-logo">драфт<span>.</span></div>
+    <div class="mode-gate-sub">закрытый мастермайнд ведущих</div>
+  </div>
+  <div class="mode-gate-actions">
+    <button class="mode-card" type="button" onclick="enterAppMode('crm')">
+      <div class="mode-card-kicker">Рабочая зона</div>
+      <div class="mode-card-title">CRM</div>
+      <div class="mode-card-text">Участники, потенциальные, организаторы, оплаты, комментарии и синхронизация.</div>
+    </button>
+    <button class="mode-card" type="button" onclick="enterAppMode('event')">
+      <div class="mode-card-kicker">Оффлайн-ивент</div>
+      <div class="mode-card-title">Команды</div>
+      <div class="mode-card-text">Публичный режим без внутренней кухни: деление участников и вывод на экран.</div>
+    </button>
+  </div>
+</div>
 
 <header>
   <div>
@@ -2875,7 +3035,7 @@ body.presentation-mode .randomizer-member-sub{
   <button class="tab" onclick="switchTab('prospects',this)">Потенциально <span class="badge muted" id="badge-pr">0</span></button>
   <button class="tab" onclick="switchTab('orgs',this)">Организаторы <span class="badge muted" id="badge-o">0</span></button>
   <button class="tab" onclick="switchTab('club',this)">Клуб</button>
-  <button class="tab" onclick="switchTab('randomizer',this)">Рандомайзер</button>
+  <button class="tab" onclick="switchTab('randomizer',this)">Команды</button>
 </nav>
 
 <main>
@@ -3049,9 +3209,11 @@ body.presentation-mode .randomizer-member-sub{
 <!-- ── RANDOMIZER ── -->
 <div class="view" id="view-randomizer">
   <div class="sec-header randomizer-header">
-    <div class="sec-title">Рандомайзер <span id="rnd-cnt"></span></div>
+    <div class="sec-title">Деление на команды <span id="rnd-cnt"></span></div>
     <div class="sec-actions">
       <span class="sec-actions-note" id="rnd-note">4 команды · только участники</span>
+      <button class="btn btn-ghost btn-sm event-exit-btn" onclick="enterAppMode('gate')">Выбор режима</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleFullscreen()">Во весь экран</button>
       <button class="btn btn-ghost btn-sm" onclick="openRandomizerPresentation()">На экран</button>
       <button class="btn btn-ghost btn-sm" onclick="resetRandomizer()">Сброс</button>
       <button class="btn btn-solid btn-sm" onclick="randomizeTeams()">↻ Собрать команды</button>
@@ -3205,8 +3367,29 @@ function saveLocal(){
   try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
   catch(e){ toast('⚠ Хранилище переполнено — удали лишние фото'); }
 }
+let appMode = 'gate';
+let randomizerLastRenderedCreatedAt = '';
+let appBroadcast = null;
+try{
+  appBroadcast = new BroadcastChannel('draft-crm-live');
+  appBroadcast.onmessage = e=>{
+    if(!e?.data || e.data.key!==KEY || !e.data.value) return;
+    try{
+      DB=JSON.parse(e.data.value);
+      normalizeDB();
+      refreshAll();
+    } catch {}
+  };
+} catch {}
+function broadcastAppState(reason='update'){
+  if(!appBroadcast) return;
+  try{
+    appBroadcast.postMessage({key:KEY,value:JSON.stringify(DB),reason,ts:Date.now()});
+  } catch {}
+}
 function save(){
   saveLocal();
+  broadcastAppState('save');
   markPendingCloudSave();
   scheduleCloudSave();
 }
@@ -3237,6 +3420,8 @@ function plural(n,f){return n===1?f[0]:n>=2&&n<=4?f[1]:f[2]}
 
 // ─── TABS ────────────────────────────────────────────────────
 function switchTab(name, btn){
+  if(document.body.classList.contains('event-mode')) document.body.classList.remove('event-mode');
+  appMode='crm';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   btn.classList.add('active');
@@ -3247,6 +3432,32 @@ function switchTab(name, btn){
   if(name==='orgs') renderOrgs();
   if(name==='randomizer') renderRandomizer();
   if(name==='club') renderClub();
+}
+
+function enterAppMode(mode){
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode');
+  if(mode==='gate'){
+    appMode='gate';
+    document.body.classList.add('mode-gate-active');
+    return;
+  }
+  if(mode==='event'){
+    appMode='event';
+    document.body.classList.add('event-mode');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-randomizer')?.classList.add('active');
+    renderRandomizer();
+    return;
+  }
+  appMode='crm';
+  const activeTab=document.querySelector('.tab.active') || document.querySelector('.tab');
+  if(activeTab){
+    const target=activeTab.getAttribute('onclick')?.match(/switchTab\('([^']+)'/)?.[1] || 'analytics';
+    switchTab(target,activeTab);
+  } else {
+    updateAnalytics();
+  }
 }
 
 // ─── INSTAGRAM ──────────────────────────────────────────────
@@ -4415,14 +4626,17 @@ function renderRandomizer(){
   const teams=(DB.randomizer?.teams||[]).map(ids=>(ids||[]).map(id=>byId.get(String(id))).filter(Boolean));
   const hasTeams=teams.some(team=>team.length);
   const created=randomizerDateLabel(DB.randomizer?.createdAt);
+  const shouldReveal=!!(hasTeams && DB.randomizer?.createdAt && DB.randomizer.createdAt!==randomizerLastRenderedCreatedAt);
+  board.classList.remove('reveal');
 
   if(!hasTeams){
     board.innerHTML='<div class="randomizer-empty">Команды ещё не собраны</div>';
     if(tops.length<RANDOMIZER_TEAM_COUNT){
-      setRandomizerStatus('Недостаточно отмеченных участников для условий раскладки.','warn');
+      setRandomizerStatus('Недостаточно данных для условий раскладки.','warn');
     } else {
       setRandomizerStatus('Готов к сборке команд','ok');
     }
+    randomizerLastRenderedCreatedAt='';
     return;
   }
 
@@ -4437,6 +4651,13 @@ function renderRandomizer(){
       </div>
     </div>
   `).join('');
+  randomizerLastRenderedCreatedAt=DB.randomizer?.createdAt || '';
+  if(shouldReveal){
+    requestAnimationFrame(()=>{
+      board.classList.add('reveal');
+      setTimeout(()=>board.classList.remove('reveal'),1400);
+    });
+  }
   setRandomizerStatus(created ? `Последний расклад: ${created}` : 'Команды собраны','ok');
 }
 function randomizeTeams(){
@@ -4468,8 +4689,8 @@ function randomizeTeams(){
 
   const topUnits=shuffled(units.filter(unit=>unit.members.some(p=>p.top)));
   if(topUnits.length<RANDOMIZER_TEAM_COUNT){
-    setRandomizerStatus('Недостаточно отмеченных участников для условий раскладки.','warn');
-    toast('Не хватает отмеченных участников');
+    setRandomizerStatus('Недостаточно данных для условий раскладки.','warn');
+    toast('Не хватает данных для раскладки');
     return;
   }
 
@@ -4510,16 +4731,36 @@ function openRandomizerPresentation(){
   const win=window.open(url.toString(),'draft-randomizer-screen','popup=yes,width=1600,height=900');
   if(!win) toast('Браузер заблокировал новое окно');
 }
+async function toggleFullscreen(){
+  try{
+    if(document.fullscreenElement){
+      await document.exitFullscreen();
+    } else {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch {
+    toast('Браузер не дал включить полный экран');
+  }
+}
 function applyPresentationMode(){
   const params=new URLSearchParams(window.location.search);
   if(params.get('present')!=='randomizer') return false;
+  document.body.classList.remove('mode-gate-active','event-mode');
   document.body.classList.add('presentation-mode');
-  document.title='Рандомайзер · драфт';
+  appMode='presentation';
+  document.title='Команды · драфт';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-randomizer')?.classList.add('active');
   renderRandomizer();
   return true;
+}
+function applyInitialMode(){
+  if(applyPresentationMode()) return;
+  const params=new URLSearchParams(window.location.search);
+  const mode=params.get('mode');
+  if(mode==='event') enterAppMode('event');
+  else if(mode==='crm') enterAppMode('crm');
 }
 window.addEventListener('storage', e=>{
   if(e.key!==KEY || !e.newValue) return;
@@ -5528,7 +5769,7 @@ renderParticipants();
 renderProspects();
 renderOrgs();
 renderRandomizer();
-applyPresentationMode();
+applyInitialMode();
 initCloudSync();
 </script>
 </body>
