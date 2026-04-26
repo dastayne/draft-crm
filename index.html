@@ -1850,7 +1850,7 @@ body.event-mode .sync-pill.error{
 }
 .timer-panel{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(250px,auto);
+  grid-template-columns:minmax(0,1fr) minmax(330px,auto);
   gap:16px;
   align-items:end;
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
@@ -1929,11 +1929,11 @@ body.event-mode .sync-pill.error{
   pointer-events:none;
 }
 .timer-actions{
-  display:flex;
-  gap:8px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(88px,1fr));
+  gap:7px;
   align-items:center;
-  justify-content:flex-end;
-  flex-wrap:nowrap;
+  justify-content:stretch;
   min-height:58px;
   padding:7px;
   background:rgba(0,0,0,.26);
@@ -1942,10 +1942,12 @@ body.event-mode .sync-pill.error{
 }
 .timer-actions .btn{
   min-height:40px;
-  padding:0 14px;
+  width:100%;
+  padding:0 12px;
   border-radius:6px;
   white-space:nowrap;
   box-shadow:none;
+  justify-content:center;
 }
 .timer-actions .timer-primary{
   padding:0 15px;
@@ -2023,110 +2025,116 @@ body.event-mode .sync-pill.error{
 .timer-stage-inner{
   position:relative;
   z-index:2;
-  width:min(1360px,calc(100% - 76px));
+  width:min(1180px,calc(100% - 76px));
+  min-height:calc(100vh - 440px);
   display:flex;
   flex-direction:column;
-  align-items:stretch;
-  text-align:left;
-  gap:0;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:28px;
   padding:74px 0 58px;
 }
-.timer-brand{
+.timer-brand{display:none}
+.timer-corner-btn{
   position:absolute;
-  left:28px;
-  top:26px;
+  top:30px;
   z-index:3;
-  font-family:'Ekran Draft',var(--font-main);
-  font-size:clamp(30px,2.8vw,44px);
-  line-height:.9;
-  color:rgba(255,255,255,.78);
-  letter-spacing:0;
-  text-transform:lowercase;
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.035);
+  color:rgba(255,255,255,.72);
+  font-size:20px;
+  line-height:1;
+  box-shadow:0 18px 46px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.025);
+  pointer-events:none;
 }
-.timer-brand span{color:var(--green)}
+.timer-corner-btn.left{left:30px}
+.timer-corner-btn.right{right:30px;font-size:18px}
 .timer-topic{
   max-width:100%;
-  color:rgba(255,255,255,.52);
-  font-size:clamp(28px,4.2vw,78px);
+  color:rgba(255,255,255,.66);
+  font-size:clamp(17px,1.8vw,28px);
   line-height:1.25;
-  font-weight:860;
+  font-weight:520;
   letter-spacing:0;
-  text-transform:uppercase;
+  text-transform:none;
   overflow-wrap:anywhere;
-  margin-top:0;
+  margin:0 0 18px;
 }
-.timer-apple-divider{
-  width:100%;
-  height:2px;
-  background:rgba(255,255,255,.14);
-  margin:54px 0 58px;
-}
-.timer-apple-main{
+.timer-focus{
+  --ring-size:clamp(360px,45vw,620px);
+  position:relative;
+  width:var(--ring-size);
+  height:var(--ring-size);
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:center;
-  gap:clamp(34px,7vw,118px);
+  place-items:center;
 }
-.timer-time-block{
+.timer-focus::before{
+  content:'';
+  position:absolute;
+  inset:6%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.055),rgba(255,255,255,.018) 50%,rgba(98,191,74,.055) 100%);
+  box-shadow:0 0 110px rgba(98,191,74,.13),inset 0 0 80px rgba(255,255,255,.025);
+}
+.timer-focus-content{
+  position:relative;
+  z-index:2;
+  width:72%;
   min-width:0;
 }
 .timer-display{
   position:relative;
   z-index:2;
   font-family:var(--font-main);
-  font-size:clamp(104px,15vw,250px);
-  line-height:.86;
-  font-weight:430;
+  font-size:clamp(78px,12vw,156px);
+  line-height:.9;
+  font-weight:330;
   letter-spacing:0;
-  color:rgba(255,255,255,.68);
+  color:rgba(255,255,255,.92);
   font-variant-numeric:tabular-nums;
-  text-shadow:none;
+  text-shadow:0 0 24px rgba(255,255,255,.08);
 }
 .timer-duration{
-  color:rgba(255,255,255,.56);
-  font-size:clamp(28px,3.1vw,54px);
+  color:rgba(255,255,255,.48);
+  font-size:clamp(16px,1.8vw,28px);
   line-height:1;
-  font-weight:460;
+  font-weight:430;
   letter-spacing:0;
-  margin-top:26px;
+  margin-top:20px;
 }
 .timer-status{
+  display:none;
   min-height:18px;
-  color:var(--green-lt);
-  font-size:13px;
-  font-weight:850;
+  color:rgba(255,255,255,.48);
+  font-size:clamp(13px,1.2vw,18px);
+  font-weight:520;
   letter-spacing:0;
-  text-transform:uppercase;
-  margin-top:34px;
+  text-transform:none;
+  margin-top:14px;
 }
 .timer-end-mark{
   display:none;
-  font-size:clamp(32px,3.6vw,64px);
+  font-size:clamp(24px,3vw,48px);
   line-height:1;
-  font-weight:900;
+  font-weight:760;
   color:var(--green-lt);
   letter-spacing:0;
   text-transform:uppercase;
-  margin-top:34px;
-  text-shadow:0 0 32px rgba(98,191,74,.26);
+  margin-top:18px;
+  text-shadow:0 0 28px rgba(98,191,74,.34);
 }
 .timer-ring-control{
-  --ring-size:clamp(156px,16vw,250px);
-  width:var(--ring-size);
-  height:var(--ring-size);
-  position:relative;
-  display:grid;
-  place-items:center;
-  border:0;
-  padding:0;
+  position:absolute;
+  inset:0;
   border-radius:50%;
-  background:transparent;
-  color:var(--green-lt);
-  cursor:pointer;
-  transition:transform .18s ease,color .18s ease,filter .18s ease;
+  pointer-events:none;
 }
-.timer-ring-control:hover{transform:scale(1.025);filter:brightness(1.08)}
-.timer-ring-control:active{transform:scale(.98)}
 .timer-ring{
   position:absolute;
   inset:0;
@@ -2137,11 +2145,11 @@ body.event-mode .sync-pill.error{
 .timer-ring-track,
 .timer-ring-progress{
   fill:none;
-  stroke-width:8;
+  stroke-width:2.8;
   vector-effect:non-scaling-stroke;
 }
 .timer-ring-track{
-  stroke:rgba(255,255,255,.11);
+  stroke:rgba(166,248,147,.22);
 }
 .timer-ring-progress{
   stroke:var(--green-lt);
@@ -2151,37 +2159,52 @@ body.event-mode .sync-pill.error{
   transform:rotate(-90deg) scaleX(-1);
   transform-origin:50% 50%;
   transition:stroke-dashoffset .08s linear,stroke .18s ease,filter .18s ease;
-  filter:drop-shadow(0 0 12px rgba(98,191,74,.2));
+  filter:drop-shadow(0 0 12px rgba(151,255,128,.42)) drop-shadow(0 0 34px rgba(98,191,74,.2));
 }
-.timer-ring-icon{
+.timer-ring-dot{fill:rgba(255,255,255,.92);filter:drop-shadow(0 0 10px rgba(255,255,255,.7))}
+.timer-deco-actions{
   position:relative;
-  z-index:2;
-  width:44%;
-  height:44%;
+  z-index:3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:34px;
+  margin-top:6px;
+}
+.timer-deco-btn{
+  width:66px;
+  height:66px;
   display:grid;
   place-items:center;
-  color:currentColor;
-  font-size:calc(var(--ring-size) * .26);
-  line-height:1;
-  font-weight:760;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.035);
+  color:rgba(255,255,255,.78);
+  box-shadow:0 18px 44px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,255,255,.02);
+  pointer-events:none;
 }
-.timer-ring-icon svg{
-  width:100%;
-  height:100%;
+.timer-deco-btn.primary{
+  border-color:rgba(151,255,128,.42);
+  color:var(--green-lt);
+  background:rgba(98,191,74,.1);
+  box-shadow:0 0 36px rgba(98,191,74,.18),inset 0 0 28px rgba(98,191,74,.08);
+}
+.timer-deco-btn svg{
+  width:24px;
+  height:24px;
   display:block;
   fill:currentColor;
 }
 .timer-stage.is-running .timer-display{color:var(--white)}
 .timer-stage.is-running .timer-ring-progress{animation:timerGlow 2.2s ease-in-out infinite}
 .timer-stage.is-paused .timer-status{color:var(--amber)}
-.timer-stage.is-paused .timer-ring-control{color:var(--amber)}
 .timer-stage.is-paused .timer-ring-progress{stroke:var(--amber);filter:drop-shadow(0 0 12px rgba(231,174,73,.18))}
 .timer-stage.is-done{
   border-color:rgba(98,191,74,.36);
 }
 .timer-stage.is-done::after{animation:timerEndFlash 1.2s ease-out 1 forwards}
 .timer-stage.is-done .timer-display{color:var(--white);animation:timerDigitsEnd 1.05s ease-out 1}
-.timer-stage.is-done .timer-ring-control{animation:timerDoneRing .95s ease-out 1}
+.timer-stage.is-done .timer-focus{animation:timerDoneRing .95s ease-out 1}
 .timer-stage.is-done .timer-ring-progress{filter:drop-shadow(0 0 22px rgba(98,191,74,.38))}
 .timer-stage.is-done .timer-status{display:none}
 .timer-stage.is-done .timer-end-mark{display:block;animation:timerEndPop .75s cubic-bezier(.18,.9,.2,1) both}
@@ -2535,15 +2558,16 @@ body.presentation-mode.presentation-timer .timer-stage{
 }
 body.presentation-mode.presentation-timer .timer-stage-inner{
   width:min(1480px,calc(100% - 104px));
-  padding:72px 0 68px;
+  min-height:100dvh;
+  padding:56px 0 58px;
 }
-body.presentation-mode.presentation-timer .timer-brand{font-size:58px;left:42px;top:38px}
-body.presentation-mode.presentation-timer .timer-topic{font-size:clamp(58px,6.6vw,128px)}
-body.presentation-mode.presentation-timer .timer-apple-divider{margin:64px 0 66px}
-body.presentation-mode.presentation-timer .timer-display{font-size:clamp(170px,18vw,350px);font-weight:420}
-body.presentation-mode.presentation-timer .timer-duration{font-size:clamp(38px,3.4vw,64px)}
-body.presentation-mode.presentation-timer .timer-status{font-size:17px;margin-top:38px}
-body.presentation-mode.presentation-timer .timer-ring-control{--ring-size:clamp(210px,18vw,310px)}
+body.presentation-mode.presentation-timer .timer-focus{--ring-size:clamp(520px,48vw,760px)}
+body.presentation-mode.presentation-timer .timer-display{font-size:clamp(108px,11vw,184px);font-weight:320}
+body.presentation-mode.presentation-timer .timer-duration{font-size:clamp(20px,1.8vw,32px)}
+body.presentation-mode.presentation-timer .timer-deco-btn{width:74px;height:74px}
+body.presentation-mode.presentation-timer .timer-corner-btn{top:42px;width:52px;height:52px}
+body.presentation-mode.presentation-timer .timer-corner-btn.left{left:42px}
+body.presentation-mode.presentation-timer .timer-corner-btn.right{right:42px}
 body.presentation-mode.presentation-splash .splash-view.theme-dark .splash-mark,
 body.presentation-mode.presentation-splash .splash-view.theme-light .splash-mark{
   font-size:clamp(130px,16vw,260px);
@@ -2759,17 +2783,19 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .timer-form{grid-template-columns:1fr;gap:10px}
   .timer-presets{gap:5px}
   .timer-preset-btn{flex:1;min-width:54px}
-  .timer-actions{justify-content:flex-start;flex-wrap:wrap}
+  .timer-actions{grid-template-columns:1fr;justify-content:stretch}
   .timer-actions-divider{display:none}
   .timer-stage{min-height:calc(100dvh - 310px)}
-  .timer-stage-inner{width:calc(100% - 28px);padding:66px 0 32px}
-  .timer-brand{font-size:34px;left:18px;top:18px}
-  .timer-topic{font-size:clamp(28px,11vw,52px)}
-  .timer-apple-divider{margin:34px 0 34px}
-  .timer-apple-main{grid-template-columns:1fr;gap:30px}
-  .timer-ring-control{--ring-size:132px;justify-self:end}
-  .timer-display{font-size:clamp(70px,22vw,126px)}
-  .timer-duration{font-size:28px;margin-top:14px}
+  .timer-stage-inner{width:calc(100% - 28px);min-height:calc(100dvh - 340px);padding:74px 0 32px;gap:20px}
+  .timer-corner-btn{top:16px;width:36px;height:36px;border-radius:13px}
+  .timer-corner-btn.left{left:16px}
+  .timer-corner-btn.right{right:16px}
+  .timer-focus{--ring-size:min(82vw,390px)}
+  .timer-topic{font-size:15px;margin-bottom:12px}
+  .timer-display{font-size:clamp(58px,18vw,94px)}
+  .timer-duration{font-size:15px;margin-top:14px}
+  .timer-deco-actions{gap:16px}
+  .timer-deco-btn{width:54px;height:54px}
   .timer-status,.timer-end-mark{margin-top:22px}
   .event-switcher{align-items:stretch;flex-direction:column;margin-bottom:16px}
   .event-tabs{width:100%}
@@ -4021,9 +4047,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
         <input id="timer-time" type="text" inputmode="numeric" placeholder="10:00" autocomplete="off">
       </div>
       <div class="timer-presets" aria-label="Быстрые пресеты таймера">
-        <button class="timer-preset-btn" type="button" data-minutes="3" onclick="setTimerPreset(3)">3 мин</button>
         <button class="timer-preset-btn" type="button" data-minutes="5" onclick="setTimerPreset(5)">5 мин</button>
-        <button class="timer-preset-btn" type="button" data-minutes="7" onclick="setTimerPreset(7)">7 мин</button>
         <button class="timer-preset-btn" type="button" data-minutes="10" onclick="setTimerPreset(10)">10 мин</button>
         <button class="timer-preset-btn" type="button" data-minutes="15" onclick="setTimerPreset(15)">15 мин</button>
         <button class="timer-preset-btn" type="button" data-minutes="30" onclick="setTimerPreset(30)">30 мин</button>
@@ -4038,24 +4062,35 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     </div>
   </div>
   <div class="timer-stage" id="timer-stage" onclick="fullscreenTimerStage()" aria-label="Таймер штурма">
-    <div class="timer-brand">драфт<span>.</span></div>
+    <div class="timer-corner-btn left" aria-hidden="true">...</div>
+    <div class="timer-corner-btn right" aria-hidden="true">⚙</div>
     <div class="timer-stage-inner">
-      <div class="timer-topic" id="timer-topic-view">Штурм</div>
-      <div class="timer-apple-divider" aria-hidden="true"></div>
-      <div class="timer-apple-main">
-        <div class="timer-time-block">
+      <div class="timer-focus">
+        <div class="timer-ring-control" aria-hidden="true">
+          <svg class="timer-ring" viewBox="0 0 220 220" aria-hidden="true" focusable="false">
+            <circle class="timer-ring-track" cx="110" cy="110" r="96" pathLength="1"></circle>
+            <circle class="timer-ring-progress" cx="110" cy="110" r="96" pathLength="1"></circle>
+            <circle class="timer-ring-dot" cx="110" cy="14" r="2.6"></circle>
+          </svg>
+        </div>
+        <div class="timer-focus-content">
+          <div class="timer-topic" id="timer-topic-view">Штурм</div>
           <div class="timer-display" id="timer-display">15:00</div>
-          <div class="timer-duration" id="timer-duration">15 мин</div>
+          <div class="timer-duration" id="timer-duration">Следующий блок через 15 мин</div>
           <div class="timer-status" id="timer-status">Готов к старту</div>
           <div class="timer-end-mark" id="timer-end-mark">Время вышло</div>
         </div>
-        <button class="timer-ring-control" id="timer-ring-action" type="button" onclick="event.stopPropagation();toggleTimerRun()" aria-label="Старт">
-          <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
-            <circle class="timer-ring-track" cx="60" cy="60" r="52" pathLength="1"></circle>
-            <circle class="timer-ring-progress" cx="60" cy="60" r="52" pathLength="1"></circle>
-          </svg>
-          <span class="timer-ring-icon" id="timer-ring-icon" aria-hidden="true"></span>
-        </button>
+      </div>
+      <div class="timer-deco-actions" aria-hidden="true">
+        <div class="timer-deco-btn">
+          <svg viewBox="0 0 48 48"><rect x="15" y="11" width="6" height="26" rx="1.5"></rect><rect x="27" y="11" width="6" height="26" rx="1.5"></rect></svg>
+        </div>
+        <div class="timer-deco-btn primary">
+          <svg viewBox="0 0 48 48"><rect x="16" y="16" width="16" height="16" rx="3"></rect></svg>
+        </div>
+        <div class="timer-deco-btn">
+          <svg viewBox="0 0 48 48"><path d="M24 10a14 14 0 1 1-12 6.8h-3.3l5.7-5.7 5.7 5.7h-4a10 10 0 1 0 8-2.8V10Zm-2 7h4v8.5l5 3-2 3.4-7-4.1V17Z"></path></svg>
+        </div>
       </div>
     </div>
   </div>
@@ -4216,6 +4251,10 @@ let _prid = 1;
 function normalizeDB(){
   if(!DB || typeof DB !== 'object') DB = deep(DEFAULTS);
   if(typeof DB._updatedAt === 'undefined') DB._updatedAt = 0;
+  if(!DB._deleted || typeof DB._deleted !== 'object') DB._deleted = {};
+  ['participants','prospects','orgs'].forEach(type=>{
+    if(!DB._deleted[type] || typeof DB._deleted[type] !== 'object') DB._deleted[type] = {};
+  });
   if(!DB.settings) DB.settings = deep(DEFAULTS.settings);
   if(!DB.randomizer || typeof DB.randomizer !== 'object') DB.randomizer = {teams:[], createdAt:''};
   if(!Array.isArray(DB.randomizer.teams)) DB.randomizer.teams = [];
@@ -4255,6 +4294,14 @@ function touchRecord(item){
 function touchDB(){
   DB._updatedAt=Date.now();
   return DB._updatedAt;
+}
+function markDeletedRecord(type,id){
+  const ts=Date.now();
+  if(!DB._deleted || typeof DB._deleted !== 'object') DB._deleted = {};
+  if(!DB._deleted[type] || typeof DB._deleted[type] !== 'object') DB._deleted[type] = {};
+  DB._deleted[type][String(id)] = ts;
+  DB._updatedAt=ts;
+  return ts;
 }
 function dbForStorage(){
   const clone=deep(DB);
@@ -4704,13 +4751,13 @@ function sortItems(list,type,sort){
 function deleteProspect(id){
   if(!confirm('Удалить потенциального участника?'))return;
   DB.prospects=DB.prospects.filter(x=>x.id!==id);
-  touchDB();
+  markDeletedRecord('prospects',id);
   save(); renderProspects(); updateAnalytics(); toast('Удалено');
 }
 function deleteOrg(id){
   if(!confirm('Удалить организатора?'))return;
   DB.orgs=DB.orgs.filter(x=>x.id!==id);
-  touchDB();
+  markDeletedRecord('orgs',id);
   save(); renderOrgs(); updateAnalytics(); toast('Удалено');
 }
 function renderParticipants(){
@@ -4917,7 +4964,7 @@ function cycleStatus(id){
 function deleteP(id){
   if(!confirm('Удалить участника?'))return;
   DB.participants=DB.participants.filter(x=>x.id!==id);
-  touchDB();
+  markDeletedRecord('participants',id);
   save(); renderParticipants();
   toast('Участник удалён');
 }
@@ -5356,7 +5403,7 @@ function movePrToP(id){
   if(DB.participants.length>=tgt){toast('Места заполнены!');return;}
   DB.participants.push({id:nextRecordId(DB.participants),name:p.name,phone:'',instagram:p.contact||'',amount:0,status:'',comment:p.comment||'',photo:'',photoPath:'',top:!!p.top,_updatedAt:Date.now()});
   DB.prospects=DB.prospects.filter(x=>x.id!==id);
-  touchDB();
+  markDeletedRecord('prospects',id);
   save(); renderProspects(); renderParticipants(); updateAnalytics();
   toast(`${p.name} добавлен в участники`);
 }
@@ -5992,6 +6039,11 @@ function timerStatusText(status){
   if(status==='done') return 'Время вышло';
   return 'Готов к старту';
 }
+function timerSublineText(computed){
+  if(computed.status==='done') return 'Блок завершён';
+  if(computed.status==='idle') return 'Длительность '+timerDurationLabel(computed.duration);
+  return 'Следующий блок через '+timerDurationLabel(computed.remaining);
+}
 function updateTimerDisplay(){
   const stage=document.getElementById('timer-stage');
   if(!stage || !DB.timer) return;
@@ -6009,6 +6061,7 @@ function updateTimerDisplay(){
   const status=document.getElementById('timer-status');
   const ringAction=document.getElementById('timer-ring-action');
   const ringIcon=document.getElementById('timer-ring-icon');
+  const ringDot=document.querySelector('.timer-ring-dot');
   const cnt=document.getElementById('timer-cnt');
   const note=document.getElementById('timer-note');
 
@@ -6016,9 +6069,17 @@ function updateTimerDisplay(){
   stage.classList.add('is-'+computed.status);
   stage.style.setProperty('--timer-progress', computed.progress.toFixed(5));
   if(display) display.textContent=formatTimerTime(computed.remaining);
-  if(duration) duration.textContent=timerDurationLabel(computed.duration);
+  if(duration) duration.textContent=timerSublineText(computed);
   if(topicView) topicView.textContent=topic;
   if(status) status.textContent=timerStatusText(computed.status);
+  if(ringDot){
+    const angle=(-90 - computed.progress*360) * Math.PI / 180;
+    const cx=110 + Math.cos(angle)*96;
+    const cy=110 + Math.sin(angle)*96;
+    ringDot.setAttribute('cx', cx.toFixed(3));
+    ringDot.setAttribute('cy', cy.toFixed(3));
+    ringDot.style.opacity=computed.progress>=.995 ? '0' : '1';
+  }
   if(ringIcon) ringIcon.innerHTML=timerActionIcon(computed.status);
   if(ringAction){
     const actionLabel=computed.status==='running' ? 'Пауза' : computed.status==='paused' ? 'Продолжить' : 'Старт';
@@ -6657,7 +6718,7 @@ function applyRemoteState(next,{silent=false,updatedAt=''}={}){
   const h=hashData(next);
   if(h===syncLastHash) return false;
   syncApplyingRemote=true;
-  DB=mergeCloudState(next,DB);
+  DB=hasPendingCloudSave() ? mergeCloudState(next,DB) : deep(next);
   normalizeDB();
   saveLocal();
   refreshAll();
@@ -6676,32 +6737,76 @@ function newestObject(remoteObj={}, localObj={}){
   const l=+localObj?._updatedAt||0;
   return l>r ? deep(localObj) : deep(remoteObj);
 }
-function mergeArrayById(remoteArr=[], localArr=[]){
+function mergeDeletedMaps(remoteDeleted={}, localDeleted={}){
+  const out={participants:{},prospects:{},orgs:{}};
+  ['participants','prospects','orgs'].forEach(type=>{
+    const keys=new Set([
+      ...Object.keys(remoteDeleted?.[type]||{}),
+      ...Object.keys(localDeleted?.[type]||{})
+    ]);
+    keys.forEach(id=>{
+      out[type][id]=Math.max(+remoteDeleted?.[type]?.[id]||0,+localDeleted?.[type]?.[id]||0);
+    });
+  });
+  return out;
+}
+function deletedRecordAt(deleted,type,id){
+  return Math.max(+deleted?.[type]?.[String(id)]||0,0);
+}
+function pruneDeletedMap(deleted,state){
+  const keep={participants:{},prospects:{},orgs:{}};
+  ['participants','prospects','orgs'].forEach(type=>{
+    const live=new Set((state?.[type]||[]).map(item=>String(item.id)));
+    Object.entries(deleted?.[type]||{}).forEach(([id,ts])=>{
+      const age=Date.now()-(+ts||0);
+      if(!live.has(id) && age < 1000*60*60*24*14) keep[type][id]=+ts||0;
+    });
+  });
+  return keep;
+}
+function mergeArrayById(remoteArr=[], localArr=[], type='', deleted={}, remoteRootUpdatedAt=0){
   const remoteMap=new Map((Array.isArray(remoteArr)?remoteArr:[]).map(x=>[String(x.id),deep(x)]));
-  const result=(Array.isArray(localArr)?localArr:[]).map(item=>{
+  const result=[];
+  (Array.isArray(localArr)?localArr:[]).forEach(item=>{
     const key=String(item.id);
     const remoteItem=remoteMap.get(key);
     remoteMap.delete(key);
-    if(!remoteItem) return deep(item);
-    return recordUpdatedAt(item)>recordUpdatedAt(remoteItem)
+    const localUpdated=recordUpdatedAt(item);
+    const remoteUpdated=recordUpdatedAt(remoteItem||{});
+    const deletedAt=deletedRecordAt(deleted,type,key);
+    if(deletedAt>=Math.max(localUpdated,remoteUpdated)) return;
+    if(!remoteItem){
+      if((+remoteRootUpdatedAt||0) >= localUpdated) return;
+      result.push(deep(item));
+      return;
+    }
+    result.push(recordUpdatedAt(item)>recordUpdatedAt(remoteItem)
       ? {...deep(remoteItem),...deep(item)}
-      : {...deep(item),...deep(remoteItem)};
+      : {...deep(item),...deep(remoteItem)});
   });
-  remoteMap.forEach(item=>result.push(deep(item)));
+  remoteMap.forEach(item=>{
+    if(deletedRecordAt(deleted,type,item.id)>=recordUpdatedAt(item)) return;
+    result.push(deep(item));
+  });
   return result;
 }
 function mergeCloudState(remote, local){
   const base=remote && typeof remote==='object' ? remote : {};
   const mine=local && typeof local==='object' ? local : {};
-  return {
+  const deleted=mergeDeletedMaps(base._deleted,mine._deleted);
+  const remoteRootUpdatedAt=+base._updatedAt||0;
+  const merged={
     _updatedAt:Math.max(+base._updatedAt||0,+mine._updatedAt||0),
+    _deleted:deleted,
     settings:{...(base.settings||{}),...(mine.settings||{})},
-    participants:mergeArrayById(base.participants,mine.participants),
-    orgs:mergeArrayById(base.orgs,mine.orgs),
-    prospects:mergeArrayById(base.prospects,mine.prospects),
+    participants:mergeArrayById(base.participants,mine.participants,'participants',deleted,remoteRootUpdatedAt),
+    orgs:mergeArrayById(base.orgs,mine.orgs,'orgs',deleted,remoteRootUpdatedAt),
+    prospects:mergeArrayById(base.prospects,mine.prospects,'prospects',deleted,remoteRootUpdatedAt),
     randomizer:newestObject(base.randomizer||{},mine.randomizer||{}),
     timer:newestObject(base.timer||{},mine.timer||{})
   };
+  merged._deleted=pruneDeletedMap(deleted,merged);
+  return merged;
 }
 function setSyncStatus(text, state='local'){
   const el=document.getElementById('sync-status');
@@ -6861,8 +6966,22 @@ async function pollCloudNow(silent=true){
   syncPolling=true;
   try{
     if(hasPendingCloudSave()){
-      if(syncSaveTimer) return;
+      if(syncSaveTimer && silent) return;
+      clearTimeout(syncSaveTimer);
+      syncSaveTimer=null;
+      const {data,error}=await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
+      if(error) throw error;
+      if(data?.data){
+        syncApplyingRemote=true;
+        DB=mergeCloudState(data.data,DB);
+        normalizeDB();
+        saveLocal();
+        refreshAll();
+        syncApplyingRemote=false;
+        rememberRemoteAt(data.updated_at);
+      }
       await pushCloudNow(true);
+      if(!silent) toast('Обновлено и синхронизировано');
       return;
     }
     const {data,error}=await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();

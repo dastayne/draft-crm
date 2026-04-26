@@ -1,4 +1,4 @@
-const CACHE_NAME = 'draft-crm-v56';
+const CACHE_NAME = 'draft-crm-v59';
 const ASSETS = [
   './',
   './index.html',
