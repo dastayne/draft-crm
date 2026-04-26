@@ -1823,6 +1823,191 @@ header::before{
   color:var(--gray1);
   text-align:center;
 }
+.timer-panel{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:end;
+  background:var(--s1);
+  border:1px solid rgba(255,255,255,.07);
+  border-top:1px solid rgba(98,191,74,.26);
+  padding:18px 20px;
+  margin-bottom:14px;
+}
+.timer-form{
+  display:grid;
+  grid-template-columns:minmax(220px,1fr) 150px auto;
+  gap:10px;
+  align-items:end;
+}
+.timer-field label{
+  display:block;
+  margin-bottom:7px;
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:0;
+  text-transform:uppercase;
+}
+.timer-field input{
+  width:100%;
+  height:42px;
+  border:1px solid rgba(255,255,255,.09);
+  background:#0d0d0d;
+  color:var(--white);
+  padding:0 13px;
+  border-radius:8px;
+  font-size:15px;
+  font-weight:720;
+  letter-spacing:0;
+  outline:none;
+}
+.timer-field input:focus{
+  border-color:rgba(98,191,74,.68);
+  box-shadow:0 0 0 3px rgba(98,191,74,.1);
+}
+.timer-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+.timer-actions .btn:disabled{
+  opacity:.48;
+  cursor:default;
+  pointer-events:none;
+}
+.timer-stage{
+  --timer-angle:0deg;
+  min-height:calc(100vh - 360px);
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  display:grid;
+  place-items:center;
+  background:
+    linear-gradient(90deg,rgba(98,191,74,.035) 1px,transparent 1px),
+    linear-gradient(180deg,#050505 0%,#0a0a0a 100%);
+  background-size:72px 100%,100% 100%;
+  border:1px solid rgba(98,191,74,.13);
+  cursor:zoom-in;
+}
+.timer-stage::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 0%,rgba(98,191,74,.08) 50%,transparent 100%);
+  opacity:.35;
+  transform:translateY(-100%);
+  animation:timerScan 8s linear infinite;
+  pointer-events:none;
+}
+.timer-stage::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(255,58,48,.16);
+  opacity:0;
+  pointer-events:none;
+}
+.timer-stage-inner{
+  position:relative;
+  z-index:2;
+  width:min(860px,calc(100% - 48px));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:18px;
+  padding:42px 0;
+}
+.timer-brand{
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:42px;
+  line-height:.9;
+  color:rgba(255,255,255,.78);
+  letter-spacing:0;
+  text-transform:lowercase;
+}
+.timer-brand span{color:var(--green)}
+.timer-topic{
+  max-width:100%;
+  color:var(--gray1);
+  font-size:18px;
+  line-height:1.25;
+  font-weight:760;
+  letter-spacing:0;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+.timer-orbit{
+  width:min(44vh,320px);
+  min-width:190px;
+  aspect-ratio:1;
+  position:relative;
+  display:grid;
+  place-items:center;
+}
+.timer-orbit::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:conic-gradient(var(--green) var(--timer-angle),rgba(255,255,255,.08) 0);
+  filter:drop-shadow(0 0 22px rgba(98,191,74,.2));
+}
+.timer-orbit::after{
+  content:'';
+  position:absolute;
+  inset:12px;
+  border-radius:50%;
+  background:#050505;
+  border:1px solid rgba(255,255,255,.06);
+}
+.timer-display{
+  position:relative;
+  z-index:2;
+  font-family:var(--font-main);
+  font-size:min(12vh,116px);
+  line-height:.86;
+  font-weight:900;
+  letter-spacing:0;
+  color:var(--white);
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 0 28px rgba(98,191,74,.14);
+}
+.timer-status{
+  min-height:18px;
+  color:var(--green-lt);
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:0;
+  text-transform:uppercase;
+}
+.timer-end-mark{
+  display:none;
+  font-size:34px;
+  line-height:1;
+  font-weight:900;
+  color:#ff4f45;
+  letter-spacing:0;
+  text-transform:uppercase;
+}
+.timer-stage.is-running .timer-orbit::before{animation:timerGlow 2.2s ease-in-out infinite}
+.timer-stage.is-paused .timer-status{color:var(--amber)}
+.timer-stage.is-done{
+  border-color:rgba(255,58,48,.6);
+  animation:timerEndShake .7s cubic-bezier(.2,.8,.2,1) 2;
+}
+.timer-stage.is-done::after{animation:timerEndFlash 1.4s ease-out infinite}
+.timer-stage.is-done .timer-orbit::before{
+  background:conic-gradient(#ff4f45 1turn,rgba(255,255,255,.08) 0);
+  filter:drop-shadow(0 0 34px rgba(255,58,48,.34));
+}
+.timer-stage.is-done .timer-display{color:#ff4f45;animation:timerDigitsEnd .8s ease-out infinite}
+.timer-stage.is-done .timer-status{color:#ff7169}
+.timer-stage.is-done .timer-end-mark{display:block;animation:timerEndPop .65s cubic-bezier(.18,.9,.2,1) both}
 .event-switcher{
   display:none;
   align-items:center;
@@ -2106,7 +2291,8 @@ body.presentation-mode main{
 }
 body.presentation-mode .view{display:none!important}
 body.presentation-mode.presentation-randomizer #view-randomizer,
-body.presentation-mode.presentation-splash #view-splash{display:block!important;animation:none}
+body.presentation-mode.presentation-splash #view-splash,
+body.presentation-mode.presentation-timer #view-timer{display:block!important;animation:none}
 body.presentation-mode .randomizer-header{
   display:flex;
   margin-bottom:24px;
@@ -2153,13 +2339,31 @@ body.presentation-mode .randomizer-member-sub{
 body.presentation-mode.presentation-splash main{
   padding:0;
 }
-body.presentation-mode.presentation-splash #view-splash .sec-header{
+body.presentation-mode.presentation-splash #view-splash .sec-header,
+body.presentation-mode.presentation-timer #view-timer .sec-header,
+body.presentation-mode.presentation-timer .timer-panel{
   display:none;
 }
 body.presentation-mode.presentation-splash .splash-view{
   min-height:100vh;min-height:100dvh;
   border:0;cursor:default;
 }
+body.presentation-mode.presentation-timer main{
+  padding:0;
+}
+body.presentation-mode.presentation-timer .timer-stage{
+  min-height:100vh;min-height:100dvh;
+  border:0;
+  cursor:default;
+}
+body.presentation-mode.presentation-timer .timer-stage-inner{
+  width:min(1100px,calc(100% - 72px));
+}
+body.presentation-mode.presentation-timer .timer-brand{font-size:60px}
+body.presentation-mode.presentation-timer .timer-topic{font-size:26px}
+body.presentation-mode.presentation-timer .timer-orbit{width:min(54vh,430px)}
+body.presentation-mode.presentation-timer .timer-display{font-size:min(15vh,160px)}
+body.presentation-mode.presentation-timer .timer-status{font-size:16px}
 body.presentation-mode.presentation-splash .splash-view.theme-dark .splash-mark,
 body.presentation-mode.presentation-splash .splash-view.theme-light .splash-mark{
   font-size:clamp(130px,16vw,260px);
@@ -2277,7 +2481,8 @@ body.event-mode .view{
   display:none!important;
 }
 body.event-mode #view-randomizer.active,
-body.event-mode #view-splash.active{
+body.event-mode #view-splash.active,
+body.event-mode #view-timer.active{
   display:block!important;
 }
 .randomizer-grid.reveal .randomizer-team{
@@ -2305,6 +2510,30 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
 }
 @keyframes memberReveal{
   to{opacity:1;transform:translateX(0)}
+}
+@keyframes timerScan{
+  to{transform:translateY(100%)}
+}
+@keyframes timerGlow{
+  0%,100%{filter:drop-shadow(0 0 18px rgba(98,191,74,.16))}
+  50%{filter:drop-shadow(0 0 34px rgba(98,191,74,.38))}
+}
+@keyframes timerEndFlash{
+  0%,100%{opacity:0}
+  35%{opacity:.95}
+}
+@keyframes timerDigitsEnd{
+  0%,100%{transform:scale(1)}
+  45%{transform:scale(1.045)}
+}
+@keyframes timerEndPop{
+  from{opacity:0;transform:translateY(16px) scale(.92)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes timerEndShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  65%{transform:translateX(5px)}
 }
 @keyframes dotGlow{
   0%,100%{opacity:.65;filter:brightness(.9)}
@@ -2346,6 +2575,15 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .randomizer-status{justify-content:flex-start;text-align:left}
   .randomizer-grid{grid-template-columns:1fr;gap:8px}
   .randomizer-team{min-height:0;border-radius:14px;padding:14px}
+  .timer-panel{grid-template-columns:1fr;padding:14px;gap:12px}
+  .timer-form{grid-template-columns:1fr;gap:10px}
+  .timer-actions{justify-content:flex-start}
+  .timer-stage{min-height:calc(100dvh - 310px)}
+  .timer-stage-inner{width:calc(100% - 28px);gap:14px;padding:28px 0}
+  .timer-brand{font-size:34px}
+  .timer-topic{font-size:14px}
+  .timer-orbit{width:min(38vh,250px);min-width:170px}
+  .timer-display{font-size:min(10vh,82px)}
   .event-switcher{align-items:stretch;flex-direction:column;margin-bottom:16px}
   .event-tabs{width:100%}
   .event-tab{flex:1;padding:0 10px}
@@ -3340,7 +3578,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <button class="mode-card" type="button" onclick="enterAppMode('event')">
       <div class="mode-card-kicker">Оффлайн-режим</div>
       <div class="mode-card-title">драфт</div>
-      <div class="mode-card-text">Публичный режим без внутренней кухни: деление участников и вывод на экран.</div>
+      <div class="mode-card-text">Публичный режим без внутренней кухни: деление участников, заставка и таймеры.</div>
     </button>
   </div>
 </div>
@@ -3376,6 +3614,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   <div class="event-tabs">
     <button class="event-tab active" id="event-tab-randomizer" type="button" onclick="switchEventTab('randomizer')">Команды</button>
     <button class="event-tab" id="event-tab-splash" type="button" onclick="switchEventTab('splash')">Заставка</button>
+    <button class="event-tab" id="event-tab-timer" type="button" onclick="switchEventTab('timer')">Таймеры</button>
   </div>
 </div>
 
@@ -3573,6 +3812,47 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   <div class="randomizer-grid" id="rnd-board"></div>
 </div>
 
+<!-- TIMER -->
+<div class="view" id="view-timer">
+  <div class="sec-header randomizer-header">
+    <div class="sec-title">Таймеры <span id="timer-cnt"></span></div>
+    <div class="sec-actions">
+      <span class="sec-actions-note" id="timer-note">Штурм · оффлайн</span>
+      <button class="btn btn-ghost btn-sm" onclick="fullscreenTimerStage()">Во весь экран</button>
+      <button class="btn btn-ghost btn-sm" onclick="openTimerPresentation()">На экран</button>
+    </div>
+  </div>
+  <div class="timer-panel">
+    <div class="timer-form">
+      <div class="timer-field">
+        <label for="timer-topic">Тема штурма</label>
+        <input id="timer-topic" type="text" maxlength="80" placeholder="Идеи для запуска" autocomplete="off">
+      </div>
+      <div class="timer-field">
+        <label for="timer-time">Время</label>
+        <input id="timer-time" type="text" inputmode="numeric" placeholder="10:00" autocomplete="off">
+      </div>
+      <button class="btn btn-solid btn-sm" type="button" onclick="createTimer()">Создать таймер</button>
+    </div>
+    <div class="timer-actions">
+      <button class="btn btn-solid btn-sm" id="timer-start-btn" type="button" onclick="startTimer()">Старт</button>
+      <button class="btn btn-ghost btn-sm" id="timer-pause-btn" type="button" onclick="pauseTimer()">Пауза</button>
+      <button class="btn btn-ghost btn-sm" id="timer-reset-btn" type="button" onclick="resetTimer()">Сброс</button>
+    </div>
+  </div>
+  <div class="timer-stage" id="timer-stage" onclick="fullscreenTimerStage()" aria-label="Таймер штурма">
+    <div class="timer-stage-inner">
+      <div class="timer-brand">драфт<span>.</span></div>
+      <div class="timer-topic" id="timer-topic-view">Штурм</div>
+      <div class="timer-orbit" aria-hidden="true">
+        <div class="timer-display" id="timer-display">15:00</div>
+      </div>
+      <div class="timer-status" id="timer-status">Готов к старту</div>
+      <div class="timer-end-mark" id="timer-end-mark">Время</div>
+    </div>
+  </div>
+</div>
+
 <!-- SPLASH -->
 <div class="view" id="view-splash">
   <div class="sec-header randomizer-header">
@@ -3702,7 +3982,17 @@ const DEFAULTS = {
     {id:7,name:'Ирина Коба',        phone:'',instagram:'',role:'',notified:true, comment:''},
     {id:8,name:'Арина Каверина',    phone:'',instagram:'',role:'',notified:true, comment:''},
   ],
-  prospects: []
+  prospects: [],
+  timer: {
+    topic: 'Штурм',
+    durationSec: 900,
+    remainingSec: 900,
+    status: 'idle',
+    startedAt: 0,
+    endsAt: 0,
+    completedAt: '',
+    _updatedAt: 0
+  }
 };
 
 let DB = (() => {
@@ -3723,6 +4013,15 @@ function normalizeDB(){
   if(!Array.isArray(DB.randomizer.teams)) DB.randomizer.teams = [];
   if(typeof DB.randomizer.createdAt === 'undefined') DB.randomizer.createdAt = '';
   if(typeof DB.randomizer._updatedAt === 'undefined') DB.randomizer._updatedAt = 0;
+  if(!DB.timer || typeof DB.timer !== 'object') DB.timer = deep(DEFAULTS.timer);
+  DB.timer.topic = String(DB.timer.topic || DEFAULTS.timer.topic);
+  DB.timer.durationSec = Math.max(1, Math.round(+DB.timer.durationSec || DEFAULTS.timer.durationSec));
+  DB.timer.remainingSec = Math.max(0, Math.round(+DB.timer.remainingSec || DB.timer.durationSec));
+  if(!['idle','running','paused','done'].includes(DB.timer.status)) DB.timer.status = 'idle';
+  DB.timer.startedAt = +DB.timer.startedAt || 0;
+  DB.timer.endsAt = +DB.timer.endsAt || 0;
+  DB.timer.completedAt = DB.timer.completedAt || '';
+  if(typeof DB.timer._updatedAt === 'undefined') DB.timer._updatedAt = 0;
   if(!Array.isArray(DB.participants)) DB.participants = [];
   if(!Array.isArray(DB.prospects)) DB.prospects = [];
   if(!Array.isArray(DB.orgs)) DB.orgs = [];
@@ -3848,12 +4147,14 @@ function switchTab(name, btn){
 }
 
 function switchEventTab(name){
-  eventActiveView = name === 'splash' ? 'splash' : 'randomizer';
+  if(eventActiveView === 'splash' && name !== 'splash') stopCarousel?.();
+  eventActiveView = name === 'splash' || name === 'timer' ? name : 'randomizer';
   document.querySelectorAll('.event-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('event-tab-'+eventActiveView)?.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+eventActiveView)?.classList.add('active');
   if(eventActiveView === 'randomizer') renderRandomizer();
+  if(eventActiveView === 'timer') renderTimer();
   if(eventActiveView === 'splash'){
     updateSplashMeta?.();
     if(splashTheme==='cards') startCarousel?.();
@@ -3861,7 +4162,7 @@ function switchEventTab(name){
 }
 
 function enterAppMode(mode){
-  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash');
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer');
   if(mode==='gate'){
     appMode='gate';
     document.body.classList.add('mode-gate-active');
@@ -5240,6 +5541,225 @@ function openRandomizerPresentation(){
   const win=window.open(url.toString(),'draft-randomizer-screen','popup=yes,width=1600,height=900');
   if(!win) toast('Браузер заблокировал новое окно');
 }
+
+// ─── EVENT TIMER ─────────────────────────────────────────────
+const TIMER_DEFAULT_SECONDS = 15 * 60;
+const TIMER_MAX_SECONDS = 8 * 60 * 60;
+let timerTick = null;
+
+function clampTimerSeconds(sec){
+  return Math.min(TIMER_MAX_SECONDS, Math.max(1, Math.round(+sec || TIMER_DEFAULT_SECONDS)));
+}
+function parseTimerSeconds(raw){
+  const value=String(raw||'').trim().toLowerCase().replace(',', '.');
+  if(!value) return 0;
+  if(value.includes(':')){
+    const parts=value.split(':').map(x=>Number(x.trim()));
+    if(parts.some(x=>!Number.isFinite(x) || x<0)) return 0;
+    if(parts.length===2) return Math.round(parts[0]*60 + parts[1]);
+    if(parts.length===3) return Math.round(parts[0]*3600 + parts[1]*60 + parts[2]);
+    return 0;
+  }
+  const num=parseFloat(value.replace(/[^\d.]/g,''));
+  if(!Number.isFinite(num) || num<=0) return 0;
+  if(/(сек|sec|с)$/.test(value)) return Math.round(num);
+  if(/(час|ч|h)$/.test(value)) return Math.round(num*3600);
+  return Math.round(num*60);
+}
+function formatTimerTime(sec){
+  const safe=Math.max(0,Math.ceil(+sec||0));
+  const h=Math.floor(safe/3600);
+  const m=Math.floor((safe%3600)/60);
+  const s=safe%60;
+  const pad=n=>String(n).padStart(2,'0');
+  return h>0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+function timerFromForm(){
+  const topic=(document.getElementById('timer-topic')?.value||'').trim() || 'Штурм';
+  const parsed=parseTimerSeconds(document.getElementById('timer-time')?.value||'');
+  if(!parsed) return null;
+  const seconds=clampTimerSeconds(parsed);
+  if(!seconds) return null;
+  return {topic,seconds};
+}
+function touchTimer(){
+  const ts=Date.now();
+  DB.timer._updatedAt=ts;
+  DB._updatedAt=ts;
+}
+function timerComputed(){
+  const t=DB.timer||deep(DEFAULTS.timer);
+  const duration=clampTimerSeconds(t.durationSec);
+  let remaining=+t.remainingSec || duration;
+  if(t.status==='running' && t.endsAt){
+    remaining=Math.ceil((+t.endsAt - Date.now())/1000);
+  }
+  const done=remaining<=0 && (t.status==='running' || t.status==='done');
+  remaining=done ? 0 : Math.max(0,remaining);
+  const status=done ? 'done' : (['running','paused','idle'].includes(t.status) ? t.status : 'idle');
+  const progress=Math.min(1,Math.max(0,(duration-remaining)/duration));
+  return {duration,remaining,status,progress,done};
+}
+function persistTimerDone(){
+  if(DB.timer?.status!=='running') return;
+  DB.timer.status='done';
+  DB.timer.remainingSec=0;
+  DB.timer.endsAt=0;
+  DB.timer.completedAt=new Date().toISOString();
+  touchTimer();
+  save();
+}
+function setTimerState(next){
+  DB.timer={...deep(DEFAULTS.timer),...(DB.timer||{}),...next};
+  touchTimer();
+  save();
+  renderTimer();
+}
+function createTimer(){
+  const form=timerFromForm();
+  if(!form){toast('Введи время таймера');return;}
+  setTimerState({
+    topic:form.topic,
+    durationSec:form.seconds,
+    remainingSec:form.seconds,
+    status:'idle',
+    startedAt:0,
+    endsAt:0,
+    completedAt:''
+  });
+  toast('Таймер создан');
+}
+function startTimer(){
+  normalizeDB();
+  const computed=timerComputed();
+  if(computed.status==='running') return;
+  const now=Date.now();
+  if(computed.status==='paused' && computed.remaining>0){
+    setTimerState({
+      status:'running',
+      remainingSec:computed.remaining,
+      startedAt:now,
+      endsAt:now + computed.remaining*1000,
+      completedAt:''
+    });
+  } else {
+    const form=timerFromForm();
+    if(!form){toast('Введи время таймера');return;}
+    setTimerState({
+      topic:form.topic,
+      durationSec:form.seconds,
+      remainingSec:form.seconds,
+      status:'running',
+      startedAt:now,
+      endsAt:now + form.seconds*1000,
+      completedAt:''
+    });
+  }
+  toast('Таймер запущен');
+}
+function pauseTimer(){
+  normalizeDB();
+  const computed=timerComputed();
+  if(computed.status!=='running'){toast('Таймер не запущен');return;}
+  if(computed.remaining<=0){
+    persistTimerDone();
+    renderTimer();
+    return;
+  }
+  setTimerState({
+    status:'paused',
+    remainingSec:computed.remaining,
+    endsAt:0
+  });
+  toast('Таймер на паузе');
+}
+function resetTimer(){
+  normalizeDB();
+  const duration=clampTimerSeconds(DB.timer?.durationSec);
+  setTimerState({
+    status:'idle',
+    remainingSec:duration,
+    startedAt:0,
+    endsAt:0,
+    completedAt:''
+  });
+  toast('Таймер сброшен');
+}
+function timerStatusText(status){
+  if(status==='running') return 'Штурм идёт';
+  if(status==='paused') return 'Пауза';
+  if(status==='done') return 'Время вышло';
+  return 'Готов к старту';
+}
+function updateTimerDisplay(){
+  const stage=document.getElementById('timer-stage');
+  if(!stage || !DB.timer) return;
+  const computed=timerComputed();
+  if(computed.done && DB.timer.status==='running'){
+    persistTimerDone();
+    renderTimer();
+    return;
+  }
+
+  const topic=DB.timer.topic || 'Штурм';
+  const display=document.getElementById('timer-display');
+  const topicView=document.getElementById('timer-topic-view');
+  const status=document.getElementById('timer-status');
+  const cnt=document.getElementById('timer-cnt');
+  const note=document.getElementById('timer-note');
+
+  stage.classList.remove('is-idle','is-running','is-paused','is-done');
+  stage.classList.add('is-'+computed.status);
+  stage.style.setProperty('--timer-angle', `${(computed.progress*360).toFixed(2)}deg`);
+  if(display) display.textContent=formatTimerTime(computed.remaining);
+  if(topicView) topicView.textContent=topic;
+  if(status) status.textContent=timerStatusText(computed.status);
+  if(cnt) cnt.innerHTML=`<span style="color:var(--green)">${formatTimerTime(computed.remaining)}</span>`;
+  if(note) note.textContent=computed.status==='running' ? 'Штурм идёт' : computed.status==='done' ? 'Время вышло' : 'Штурм · оффлайн';
+}
+function ensureTimerLoop(){
+  if(timerTick) return;
+  timerTick=setInterval(updateTimerDisplay,250);
+}
+function renderTimer(){
+  normalizeDB();
+  const topicInput=document.getElementById('timer-topic');
+  const timeInput=document.getElementById('timer-time');
+  if(topicInput && document.activeElement!==topicInput) topicInput.value=DB.timer.topic || '';
+  if(timeInput && document.activeElement!==timeInput) timeInput.value=formatTimerTime(DB.timer.durationSec || TIMER_DEFAULT_SECONDS);
+
+  const computed=timerComputed();
+  const startBtn=document.getElementById('timer-start-btn');
+  const pauseBtn=document.getElementById('timer-pause-btn');
+  const resetBtn=document.getElementById('timer-reset-btn');
+  if(startBtn){
+    startBtn.textContent=computed.status==='paused' ? 'Продолжить' : computed.status==='running' ? 'Идёт' : 'Старт';
+    startBtn.disabled=computed.status==='running';
+  }
+  if(pauseBtn) pauseBtn.disabled=computed.status!=='running';
+  if(resetBtn) resetBtn.disabled=computed.status==='idle' && computed.remaining===computed.duration;
+  updateTimerDisplay();
+  ensureTimerLoop();
+}
+function openTimerPresentation(){
+  const url=new URL(window.location.href);
+  url.searchParams.set('present','timer');
+  url.hash='';
+  const win=window.open(url.toString(),'draft-timer-screen','popup=yes,width=1600,height=900');
+  if(!win) toast('Браузер заблокировал новое окно');
+}
+async function fullscreenTimerStage(){
+  try{
+    const el=document.getElementById('timer-stage') || document.documentElement;
+    if(document.fullscreenElement){
+      await document.exitFullscreen();
+    } else {
+      await (el.requestFullscreen?.() || document.documentElement.requestFullscreen());
+    }
+  } catch {
+    toast('Браузер не дал включить полный экран');
+  }
+}
 // ── SPLASH V4 ──────────────────────────────────────────────
 let splashTheme = 'dark';
 let _carouselTimer = null;
@@ -5482,15 +6002,16 @@ async function toggleFullscreen(){
 function applyPresentationMode(){
   const params=new URLSearchParams(window.location.search);
   const present=params.get('present');
-  if(present!=='randomizer' && present!=='splash') return false;
+  if(present!=='randomizer' && present!=='splash' && present!=='timer') return false;
   document.body.classList.remove('mode-gate-active','event-mode');
   document.body.classList.add('presentation-mode','presentation-'+present);
   appMode='presentation';
-  document.title=(present==='splash' ? 'Заставка' : 'Команды')+' · драфт';
+  document.title=(present==='splash' ? 'Заставка' : present==='timer' ? 'Таймер' : 'Команды')+' · драфт';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+present)?.classList.add('active');
   if(present==='randomizer') renderRandomizer();
+  if(present==='timer') renderTimer();
   if(present==='splash'){
     updateSplashMeta?.();
     if(splashTheme==='cards') startCarousel?.();
@@ -5851,7 +6372,8 @@ function mergeCloudState(remote, local){
     participants:mergeArrayById(base.participants,mine.participants),
     orgs:mergeArrayById(base.orgs,mine.orgs),
     prospects:mergeArrayById(base.prospects,mine.prospects),
-    randomizer:newestObject(base.randomizer||{},mine.randomizer||{})
+    randomizer:newestObject(base.randomizer||{},mine.randomizer||{}),
+    timer:newestObject(base.timer||{},mine.timer||{})
   };
 }
 function setSyncStatus(text, state='local'){
@@ -5861,7 +6383,7 @@ function setSyncStatus(text, state='local'){
   el.className='sync-pill '+state;
 }
 function hashData(data){ try{return JSON.stringify(data)}catch{return String(Date.now())} }
-function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); renderProspects(); renderOrgs(); renderRandomizer(); renderClub(); }
+function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); renderProspects(); renderOrgs(); renderRandomizer(); renderTimer(); renderClub(); }
 function canUseSupabase(){ return !!(window.supabase && syncConfig?.url && syncConfig?.anonKey && syncConfig?.rowId); }
 function makeSyncClient(){ if(!canUseSupabase()) return null; return window.supabase.createClient(syncConfig.url, syncConfig.anonKey); }
 
@@ -6558,6 +7080,7 @@ renderParticipants();
 renderProspects();
 renderOrgs();
 renderRandomizer();
+renderTimer();
 applyInitialMode();
 initCloudSync();
 updateSplashMeta?.();
