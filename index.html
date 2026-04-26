@@ -1815,11 +1815,125 @@ header::before{
   color:var(--gray1);
   text-align:center;
 }
+.event-switcher{
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:22px;
+}
+.event-tabs{
+  display:flex;
+  gap:2px;
+  padding:3px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+}
+.event-tab{
+  min-height:38px;
+  padding:0 18px;
+  border:0;
+  background:transparent;
+  color:var(--gray1);
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .18s,color .18s;
+}
+.event-tab:hover{color:var(--white);background:rgba(255,255,255,.05)}
+.event-tab.active{color:var(--green-lt);background:rgba(98,191,74,.13)}
+.splash-view{
+  min-height:calc(100vh - 190px);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg,rgba(98,191,74,.08) 1px,transparent 1px),
+    linear-gradient(180deg,rgba(98,191,74,.055) 1px,transparent 1px),
+    #050505;
+  background-size:72px 72px;
+  border:1px solid rgba(98,191,74,.16);
+  position:relative;
+  isolation:isolate;
+}
+.splash-view::before{
+  content:'';
+  position:absolute;
+  inset:8%;
+  border:1px solid rgba(98,191,74,.18);
+  transform:skewX(-10deg);
+  animation:splashFrame 9s ease-in-out infinite;
+}
+.splash-view::after{
+  content:'';
+  position:absolute;
+  left:-30%;
+  right:-30%;
+  top:48%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(155,255,93,.66),transparent);
+  opacity:.55;
+  animation:splashScan 6.5s linear infinite;
+}
+.splash-inner{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:18px;
+  padding:44px;
+}
+.splash-mark{
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:clamp(92px,13vw,190px);
+  line-height:.82;
+  color:var(--white);
+  letter-spacing:-.02em;
+  text-transform:lowercase;
+  text-shadow:0 0 36px rgba(98,191,74,.18);
+  animation:splashPulse 5.8s ease-in-out infinite;
+}
+.splash-mark span{color:var(--green)}
+.splash-subtitle{
+  color:var(--gray1);
+  font-size:clamp(12px,1.15vw,18px);
+  font-weight:850;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+}
+.splash-line{
+  width:min(420px,70vw);
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--green-lt),transparent);
+  transform-origin:center;
+  animation:splashLine 4.8s ease-in-out infinite;
+}
+.splash-corners{
+  position:absolute;
+  inset:26px;
+  pointer-events:none;
+}
+.splash-corners span{
+  position:absolute;
+  width:74px;
+  height:74px;
+  border-color:rgba(155,255,93,.42);
+  animation:splashCorner 4.6s ease-in-out infinite;
+}
+.splash-corners span:nth-child(1){left:0;top:0;border-left:2px solid;border-top:2px solid}
+.splash-corners span:nth-child(2){right:0;top:0;border-right:2px solid;border-top:2px solid;animation-delay:.4s}
+.splash-corners span:nth-child(3){left:0;bottom:0;border-left:2px solid;border-bottom:2px solid;animation-delay:.8s}
+.splash-corners span:nth-child(4){right:0;bottom:0;border-right:2px solid;border-bottom:2px solid;animation-delay:1.2s}
 body.presentation-mode{
   background:#050505;
 }
 body.presentation-mode header,
 body.presentation-mode nav,
+body.presentation-mode .event-switcher,
 body.presentation-mode .randomizer-header .sec-actions,
 body.presentation-mode .randomizer-panel,
 body.presentation-mode .toast,
@@ -1831,7 +1945,8 @@ body.presentation-mode main{
   min-height:100vh;
 }
 body.presentation-mode .view{display:none!important}
-body.presentation-mode #view-randomizer{display:block!important;animation:none}
+body.presentation-mode.presentation-randomizer #view-randomizer,
+body.presentation-mode.presentation-splash #view-splash{display:block!important;animation:none}
 body.presentation-mode .randomizer-header{
   display:flex;
   margin-bottom:24px;
@@ -1874,6 +1989,19 @@ body.presentation-mode .randomizer-member-name{
 }
 body.presentation-mode .randomizer-member-sub{
   display:none;
+}
+body.presentation-mode.presentation-splash main{
+  padding:0;
+}
+body.presentation-mode.presentation-splash #view-splash .sec-header{
+  display:none;
+}
+body.presentation-mode.presentation-splash .splash-view{
+  min-height:100vh;
+  border:0;
+}
+body.presentation-mode.presentation-splash .splash-mark{
+  font-size:clamp(120px,15vw,230px);
 }
 body.mode-gate-active{
   min-height:100vh;
@@ -1973,10 +2101,14 @@ body.event-mode nav{
 body.event-mode main{
   padding:30px 44px 44px;
 }
+body.event-mode .event-switcher{
+  display:flex;
+}
 body.event-mode .view{
   display:none!important;
 }
-body.event-mode #view-randomizer{
+body.event-mode #view-randomizer.active,
+body.event-mode #view-splash.active{
   display:block!important;
 }
 .event-exit-btn{
@@ -2011,6 +2143,26 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
 @keyframes memberReveal{
   to{opacity:1;transform:translateX(0)}
 }
+@keyframes splashPulse{
+  0%,100%{filter:brightness(1);transform:scale(1)}
+  50%{filter:brightness(1.14);transform:scale(1.015)}
+}
+@keyframes splashLine{
+  0%,100%{opacity:.42;transform:scaleX(.62)}
+  50%{opacity:.95;transform:scaleX(1)}
+}
+@keyframes splashScan{
+  from{transform:translateY(-42vh) rotate(-8deg)}
+  to{transform:translateY(42vh) rotate(-8deg)}
+}
+@keyframes splashFrame{
+  0%,100%{opacity:.32;transform:skewX(-10deg) scale(.985)}
+  50%{opacity:.72;transform:skewX(-10deg) scale(1.015)}
+}
+@keyframes splashCorner{
+  0%,100%{opacity:.36}
+  50%{opacity:.86}
+}
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
   .club-hero{grid-template-columns:1fr;gap:14px;padding-top:6px}
@@ -2031,6 +2183,11 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .randomizer-status{justify-content:flex-start;text-align:left}
   .randomizer-grid{grid-template-columns:1fr;gap:8px}
   .randomizer-team{min-height:0;border-radius:14px;padding:14px}
+  .event-switcher{align-items:stretch;flex-direction:column;margin-bottom:16px}
+  .event-tabs{width:100%}
+  .event-tab{flex:1;padding:0 10px}
+  .splash-view{min-height:calc(100vh - 220px)}
+  .splash-inner{padding:28px 18px}
   .mode-gate{padding:28px 18px}
   .mode-gate-actions{grid-template-columns:1fr}
   .mode-card{min-height:170px;padding:22px}
@@ -3042,6 +3199,14 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
 
 <main>
 
+<div class="event-switcher" id="event-switcher">
+  <div class="event-tabs">
+    <button class="event-tab active" id="event-tab-randomizer" type="button" onclick="switchEventTab('randomizer')">Команды</button>
+    <button class="event-tab" id="event-tab-splash" type="button" onclick="switchEventTab('splash')">Заставка</button>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="enterAppMode('gate')">Выбор режима</button>
+</div>
+
 <!-- ── ANALYTICS ── -->
 <div class="view active" id="view-analytics">
   <div class="kpi-row">
@@ -3237,6 +3402,26 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   <div class="randomizer-grid" id="rnd-board"></div>
 </div>
 
+<!-- SPLASH -->
+<div class="view" id="view-splash">
+  <div class="sec-header randomizer-header">
+    <div class="sec-title">Заставка</div>
+    <div class="sec-actions">
+      <span class="sec-actions-note">Петлевой экран для плазмы</span>
+      <button class="btn btn-ghost btn-sm" onclick="toggleFullscreen()">Во весь экран</button>
+      <button class="btn btn-ghost btn-sm" onclick="openSplashPresentation()">На экран</button>
+    </div>
+  </div>
+  <div class="splash-view" aria-label="драфт">
+    <div class="splash-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="splash-inner">
+      <div class="splash-mark">драфт<span>.</span></div>
+      <div class="splash-line"></div>
+      <div class="splash-subtitle">закрытый мастермайнд ведущих</div>
+    </div>
+  </div>
+</div>
+
 <!-- ── CLUB ── -->
 <div class="view" id="view-club">
   <div class="club-hero">
@@ -3390,6 +3575,7 @@ function saveLocal(){
   }
 }
 let appMode = 'gate';
+let eventActiveView = 'randomizer';
 let randomizerLastRenderedCreatedAt = '';
 let appLastExternalStateHash = '';
 let appBroadcast = null;
@@ -3461,8 +3647,17 @@ function switchTab(name, btn){
   if(name==='club') renderClub();
 }
 
+function switchEventTab(name){
+  eventActiveView = name === 'splash' ? 'splash' : 'randomizer';
+  document.querySelectorAll('.event-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('event-tab-'+eventActiveView)?.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+eventActiveView)?.classList.add('active');
+  if(eventActiveView === 'randomizer') renderRandomizer();
+}
+
 function enterAppMode(mode){
-  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode');
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash');
   if(mode==='gate'){
     appMode='gate';
     document.body.classList.add('mode-gate-active');
@@ -3472,9 +3667,7 @@ function enterAppMode(mode){
     appMode='event';
     document.body.classList.add('event-mode');
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    document.getElementById('view-randomizer')?.classList.add('active');
-    renderRandomizer();
+    switchEventTab(eventActiveView);
     return;
   }
   appMode='crm';
@@ -4843,6 +5036,13 @@ function openRandomizerPresentation(){
   const win=window.open(url.toString(),'draft-randomizer-screen','popup=yes,width=1600,height=900');
   if(!win) toast('Браузер заблокировал новое окно');
 }
+function openSplashPresentation(){
+  const url=new URL(window.location.href);
+  url.searchParams.set('present','splash');
+  url.hash='';
+  const win=window.open(url.toString(),'draft-splash-screen','popup=yes,width=1600,height=900');
+  if(!win) toast('Браузер заблокировал новое окно');
+}
 async function toggleFullscreen(){
   try{
     if(document.fullscreenElement){
@@ -4856,15 +5056,16 @@ async function toggleFullscreen(){
 }
 function applyPresentationMode(){
   const params=new URLSearchParams(window.location.search);
-  if(params.get('present')!=='randomizer') return false;
+  const present=params.get('present');
+  if(present!=='randomizer' && present!=='splash') return false;
   document.body.classList.remove('mode-gate-active','event-mode');
-  document.body.classList.add('presentation-mode');
+  document.body.classList.add('presentation-mode','presentation-'+present);
   appMode='presentation';
-  document.title='Команды · драфт';
+  document.title=(present==='splash' ? 'Заставка' : 'Команды')+' · драфт';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-randomizer')?.classList.add('active');
-  renderRandomizer();
+  document.getElementById('view-'+present)?.classList.add('active');
+  if(present==='randomizer') renderRandomizer();
   return true;
 }
 function applyInitialMode(){
