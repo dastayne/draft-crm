@@ -1678,6 +1678,161 @@ header::before{
 .club-chip.green{color:var(--green-lt);border-color:rgba(98,191,74,.28);background:rgba(25,53,22,.72)}
 .club-chip.org-chip{color:#FFD782;border-color:rgba(255,215,130,.34);background:rgba(74,54,20,.72)}
 .club-empty{padding:46px 18px;border:1px dashed rgba(255,255,255,.13);border-radius:18px;color:var(--gray1);text-align:center;background:rgba(255,255,255,.025)}
+
+.randomizer-header{align-items:flex-end}
+.randomizer-panel{
+  background:var(--s1);
+  border:1px solid rgba(255,255,255,.07);
+  border-top:1px solid rgba(98,191,74,.26);
+  padding:18px 20px;
+  margin-bottom:2px;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:20px;
+  align-items:center;
+}
+.randomizer-metrics{display:flex;gap:2px;min-width:360px}
+.randomizer-metric{
+  min-width:112px;
+  padding:13px 14px 12px;
+  background:#0d0d0d;
+  border:1px solid rgba(255,255,255,.06);
+}
+.randomizer-metric-val{
+  font-family:var(--font-main);
+  font-size:30px;
+  line-height:.95;
+  font-weight:850;
+  color:var(--green-lt);
+  letter-spacing:-.03em;
+}
+.randomizer-metric-lbl{
+  margin-top:6px;
+  color:var(--gray2);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.randomizer-status{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  color:var(--gray1);
+  font-size:12px;
+  line-height:1.35;
+  text-align:right;
+}
+.randomizer-status.warn{color:var(--amber)}
+.randomizer-status.ok{color:var(--green-lt)}
+.randomizer-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:2px;
+  padding-bottom:44px;
+}
+.randomizer-team{
+  min-height:340px;
+  background:linear-gradient(180deg,#111,#0d0d0d);
+  border:1px solid rgba(255,255,255,.07);
+  border-top:2px solid rgba(98,191,74,.62);
+  padding:18px;
+}
+.randomizer-team-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.randomizer-team-title{
+  font-size:18px;
+  line-height:1;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--white);
+}
+.randomizer-team-meta{
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.randomizer-members{display:flex;flex-direction:column;gap:8px}
+.randomizer-member{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  min-height:48px;
+  padding:7px 8px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.055);
+}
+.randomizer-member.top{
+  background:linear-gradient(90deg,rgba(98,191,74,.13),rgba(255,255,255,.025));
+  border-color:rgba(98,191,74,.23);
+}
+.randomizer-avatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#1b1b1b;
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--gray1);
+  font-size:11px;
+  font-weight:850;
+}
+.randomizer-avatar img{width:100%;height:100%;object-fit:cover}
+.randomizer-member-name{
+  min-width:0;
+  color:var(--white);
+  font-size:13px;
+  line-height:1.12;
+  font-weight:720;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.randomizer-member-sub{
+  margin-top:3px;
+  color:var(--gray2);
+  font-size:10px;
+  line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.randomizer-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:22px;
+  padding:5px 7px;
+  border-radius:999px;
+  border:1px solid rgba(98,191,74,.28);
+  background:rgba(25,53,22,.5);
+  color:var(--green-lt);
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.randomizer-empty{
+  grid-column:1/-1;
+  padding:52px 18px;
+  background:var(--s1);
+  border:1px dashed rgba(255,255,255,.13);
+  color:var(--gray1);
+  text-align:center;
+}
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
   .club-hero{grid-template-columns:1fr;gap:14px;padding-top:6px}
@@ -1691,6 +1846,13 @@ header::before{
   .club-card img{min-height:210px}
   .club-name{font-size:15px}
   .club-card{animation-duration:.34s}
+  .randomizer-panel{grid-template-columns:1fr;padding:14px;gap:14px}
+  .randomizer-metrics{min-width:0;width:100%;display:grid;grid-template-columns:repeat(3,1fr)}
+  .randomizer-metric{min-width:0;padding:11px 10px}
+  .randomizer-metric-val{font-size:24px}
+  .randomizer-status{justify-content:flex-start;text-align:left}
+  .randomizer-grid{grid-template-columns:1fr;gap:8px}
+  .randomizer-team{min-height:0;border-radius:14px;padding:14px}
 }
 
 
@@ -2670,6 +2832,7 @@ header::before{
   <button class="tab" onclick="switchTab('participants',this)">Участники <span class="badge" id="badge-p">0</span></button>
   <button class="tab" onclick="switchTab('prospects',this)">Потенциально <span class="badge muted" id="badge-pr">0</span></button>
   <button class="tab" onclick="switchTab('orgs',this)">Организаторы <span class="badge muted" id="badge-o">0</span></button>
+  <button class="tab" onclick="switchTab('randomizer',this)">Рандомайзер</button>
   <button class="tab" onclick="switchTab('club',this)">Клуб</button>
 </nav>
 
@@ -2841,6 +3004,35 @@ header::before{
   <div class="p-list" id="o-list"></div>
 </div>
 
+<!-- ── RANDOMIZER ── -->
+<div class="view" id="view-randomizer">
+  <div class="sec-header randomizer-header">
+    <div class="sec-title">Рандомайзер <span id="rnd-cnt"></span></div>
+    <div class="sec-actions">
+      <span class="sec-actions-note" id="rnd-note">4 команды · только участники</span>
+      <button class="btn btn-solid btn-sm" onclick="randomizeTeams()">↻ Собрать команды</button>
+    </div>
+  </div>
+  <div class="randomizer-panel">
+    <div class="randomizer-metrics">
+      <div class="randomizer-metric">
+        <div class="randomizer-metric-val" id="rnd-total">0</div>
+        <div class="randomizer-metric-lbl">Ведущие</div>
+      </div>
+      <div class="randomizer-metric">
+        <div class="randomizer-metric-val" id="rnd-top">0</div>
+        <div class="randomizer-metric-lbl">Топы</div>
+      </div>
+      <div class="randomizer-metric">
+        <div class="randomizer-metric-val" id="rnd-teams">4</div>
+        <div class="randomizer-metric-lbl">Команды</div>
+      </div>
+    </div>
+    <div class="randomizer-status" id="rnd-status"></div>
+  </div>
+  <div class="randomizer-grid" id="rnd-board"></div>
+</div>
+
 <!-- ── CLUB ── -->
 <div class="view" id="view-club">
   <div class="club-hero">
@@ -2953,6 +3145,9 @@ let _prid = 1;
 function normalizeDB(){
   if(!DB || typeof DB !== 'object') DB = deep(DEFAULTS);
   if(!DB.settings) DB.settings = deep(DEFAULTS.settings);
+  if(!DB.randomizer || typeof DB.randomizer !== 'object') DB.randomizer = {teams:[], createdAt:''};
+  if(!Array.isArray(DB.randomizer.teams)) DB.randomizer.teams = [];
+  if(typeof DB.randomizer.createdAt === 'undefined') DB.randomizer.createdAt = '';
   if(!Array.isArray(DB.participants)) DB.participants = [];
   if(!Array.isArray(DB.prospects)) DB.prospects = [];
   if(!Array.isArray(DB.orgs)) DB.orgs = [];
@@ -3010,6 +3205,7 @@ function switchTab(name, btn){
   if(name==='participants') renderParticipants();
   if(name==='prospects') renderProspects();
   if(name==='orgs') renderOrgs();
+  if(name==='randomizer') renderRandomizer();
   if(name==='club') renderClub();
 }
 
@@ -3525,13 +3721,14 @@ function deletePhoto(id,type='participant'){
   if(!p || !p.photo){ toast('Фото уже нет'); return; }
   if(!confirm('Удалить фото?')) return;
   p.photo='';
+  p.photoUpdatedAt=Date.now();
+  refreshPhotoEntity(p,type);
   save();
   if(syncReady && syncClient){
     clearTimeout(syncSaveTimer);
     setSyncStatus('Сохраняю','syncing');
     pushCloudNow(false);
   }
-  refreshPhotoEntity(p,type);
   toast('Фото удалено');
 }
 
@@ -3669,16 +3866,19 @@ function saveCrop(){
   const p=getPhotoEntity(targetType,photoTargetId);
   if(p){
     p.photo=data;
+    p.photoUpdatedAt=Date.now();
+    document.getElementById('crop-overlay').classList.remove('open');
+    document.getElementById('photo-input').value='';
+    refreshPhotoEntity(p,targetType);
     save();
     if(syncReady && syncClient){
       clearTimeout(syncSaveTimer);
       setSyncStatus('Сохраняю','syncing');
       pushCloudNow(false);
     }
-    document.getElementById('crop-overlay').classList.remove('open');
-    document.getElementById('photo-input').value='';
-    refreshPhotoEntity(p,targetType);
-    toast('Фото сохранено и отправляется в синк');
+    photoTargetId=null;
+    photoTargetType='participant';
+    toast('Фото обновлено');
   } else {
     cancelCrop();
   }
@@ -4105,6 +4305,161 @@ function openOrgDossier(id){
   document.getElementById('modal-save-btn').style.display='none';
 }
 
+// ─── RANDOMIZER ─────────────────────────────────────────────
+const RANDOMIZER_TEAM_COUNT = 4;
+const RANDOMIZER_LOCKED_NAMES = ['Виктор Зинченко','Егор Панасенко'];
+
+function randomizerPool(){
+  return (DB.participants||[]).filter(p=>p && p.name);
+}
+function randomNameKey(name){
+  return (name||'')
+    .toLowerCase()
+    .replace(/ё/g,'е')
+    .replace(/[^а-яa-z0-9]+/g,' ')
+    .trim();
+}
+function findRandomizerPerson(name, pool=randomizerPool()){
+  const target=randomNameKey(name);
+  const words=target.split(' ').filter(Boolean);
+  return pool.find(p=>{
+    const current=randomNameKey(p.name);
+    return current===target || words.every(w=>current.includes(w));
+  });
+}
+function shuffled(list){
+  const arr=[...list];
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function randomizerTopCount(team){
+  return (team||[]).filter(p=>p?.top).length;
+}
+function randomizerDateLabel(value){
+  if(!value) return '';
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function setRandomizerStatus(text,state=''){
+  const el=document.getElementById('rnd-status');
+  if(!el) return;
+  el.textContent=text||'';
+  el.className='randomizer-status '+state;
+}
+function randomizerMemberMarkup(p){
+  const idx=DB.participants.indexOf(p)+1;
+  return `
+    <div class="randomizer-member ${p.top?'top':''}">
+      <div class="randomizer-avatar">${p.photo ? `<img src="${p.photo}" alt="">` : makeInitials(p.name)}</div>
+      <div>
+        <div class="randomizer-member-name">${esc(p.name)}</div>
+        <div class="randomizer-member-sub">Участник #${idx || '—'}</div>
+      </div>
+      ${p.top ? '<span class="randomizer-badge">Топ</span>' : ''}
+    </div>
+  `;
+}
+function renderRandomizer(){
+  const pool=randomizerPool();
+  const tops=pool.filter(p=>p.top);
+  const board=document.getElementById('rnd-board');
+  if(!board) return;
+  document.getElementById('rnd-cnt').innerHTML=`<span style="color:var(--green)">${pool.length}</span>`;
+  document.getElementById('rnd-total').textContent=pool.length;
+  document.getElementById('rnd-top').textContent=tops.length;
+  document.getElementById('rnd-teams').textContent=RANDOMIZER_TEAM_COUNT;
+
+  const byId=new Map(pool.map(p=>[String(p.id),p]));
+  const teams=(DB.randomizer?.teams||[]).map(ids=>(ids||[]).map(id=>byId.get(String(id))).filter(Boolean));
+  const hasTeams=teams.some(team=>team.length);
+  const created=randomizerDateLabel(DB.randomizer?.createdAt);
+
+  if(!hasTeams){
+    board.innerHTML='<div class="randomizer-empty">Команды ещё не собраны</div>';
+    if(tops.length<RANDOMIZER_TEAM_COUNT){
+      setRandomizerStatus(`Нужно минимум ${RANDOMIZER_TEAM_COUNT} топа. Сейчас: ${tops.length}.`,'warn');
+    } else {
+      setRandomizerStatus('Готов к сборке команд','ok');
+    }
+    return;
+  }
+
+  board.innerHTML=teams.map((team,i)=>`
+    <div class="randomizer-team">
+      <div class="randomizer-team-head">
+        <div class="randomizer-team-title">Команда ${i+1}</div>
+        <div class="randomizer-team-meta">${team.length} чел · топов ${randomizerTopCount(team)}</div>
+      </div>
+      <div class="randomizer-members">
+        ${team.map(randomizerMemberMarkup).join('')}
+      </div>
+    </div>
+  `).join('');
+  setRandomizerStatus(created ? `Последний расклад: ${created}` : 'Команды собраны','ok');
+}
+function randomizeTeams(){
+  normalizeDB();
+  const pool=randomizerPool();
+  if(pool.length<RANDOMIZER_TEAM_COUNT){
+    setRandomizerStatus(`Нужно минимум ${RANDOMIZER_TEAM_COUNT} участника. Сейчас: ${pool.length}.`,'warn');
+    toast('Недостаточно участников для 4 команд');
+    return;
+  }
+
+  const locked=RANDOMIZER_LOCKED_NAMES.map(name=>findRandomizerPerson(name,pool));
+  const missing=RANDOMIZER_LOCKED_NAMES.filter((name,i)=>!locked[i]);
+  if(missing.length){
+    setRandomizerStatus('Не нашёл обязательную связку: '+missing.join(', '),'warn');
+    toast('Проверь имена Виктора и Егора');
+    return;
+  }
+  if(locked[0].id===locked[1].id){
+    setRandomizerStatus('Связка Виктор + Егор распозналась как один человек','warn');
+    return;
+  }
+
+  const usedIds=new Set(locked.map(p=>String(p.id)));
+  const units=[{members:locked, locked:true}];
+  pool.forEach(p=>{
+    if(!usedIds.has(String(p.id))) units.push({members:[p], locked:false});
+  });
+
+  const topUnits=shuffled(units.filter(unit=>unit.members.some(p=>p.top)));
+  if(topUnits.length<RANDOMIZER_TEAM_COUNT){
+    setRandomizerStatus(`Топов должно хватать на ${RANDOMIZER_TEAM_COUNT} разные команды. Сейчас топ-групп: ${topUnits.length}.`,'warn');
+    toast('Не хватает топов для честного расклада');
+    return;
+  }
+
+  const teams=Array.from({length:RANDOMIZER_TEAM_COUNT},()=>[]);
+  const seeded=new Set();
+  topUnits.slice(0,RANDOMIZER_TEAM_COUNT).forEach((unit,i)=>{
+    teams[i].push(...unit.members);
+    seeded.add(unit);
+  });
+
+  shuffled(units.filter(unit=>!seeded.has(unit))).forEach(unit=>{
+    const minSize=Math.min(...teams.map(team=>team.length));
+    const candidates=teams.map((team,i)=>({team,i})).filter(x=>x.team.length===minSize);
+    const pick=candidates[Math.floor(Math.random()*candidates.length)].i;
+    teams[pick].push(...unit.members);
+  });
+
+  teams.forEach(team=>team.sort((a,b)=>byTop(a,b)||byName(a,b)));
+  DB.randomizer={
+    createdAt:new Date().toISOString(),
+    teams:teams.map(team=>team.map(p=>p.id)),
+    lockedPair:RANDOMIZER_LOCKED_NAMES
+  };
+  save();
+  renderRandomizer();
+  toast('Команды собраны');
+}
+
 // ─── CLUB ──────────────────────────────────────────────────
 function clubItems(){
   const participants=(DB.participants||[]).map(p=>({...p,_type:'participant'}));
@@ -4306,6 +4661,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 const SYNC_KEY = 'draft_mm_sync_config_v1';
 const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
 const SYNC_POLL_MS = 4500;
+const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
   anonKey: 'sb_publishable_ujpC3zRG3h-e0FEYq6dNdA_qT8AV-lP',
@@ -4328,18 +4684,59 @@ let syncReconnectTimer = null;
 let syncPollTimer = null;
 let syncConnecting = false;
 let syncPolling = false;
+let syncPushing = false;
 let syncLastHash = '';
+let syncLastRemoteAt = '';
+let syncReconnectAttempt = 0;
+let syncSdkLoadPromise = null;
 
 function markPendingCloudSave(){ try{ localStorage.setItem(PENDING_SYNC_KEY,'1'); }catch{} }
 function clearPendingCloudSave(){ try{ localStorage.removeItem(PENDING_SYNC_KEY); }catch{} }
 function hasPendingCloudSave(){ try{ return localStorage.getItem(PENDING_SYNC_KEY)==='1'; }catch{ return false; } }
-function scheduleCloudReconnect(){
+function scheduleCloudReconnect(delay=null){
   if(!syncConfig) return;
   clearTimeout(syncReconnectTimer);
-  syncReconnectTimer=setTimeout(()=>initCloudSync(true),700);
+  const wait = delay ?? Math.min(15000, 900 * Math.pow(1.55, Math.min(syncReconnectAttempt, 7)));
+  syncReconnectAttempt += 1;
+  syncReconnectTimer=setTimeout(()=>initCloudSync(true),wait);
 }
-function applyRemoteState(next,{silent=false}={}){
+function isOlderRemote(updatedAt){
+  if(!updatedAt || !syncLastRemoteAt) return false;
+  const nextTime=Date.parse(updatedAt);
+  const lastTime=Date.parse(syncLastRemoteAt);
+  return Number.isFinite(nextTime) && Number.isFinite(lastTime) && nextTime < lastTime;
+}
+function rememberRemoteAt(updatedAt){
+  if(updatedAt && !isOlderRemote(updatedAt)) syncLastRemoteAt=updatedAt;
+}
+function ensureSupabaseSdk(){
+  if(window.supabase) return Promise.resolve(true);
+  if(syncSdkLoadPromise) return syncSdkLoadPromise;
+  syncSdkLoadPromise=new Promise(resolve=>{
+    let settled=false;
+    const finish=()=>{ if(settled) return; settled=true; resolve(!!window.supabase); };
+    let script=[...document.scripts].find(s=>(s.src||'').includes('@supabase/supabase-js'));
+    if(script && !window.supabase){
+      script.remove();
+      script=null;
+    }
+    if(!script){
+      script=document.createElement('script');
+      script.src=SUPABASE_SDK_URL;
+      script.async=true;
+      document.head.appendChild(script);
+    }
+    script.addEventListener('load',finish,{once:true});
+    script.addEventListener('error',finish,{once:true});
+    setTimeout(finish,5000);
+  }).finally(()=>{
+    if(!window.supabase) syncSdkLoadPromise=null;
+  });
+  return syncSdkLoadPromise;
+}
+function applyRemoteState(next,{silent=false,updatedAt=''}={}){
   if(!next) return false;
+  if(isOlderRemote(updatedAt)) return false;
   const h=hashData(next);
   if(h===syncLastHash) return false;
   syncApplyingRemote=true;
@@ -4349,6 +4746,7 @@ function applyRemoteState(next,{silent=false}={}){
   refreshAll();
   syncApplyingRemote=false;
   syncLastHash=h;
+  rememberRemoteAt(updatedAt);
   setSyncStatus('Онлайн','online');
   if(!silent) toast('Обновлено с другого устройства');
   return true;
@@ -4373,7 +4771,8 @@ function mergeCloudState(remote, local){
     settings:{...(base.settings||{}),...(mine.settings||{})},
     participants:mergeArrayById(base.participants,mine.participants),
     orgs:mergeArrayById(base.orgs,mine.orgs),
-    prospects:mergeArrayById(base.prospects,mine.prospects)
+    prospects:mergeArrayById(base.prospects,mine.prospects),
+    randomizer:{...(base.randomizer||{}),...(mine.randomizer||{})}
   };
 }
 function setSyncStatus(text, state='local'){
@@ -4383,7 +4782,7 @@ function setSyncStatus(text, state='local'){
   el.className='sync-pill '+state;
 }
 function hashData(data){ try{return JSON.stringify(data)}catch{return String(Date.now())} }
-function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); renderProspects(); renderOrgs(); renderClub(); }
+function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); renderProspects(); renderOrgs(); renderRandomizer(); renderClub(); }
 function canUseSupabase(){ return !!(window.supabase && syncConfig?.url && syncConfig?.anonKey && syncConfig?.rowId); }
 function makeSyncClient(){ if(!canUseSupabase()) return null; return window.supabase.createClient(syncConfig.url, syncConfig.anonKey); }
 
@@ -4426,7 +4825,15 @@ function clearSyncSetup(){
 
 async function initCloudSync(force=false){
   if(!syncConfig){ setSyncStatus('Локально','local'); return; }
-  if(!window.supabase){ setSyncStatus('Нет SDK','error'); toast('Supabase SDK не загрузился'); return; }
+  if(!window.supabase){
+    setSyncStatus('Загружаю SDK','syncing');
+    const sdkReady=await ensureSupabaseSdk();
+    if(!sdkReady){
+      setSyncStatus('Нет SDK','error');
+      scheduleCloudReconnect();
+      return;
+    }
+  }
   if(syncConnecting) return;
   syncConnecting=true;
   const localBeforeSync=deep(DB);
@@ -4441,22 +4848,30 @@ async function initCloudSync(force=false){
     if(data?.data){
       const pendingNow=hadPendingLocal || hasPendingCloudSave();
       const localForMerge=pendingNow ? deep(DB) : localBeforeSync;
-      syncApplyingRemote=true;
-      DB = pendingNow ? mergeCloudState(data.data, localForMerge) : data.data;
-      normalizeDB(); saveLocal(); refreshAll();
-      syncApplyingRemote=false;
-      syncLastHash = hashData(DB);
-      if(pendingNow){
-        await pushCloudNow(true);
-        toast('Локальные изменения слиты с облаком');
+      if(isOlderRemote(data.updated_at) && !pendingNow){
+        syncLastHash = hashData(DB);
       } else {
-        toast('Данные подтянулись из облака');
+        syncApplyingRemote=true;
+        DB = pendingNow ? mergeCloudState(data.data, localForMerge) : data.data;
+        normalizeDB(); saveLocal(); refreshAll();
+        syncApplyingRemote=false;
+        syncLastHash = hashData(DB);
+        rememberRemoteAt(data.updated_at);
+        if(pendingNow){
+          const pushed=await pushCloudNow(true);
+          if(!pushed) throw new Error('Не удалось отправить локальные изменения');
+          toast('Локальные изменения слиты с облаком');
+        } else {
+          toast('Данные подтянулись из облака');
+        }
       }
     } else {
-      await pushCloudNow(true);
+      const pushed=await pushCloudNow(true);
+      if(!pushed) throw new Error('Не удалось создать облачную базу');
       toast('Создал облачную базу из текущих данных');
     }
     syncReady=true;
+    syncReconnectAttempt=0;
     clearTimeout(syncReconnectTimer);
     setSyncStatus('Онлайн','online');
     subscribeCloudChanges();
@@ -4466,6 +4881,7 @@ async function initCloudSync(force=false){
     syncApplyingRemote=false;
     syncReady=false;
     setSyncStatus('Ошибка','error');
+    scheduleCloudReconnect();
     toast('Синк не подключился: '+(err?.message||'проверь настройки'));
   } finally {
     syncConnecting=false;
@@ -4480,11 +4896,12 @@ function subscribeCloudChanges(){
       const next = payload?.new?.data;
       if(!next) return;
       if(hasPendingCloudSave()) return;
-      applyRemoteState(next);
+      applyRemoteState(next,{updatedAt:payload?.new?.updated_at});
     })
     .subscribe(status=>{
       if(status==='SUBSCRIBED') setSyncStatus('Онлайн','online');
       if(status==='CHANNEL_ERROR' || status==='TIMED_OUT'){
+        syncReady=false;
         setSyncStatus('Сбой','error');
         scheduleCloudReconnect();
       }
@@ -4515,10 +4932,12 @@ async function pollCloudNow(silent=true){
     }
     const {data,error}=await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
     if(error) throw error;
-    if(data?.data) applyRemoteState(data.data,{silent});
+    if(data?.data) applyRemoteState(data.data,{silent,updatedAt:data.updated_at});
   } catch(err){
     console.error(err);
+    syncReady=false;
     setSyncStatus('Сбой','error');
+    scheduleCloudReconnect();
   } finally {
     syncPolling=false;
   }
@@ -4536,20 +4955,47 @@ function scheduleCloudSave(){
   syncSaveTimer=setTimeout(()=>pushCloudNow(false),90);
 }
 async function pushCloudNow(silent=false){
-  if(!syncConfig || !syncClient) return;
+  if(!syncConfig) return false;
+  if(!syncClient){
+    markPendingCloudSave();
+    scheduleCloudReconnect();
+    return false;
+  }
+  if(syncPushing){
+    markPendingCloudSave();
+    return false;
+  }
+  syncPushing=true;
   const h=hashData(DB);
   syncLastHash=h;
-  const payload={id:syncConfig.rowId,data:deep(DB),updated_at:new Date().toISOString()};
-  const {error}=await syncClient.from('draft_crm_state').upsert(payload,{onConflict:'id'});
-  if(error){
+  const updatedAt=new Date().toISOString();
+  const payload={id:syncConfig.rowId,data:deep(DB),updated_at:updatedAt};
+  try{
+    const {error}=await syncClient.from('draft_crm_state').upsert(payload,{onConflict:'id'});
+    if(error) throw error;
+  } catch(error){
     console.error(error);
     markPendingCloudSave();
+    syncReady=false;
     setSyncStatus('Ошибка','error');
+    scheduleCloudReconnect();
     if(!silent) toast('Не сохранилось в облако, попробую ещё раз при подключении');
-    return;
+    syncPushing=false;
+    return false;
+  }
+  if(hashData(DB)!==h){
+    markPendingCloudSave();
+    syncPushing=false;
+    scheduleCloudSave();
+    return true;
   }
   clearPendingCloudSave();
+  rememberRemoteAt(updatedAt);
+  syncReconnectAttempt=0;
+  syncReady=true;
   setSyncStatus('Онлайн','online');
+  syncPushing=false;
+  return true;
 }
 
 window.addEventListener('online',()=>{
@@ -5011,6 +5457,7 @@ syncOrgModeUI();
 renderParticipants();
 renderProspects();
 renderOrgs();
+renderRandomizer();
 initCloudSync();
 </script>
 </body>
