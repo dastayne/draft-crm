@@ -1891,107 +1891,82 @@ header::before{
 .splash-view:fullscreen .splash-controls{display:none!important}
 
 /* ── ТЁМНАЯ: вертикальные полосы плывут ── */
-.splash-view.theme-dark{background:#030303;border:1px solid rgba(98,191,74,.09)}
-.splash-view.theme-dark .splash-stripes{
-  position:absolute;inset:-20% -10%;pointer-events:none;z-index:0;
-  display:flex;gap:0;
-  animation:stripesFlow 18s linear infinite;
-  will-change:transform;
+/* ── ТЁМНАЯ: чистый фон, только логотип живёт ── */
+.splash-view.theme-dark{
+  background:#050505;
+  border:1px solid rgba(98,191,74,.08);
 }
-.splash-view.theme-dark .splash-stripes span{
-  display:block;flex-shrink:0;height:100%;
-  background:rgba(255,255,255,0);
-}
-/* полосы разной ширины и прозрачности — нечётные светлее */
-.splash-view.theme-dark .splash-stripes span:nth-child(odd){
-  width:clamp(28px,2.2vw,44px);
-  background:linear-gradient(180deg,transparent,rgba(255,255,255,.016),transparent);
-}
-.splash-view.theme-dark .splash-stripes span:nth-child(even){
-  width:clamp(44px,3.5vw,72px);
-}
+.splash-view.theme-dark .splash-stripes{display:none}
 .splash-view.theme-dark .splash-inner{
   position:relative;z-index:2;
-  display:flex;flex-direction:column;align-items:center;text-align:center;gap:28px;padding:44px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:22px;padding:44px;
 }
 .splash-view.theme-dark .splash-mark{
   font-family:'Ekran Draft',var(--font-main);
   font-size:clamp(96px,13vw,200px);
-  line-height:.84;color:#f2f2f2;letter-spacing:-.015em;text-transform:lowercase;
-  text-shadow:0 2px 40px rgba(0,0,0,.9);
+  line-height:.84;color:#f0f0f0;letter-spacing:-.015em;text-transform:lowercase;
 }
 .splash-view.theme-dark .splash-mark span{
   color:var(--green);display:inline-block;
   animation:dotGlow 4.2s ease-in-out infinite;
 }
 .splash-view.theme-dark .splash-subtitle{
-  color:rgba(255,255,255,.28);font-size:clamp(10px,.9vw,13px);
-  font-weight:700;letter-spacing:.36em;text-transform:uppercase;
+  color:rgba(255,255,255,.22);font-size:clamp(10px,.85vw,13px);
+  font-weight:700;letter-spacing:.38em;text-transform:uppercase;
 }
 .splash-view.theme-dark .splash-line{display:none}
 .splash-view.theme-dark .splash-meta{
   position:absolute;left:32px;right:32px;bottom:24px;z-index:2;
   display:flex;justify-content:space-between;align-items:center;
-  font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
-  color:rgba(255,255,255,.26);pointer-events:none;
+  font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.2);pointer-events:none;
 }
 .splash-view.theme-dark .splash-meta span::before{
   content:'';display:inline-block;width:5px;height:5px;border-radius:50%;
   background:var(--green);margin-right:8px;vertical-align:middle;
-  box-shadow:0 0 8px var(--green);animation:dotGlow 2.4s ease-in-out infinite;
+  box-shadow:0 0 8px var(--green);
+  animation:dotGlow 2.4s ease-in-out infinite;
 }
-/* элементы которые не нужны в тёмной */
 .splash-view.theme-dark .splash-grid,
 .splash-view.theme-dark .splash-aura,
 .splash-view.theme-dark .splash-rings{display:none}
 
-/* ── СВЕТЛАЯ: те же полосы, светлый фон ── */
-.splash-view.theme-light{background:#f0ece4;border:1px solid rgba(0,0,0,.07)}
-.splash-view.theme-light .splash-stripes{
-  position:absolute;inset:-20% -10%;pointer-events:none;z-index:0;
-  display:flex;gap:0;
-  animation:stripesFlow 22s linear infinite;
-  will-change:transform;
+/* ── СВЕТЛАЯ: почти белый, только логотип живёт ── */
+.splash-view.theme-light{
+  background:#F8F7F4;
+  border:1px solid rgba(0,0,0,.06);
 }
-.splash-view.theme-light .splash-stripes span{
-  display:block;flex-shrink:0;height:100%;
-}
-.splash-view.theme-light .splash-stripes span:nth-child(odd){
-  width:clamp(28px,2.2vw,44px);
-  background:linear-gradient(180deg,transparent,rgba(0,0,0,.018),transparent);
-}
-.splash-view.theme-light .splash-stripes span:nth-child(even){
-  width:clamp(44px,3.5vw,72px);
-}
+.splash-view.theme-light .splash-stripes{display:none}
 .splash-view.theme-light .splash-inner{
   position:relative;z-index:2;
-  display:flex;flex-direction:column;align-items:center;text-align:center;gap:28px;padding:44px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:22px;padding:44px;
 }
 .splash-view.theme-light .splash-mark{
   font-family:'Ekran Draft',var(--font-main);
   font-size:clamp(96px,13vw,200px);
-  line-height:.84;color:#0a0a0a;letter-spacing:-.015em;text-transform:lowercase;
+  line-height:.84;color:#0b0b0b;letter-spacing:-.015em;text-transform:lowercase;
 }
 .splash-view.theme-light .splash-mark span{
-  color:#1e6b0a;display:inline-block;
+  color:#1a6608;display:inline-block;
   animation:dotGlow 4.2s ease-in-out infinite;
 }
 .splash-view.theme-light .splash-subtitle{
-  color:rgba(0,0,0,.35);font-size:clamp(10px,.9vw,13px);
-  font-weight:700;letter-spacing:.36em;text-transform:uppercase;
+  color:rgba(0,0,0,.28);font-size:clamp(10px,.85vw,13px);
+  font-weight:700;letter-spacing:.38em;text-transform:uppercase;
 }
 .splash-view.theme-light .splash-line{display:none}
 .splash-view.theme-light .splash-meta{
   position:absolute;left:32px;right:32px;bottom:24px;z-index:2;
   display:flex;justify-content:space-between;align-items:center;
-  font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
-  color:rgba(0,0,0,.28);pointer-events:none;
+  font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(0,0,0,.22);pointer-events:none;
 }
 .splash-view.theme-light .splash-meta span::before{
   content:'';display:inline-block;width:5px;height:5px;border-radius:50%;
-  background:#1e6b0a;margin-right:8px;vertical-align:middle;
+  background:#1a6608;margin-right:8px;vertical-align:middle;
 }
-/* скрываем ненужное */
 .splash-view.theme-light .splash-grid,
 .splash-view.theme-light .splash-aura,
 .splash-view.theme-light .splash-rings{display:none}
@@ -2013,47 +1988,51 @@ header::before{
 .splash-cards-badge{
   position:absolute;top:20px;left:24px;z-index:10;
   font-family:'Ekran Draft',var(--font-main);
-  font-size:clamp(22px,2.8vw,42px);line-height:1;
-  color:rgba(255,255,255,.82);letter-spacing:-.01em;text-transform:lowercase;
+  font-size:clamp(22px,2.4vw,36px);line-height:1;
+  color:rgba(255,255,255,.75);letter-spacing:-.01em;text-transform:lowercase;
   pointer-events:none;user-select:none;
 }
 .splash-cards-badge span{color:var(--green)}
 
-/* сетка карточек — 4 колонки × 2 ряда */
+/* сетка: с воздухом, карточки чуть поменьше */
 .splash-cards-grid{
-  position:absolute;inset:0;
+  position:absolute;
+  inset:0;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   grid-template-rows:repeat(2,1fr);
-  gap:clamp(10px,1.4vw,22px);
-  padding:clamp(16px,2vw,32px);
+  gap:clamp(8px,1.1vw,16px);
+  padding:clamp(24px,2.8vw,48px) clamp(20px,2.4vw,40px);
   pointer-events:none;
 }
 
-/* одна ячейка-обёртка: держит clip и overflow для анимации */
+/* ячейка: clip для въезда/выезда, rounded */
 .splash-cell{
-  position:relative;overflow:hidden;border-radius:16px;
+  position:relative;
+  overflow:hidden;
+  border-radius:14px;
+  /* сдвигаем cardFloat на саму карточку, ячейка не двигается */
 }
 
-/* сама карточка — абсолютно в ячейке */
+/* карточка занимает всю ячейку — floating работает через transform */
 .splash-fcard{
   position:absolute;inset:0;
-  border-radius:16px;overflow:hidden;
-  background:linear-gradient(180deg,#1c1c1c,#0a0a0a);
-  border:1px solid rgba(255,255,255,.07);
-  box-shadow:0 16px 40px rgba(0,0,0,.55);
-  transition:opacity .15s;
+  border-radius:14px;overflow:hidden;
+  background:linear-gradient(180deg,#181818,#090909);
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 12px 32px rgba(0,0,0,.6);
+  /* floating накладываем JS-классом, не мешаем enter/leave */
 }
-/* анимации въезда/выезда */
-.splash-fcard.entering{
-  animation:cardEnter .7s cubic-bezier(.22,1,.36,1) forwards;
-}
-.splash-fcard.leaving{
-  animation:cardLeave .6s cubic-bezier(.55,0,1,.45) forwards;
-}
-/* плавающий покой */
 .splash-fcard.floating{
-  animation:cardFloat var(--float-dur,9s) ease-in-out var(--float-delay,0s) infinite;
+  animation:cardFloat var(--float-dur,10s) ease-in-out var(--float-delay,0s) infinite;
+}
+/* въезд справа — через clip внутри ячейки */
+.splash-fcard.entering{
+  animation:cardSlideIn .65s cubic-bezier(.22,1,.36,1) forwards;
+}
+/* выезд влево */
+.splash-fcard.leaving{
+  animation:cardSlideOut .55s cubic-bezier(.55,0,.8,.45) forwards;
 }
 
 .splash-fcard-photo{
@@ -2061,31 +2040,35 @@ header::before{
   display:flex;align-items:center;justify-content:center;
   background:#111;
   font-family:'Ekran Draft',var(--font-main);
-  font-size:clamp(36px,4vw,62px);
-  color:rgba(255,255,255,.15);letter-spacing:-.04em;
+  font-size:clamp(32px,3.5vw,56px);
+  color:rgba(255,255,255,.14);letter-spacing:-.04em;
 }
-.splash-fcard-photo img{width:100%;height:100%;object-fit:cover;object-position:top center}
+.splash-fcard-photo img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:top center;
+  display:block;
+}
 .splash-fcard-photo::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(0,0,0,.08) 0%,transparent 30%,rgba(0,0,0,.78) 100%);
+  background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,transparent 28%,rgba(0,0,0,.82) 100%);
 }
 .splash-fcard-info{
   position:absolute;left:12px;right:12px;bottom:12px;z-index:2;
 }
 .splash-fcard-name{
-  font-size:clamp(12px,1.05vw,16px);font-weight:800;
-  color:#fff;line-height:1.18;letter-spacing:-.015em;
-  text-shadow:0 1px 10px rgba(0,0,0,.8);
+  font-size:clamp(11px,.95vw,15px);font-weight:800;
+  color:#fff;line-height:1.18;letter-spacing:-.01em;
+  text-shadow:0 1px 8px rgba(0,0,0,.9);
 }
 .splash-fcard-role{
-  font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--green-lt);opacity:.85;margin-top:3px;
+  font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--green-lt);opacity:.82;margin-top:3px;
 }
 .splash-fcard-num{
-  position:absolute;top:10px;right:10px;z-index:2;
-  font-size:9px;font-weight:800;letter-spacing:.15em;color:#fff;
-  background:rgba(0,0,0,.42);padding:4px 8px;border-radius:999px;
-  backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);
+  position:absolute;top:9px;right:9px;z-index:2;
+  font-size:8px;font-weight:800;letter-spacing:.14em;color:rgba(255,255,255,.85);
+  background:rgba(0,0,0,.44);padding:3px 7px;border-radius:999px;
+  backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.1);
 }
 body.presentation-mode{
   background:#050505;
@@ -2312,29 +2295,24 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   to{opacity:1;transform:translateX(0)}
 }
 @keyframes dotGlow{
-  0%,100%{opacity:.7;filter:brightness(.95)}
-  50%{opacity:1;filter:brightness(1.5) drop-shadow(0 0 14px rgba(98,191,74,.6))}
+  0%,100%{opacity:.65;filter:brightness(.9)}
+  50%{opacity:1;filter:brightness(1.5) drop-shadow(0 0 16px rgba(98,191,74,.62))}
 }
-/* вертикальные полосы — плывут справа налево */
-@keyframes stripesFlow{
+/* карточка: въезжает справа внутри overflow:hidden ячейки */
+@keyframes cardSlideIn{
+  from{transform:translateX(102%)}
+  to{transform:translateX(0)}
+}
+/* карточка: уезжает влево */
+@keyframes cardSlideOut{
   from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
+  to{transform:translateX(-102%)}
 }
-/* карточки: въезд справа */
-@keyframes cardEnter{
-  from{transform:translateX(110%);opacity:0}
-  to{transform:translateX(0);opacity:1}
-}
-/* карточки: выезд влево */
-@keyframes cardLeave{
-  from{transform:translateX(0);opacity:1}
-  to{transform:translateX(-110%);opacity:0}
-}
-/* тихое плавание когда карточка на месте */
+/* тихое плавание — только translateY, не трогаем X чтобы не путаться */
 @keyframes cardFloat{
-  0%,100%{transform:translateY(0px) rotate(var(--card-rot,0deg))}
-  40%{transform:translateY(-7px) rotate(calc(var(--card-rot,0deg) + .5deg))}
-  70%{transform:translateY(4px) rotate(calc(var(--card-rot,0deg) - .4deg))}
+  0%,100%{transform:translateY(0)}
+  35%{transform:translateY(-5px)}
+  65%{transform:translateY(3px)}
 }
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
@@ -5287,16 +5265,6 @@ function setSplashTheme(theme, btn){
 }
 
 // Генерируем полосы один раз при переключении тёмная/светлая
-function initSplashStripes(){
-  const el = document.getElementById('splash-stripes');
-  if(!el) return;
-  if(el.children.length > 0) return; // уже создано
-  const N = 36; // 18 × 2 для бесшовного лупа
-  let html = '';
-  for(let i=0; i<N; i++) html += '<span></span>';
-  el.innerHTML = html;
-}
-
 function updateSplashMeta(){
   const left  = document.getElementById('splash-meta-left');
   const right = document.getElementById('splash-meta-right');
@@ -5310,8 +5278,13 @@ function updateSplashMeta(){
   left.textContent  = `драфт · ${count} ведущих`;
 }
 
-// ── CAROUSEL ────────────────────────────────────────────────
-const CAROUSEL_SLOT_INTERVAL = 3000; // ms между сменами
+// ── CAROUSEL V2 ──────────────────────────────────────────────
+// Ключевой принцип: floating-анимация живёт на wrapper-е (.splash-fcard-wrap),
+// а slide in/out — на самом .splash-fcard поверх.
+// Ячейка (.splash-cell) никогда не двигается → нет дёрганья.
+
+const CAROUSEL_SLOT_INTERVAL = 3200;  // ms между заменами
+const CAROUSEL_SLIDE_MS      = 600;   // длительность слайда
 
 function stopCarousel(){
   clearInterval(_carouselTimer);
@@ -5322,18 +5295,18 @@ function startCarousel(){
   stopCarousel();
   const people = (DB.participants||[]).filter(p=>p.name);
   if(!people.length) return;
+
   const isMobile = window.matchMedia('(max-width:760px)').matches;
   const cols = isMobile ? 2 : 4;
   const rows = isMobile ? 3 : 2;
   const totalSlots = cols * rows;
 
-  // Обновляем grid CSS
   const grid = document.getElementById('splash-cards-grid');
   if(!grid) return;
   grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
   grid.style.gridTemplateRows    = `repeat(${rows},1fr)`;
 
-  // Перемешиваем очередь участников
+  // Перемешиваем очередь
   _carouselQueue = [...people];
   for(let i=_carouselQueue.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
@@ -5341,7 +5314,7 @@ function startCarousel(){
   }
   _carouselPtr = 0;
 
-  // Первая отрисовка: заполняем все ячейки сразу
+  // Первая отрисовка — все ячейки, карточки появляются сразу на месте
   grid.innerHTML = '';
   _carouselSlots = [];
   for(let i=0;i<totalSlots;i++){
@@ -5352,47 +5325,63 @@ function startCarousel(){
     const cell = document.createElement('div');
     cell.className = 'splash-cell';
     cell.dataset.slot = i;
-    cell.appendChild(makeCardEl(p, i+1));
+
+    const card = makeCardEl(p, i+1);
+    // При первом показе — без slide, сразу floating
+    card.classList.add('floating');
+    cell.appendChild(card);
     grid.appendChild(cell);
-    // добавляем класс floating с задержкой чтобы не мешал enter
-    setTimeout(()=>{
-      const card = cell.querySelector('.splash-fcard');
-      if(card){ card.classList.remove('entering'); card.classList.add('floating'); }
-    }, 800 + i * 80);
   }
 
   _carouselSlotPtr = 0;
 
-  // Запускаем таймер смены по одной карточке
+  // Таймер: меняем по одной ячейке за раз
   _carouselTimer = setInterval(()=>{
     if(splashTheme !== 'cards'){ stopCarousel(); return; }
     const grid = document.getElementById('splash-cards-grid');
     if(!grid) return;
+
     const slotIdx = _carouselSlotPtr % totalSlots;
     _carouselSlotPtr++;
 
     const cell = grid.querySelector(`.splash-cell[data-slot="${slotIdx}"]`);
     if(!cell) return;
 
-    const oldCard = cell.querySelector('.splash-fcard');
-    if(oldCard){
-      oldCard.classList.remove('floating');
-      oldCard.classList.add('leaving');
-      setTimeout(()=>oldCard.remove(), 650);
-    }
-
-    // Следующий участник
+    // Следующий участник в очереди
     const p = _carouselQueue[_carouselPtr % _carouselQueue.length];
-    _carouselSlots[slotIdx] = _carouselPtr % _carouselQueue.length;
     _carouselPtr++;
 
+    // Новая карточка: позиционируем за правым краем, без floating пока
     const newCard = makeCardEl(p, _carouselPtr);
-    newCard.classList.add('entering');
+    // Новая карточка поверх старой, начинает за правым краем ячейки
+    newCard.style.transform = 'translateX(102%)';
     cell.appendChild(newCard);
+
+    // Старая: запускаем slide-out влево
+    const oldCard = cell.querySelector('.splash-fcard:not(:last-child)');
+    if(oldCard){
+      oldCard.classList.remove('floating');
+      // Чтобы float transform не мешал, сбрасываем через inline
+      oldCard.style.animation = 'none';
+      oldCard.style.transform = 'translateX(0)';
+      // Форсируем reflow и запускаем slide out
+      void oldCard.offsetWidth;
+      oldCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.55,0,.8,.45)`;
+      oldCard.style.transform = 'translateX(-102%)';
+      setTimeout(()=>oldCard.remove(), CAROUSEL_SLIDE_MS + 50);
+    }
+
+    // Новая: slide-in
+    void newCard.offsetWidth; // reflow
+    newCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.22,1,.36,1)`;
+    newCard.style.transform = 'translateX(0)';
+
+    // После slide-in включаем floating
     setTimeout(()=>{
-      newCard.classList.remove('entering');
+      newCard.style.transition = '';
+      newCard.style.transform  = '';
       newCard.classList.add('floating');
-    }, 750);
+    }, CAROUSEL_SLIDE_MS + 60);
 
   }, CAROUSEL_SLOT_INTERVAL);
 }
@@ -5400,10 +5389,8 @@ function startCarousel(){
 function makeCardEl(p, num){
   const el = document.createElement('div');
   el.className = 'splash-fcard';
-  const rot = (Math.random()*4 - 2).toFixed(2);
   const dur = (9 + Math.random()*4).toFixed(1);
-  const del = (Math.random()*3).toFixed(1);
-  el.style.setProperty('--card-rot', rot+'deg');
+  const del = (Math.random()*6).toFixed(1);
   el.style.setProperty('--float-dur', dur+'s');
   el.style.setProperty('--float-delay', '-'+del+'s');
 
@@ -5426,7 +5413,6 @@ function makeCardEl(p, num){
     </div>`;
   return el;
 }
-
 function splashClickFullscreen(){
   if(document.fullscreenElement){
     document.exitFullscreen().catch(()=>{});
