@@ -1984,7 +1984,6 @@ body.event-mode .sync-pill.error{
   pointer-events:none;
 }
 .timer-stage{
-  --timer-remaining-dash:100.01;
   min-height:calc(100vh - 360px);
   position:relative;
   overflow:hidden;
@@ -2161,12 +2160,8 @@ body.event-mode .sync-pill.error{
 .timer-ring-progress{
   stroke:var(--green-lt);
   stroke-linecap:round;
-  stroke-dasharray:var(--timer-remaining-dash) 100;
-  stroke-dashoffset:0;
-  transform:rotate(-90deg);
-  transform-origin:50% 50%;
   transition:stroke .18s ease,filter .18s ease;
-  will-change:stroke-dasharray;
+  will-change:d;
   filter:drop-shadow(0 0 8px rgba(151,255,128,.38)) drop-shadow(0 0 24px rgba(98,191,74,.18));
 }
 .timer-ring-dot{
@@ -4084,7 +4079,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
         <div class="timer-ring-control" aria-hidden="true">
           <svg class="timer-ring" viewBox="0 0 220 220" aria-hidden="true" focusable="false">
             <circle class="timer-ring-track" cx="110" cy="110" r="96" pathLength="100"></circle>
-            <circle class="timer-ring-progress" cx="110" cy="110" r="96" pathLength="100"></circle>
+            <path class="timer-ring-progress" id="timer-ring-progress"></path>
             <circle class="timer-ring-dot" cx="110" cy="14" r="2.6"></circle>
           </svg>
         </div>
@@ -6060,6 +6055,34 @@ function timerSublineText(computed){
   if(computed.status==='idle') return 'Длительность '+timerDurationLabel(computed.duration);
   return 'Следующий блок через '+timerDurationLabel(computed.remaining);
 }
+function timerRingPoint(angleDeg,r=96,c=110){
+  const a=angleDeg*Math.PI/180;
+  return {x:c+Math.cos(a)*r,y:c+Math.sin(a)*r};
+}
+function timerRingPath(progress){
+  const safe=Math.min(1,Math.max(0,+progress||0));
+  const startAngle=-90 - safe*360;
+  const endAngle=-90;
+  const start=timerRingPoint(startAngle);
+  const end=timerRingPoint(endAngle);
+  if(safe<=.0005){
+    return {
+      d:'M 110 14 A 96 96 0 1 0 110 206 A 96 96 0 1 0 110 14',
+      dot:timerRingPoint(-90),
+      visible:true
+    };
+  }
+  if(safe>=.9995){
+    return {d:'',dot:timerRingPoint(-450),visible:false};
+  }
+  const remaining=1-safe;
+  const largeArc=remaining>.5 ? 1 : 0;
+  return {
+    d:`M ${start.x.toFixed(3)} ${start.y.toFixed(3)} A 96 96 0 ${largeArc} 0 ${end.x.toFixed(3)} ${end.y.toFixed(3)}`,
+    dot:start,
+    visible:true
+  };
+}
 function updateTimerDisplay(){
   const stage=document.getElementById('timer-stage');
   if(!stage || !DB.timer) return;
@@ -6075,6 +6098,7 @@ function updateTimerDisplay(){
   const duration=document.getElementById('timer-duration');
   const topicView=document.getElementById('timer-topic-view');
   const status=document.getElementById('timer-status');
+  const ringProgress=document.getElementById('timer-ring-progress');
   const ringDot=document.querySelector('.timer-ring-dot');
   const cnt=document.getElementById('timer-cnt');
   const note=document.getElementById('timer-note');
@@ -6082,19 +6106,16 @@ function updateTimerDisplay(){
   stage.classList.remove('is-idle','is-running','is-paused','is-done','is-long-time');
   stage.classList.add('is-'+computed.status);
   if(formatTimerTime(computed.remaining).length>=7) stage.classList.add('is-long-time');
-  const ringDash = computed.remainingRatio >= .9995 ? 100.01 : Math.max(0,computed.remainingRatio*100);
-  stage.style.setProperty('--timer-remaining-dash', ringDash.toFixed(4));
+  const ring=timerRingPath(computed.progress);
+  if(ringProgress) ringProgress.setAttribute('d',ring.d);
   if(display) display.textContent=formatTimerTime(computed.remaining);
   if(duration) duration.textContent=timerSublineText(computed);
   if(topicView) topicView.textContent=topic;
   if(status) status.textContent=timerStatusText(computed.status);
   if(ringDot){
-    const angle=(-90 + computed.remainingRatio*360) * Math.PI / 180;
-    const cx=110 + Math.cos(angle)*96;
-    const cy=110 + Math.sin(angle)*96;
-    ringDot.setAttribute('cx', cx.toFixed(3));
-    ringDot.setAttribute('cy', cy.toFixed(3));
-    ringDot.style.opacity=computed.remainingRatio<=.004 ? '0' : '1';
+    ringDot.setAttribute('cx', ring.dot.x.toFixed(3));
+    ringDot.setAttribute('cy', ring.dot.y.toFixed(3));
+    ringDot.style.opacity=ring.visible ? '1' : '0';
   }
   if(cnt) cnt.innerHTML=`<span style="color:var(--green)">${formatTimerTime(computed.remaining)}</span>`;
   if(note) note.textContent=computed.status==='running' ? 'Штурм идёт' : computed.status==='done' ? 'Время вышло' : 'Штурм · оффлайн';
@@ -6645,6 +6666,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // ─── CLOUD SYNC / BACKUP ───────────────────────────────────
 const SYNC_KEY = 'draft_mm_sync_config_v1';
 const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
+const RESTORE_LOCK_KEY = 'draft_mm_restore_lock_v1';
 const SYNC_POLL_MS = 1800;
 const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const EMBEDDED_SYNC_CONFIG = {
@@ -6679,6 +6701,23 @@ let syncLastErrorToastAt = 0;
 function markPendingCloudSave(){ try{ localStorage.setItem(PENDING_SYNC_KEY,'1'); }catch{} }
 function clearPendingCloudSave(){ try{ localStorage.removeItem(PENDING_SYNC_KEY); }catch{} }
 function hasPendingCloudSave(){ try{ return localStorage.getItem(PENDING_SYNC_KEY)==='1'; }catch{ return false; } }
+function setRestoreLock(token,ttlMs=10*60*1000){
+  try{ localStorage.setItem(RESTORE_LOCK_KEY,JSON.stringify({token,until:Date.now()+ttlMs})); }catch{}
+}
+function getRestoreLock(){
+  try{
+    const lock=JSON.parse(localStorage.getItem(RESTORE_LOCK_KEY)||'null');
+    if(!lock?.token || Date.now()>+lock.until){
+      localStorage.removeItem(RESTORE_LOCK_KEY);
+      return null;
+    }
+    return lock;
+  } catch {
+    return null;
+  }
+}
+function clearRestoreLock(){ try{ localStorage.removeItem(RESTORE_LOCK_KEY); }catch{} }
+function isRestoreLocked(){ return !!getRestoreLock(); }
 function toastSyncRetry(message){
   const now=Date.now();
   if(now-syncLastErrorToastAt<60000) return;
