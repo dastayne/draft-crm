@@ -1967,6 +1967,12 @@ body.event-mode .sync-pill.error{
   line-height:1;
   letter-spacing:0;
 }
+.btn-ico svg{
+  width:14px;
+  height:14px;
+  display:block;
+  fill:currentColor;
+}
 .event-screen-btn{
   min-height:34px;
   padding:0 14px;
@@ -2020,13 +2026,13 @@ body.event-mode .sync-pill.error{
 .timer-stage-inner{
   position:relative;
   z-index:2;
-  width:min(1180px,calc(100% - 64px));
+  width:min(1360px,calc(100% - 76px));
   display:flex;
   flex-direction:column;
-  align-items:center;
-  text-align:center;
-  gap:28px;
-  padding:76px 0 54px;
+  align-items:stretch;
+  text-align:left;
+  gap:0;
+  padding:74px 0 58px;
 }
 .timer-brand{
   position:absolute;
@@ -2043,59 +2049,57 @@ body.event-mode .sync-pill.error{
 .timer-brand span{color:var(--green)}
 .timer-topic{
   max-width:100%;
-  color:var(--gray1);
-  font-size:clamp(18px,1.7vw,28px);
+  color:rgba(255,255,255,.52);
+  font-size:clamp(18px,1.8vw,30px);
   line-height:1.25;
   font-weight:760;
   letter-spacing:0;
   text-transform:uppercase;
   overflow-wrap:anywhere;
-  margin-bottom:2px;
+  margin-top:14px;
 }
-.timer-orbit{
-  width:min(980px,100%);
-  min-width:0;
-  min-height:0;
-  aspect-ratio:auto;
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:12px 0 38px;
+.timer-apple-title{
+  color:var(--white);
+  font-size:clamp(54px,7.2vw,128px);
+  line-height:.86;
+  font-weight:900;
+  letter-spacing:0;
+  text-transform:uppercase;
 }
-.timer-orbit::before{
-  content:'';
-  position:absolute;
-  left:0;right:0;bottom:0;
-  height:4px;
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  filter:none;
-}
-.timer-orbit::after{
-  content:'';
-  position:absolute;
-  left:0;bottom:0;
+.timer-apple-divider{
   width:100%;
-  height:4px;
-  border-radius:999px;
-  background:linear-gradient(90deg,var(--green),var(--green-lt));
-  transform:scaleX(var(--timer-progress));
-  transform-origin:left center;
-  transition:transform .22s linear,filter .2s;
-  box-shadow:0 0 18px rgba(98,191,74,.22);
+  height:2px;
+  background:rgba(255,255,255,.14);
+  margin:66px 0 58px;
+}
+.timer-apple-main{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:clamp(34px,7vw,118px);
+}
+.timer-time-block{
+  min-width:0;
 }
 .timer-display{
   position:relative;
   z-index:2;
   font-family:var(--font-main);
-  font-size:clamp(92px,15vw,260px);
-  line-height:.82;
-  font-weight:520;
+  font-size:clamp(104px,15vw,250px);
+  line-height:.86;
+  font-weight:430;
   letter-spacing:0;
-  color:var(--white);
+  color:rgba(255,255,255,.68);
   font-variant-numeric:tabular-nums;
-  text-shadow:0 0 34px rgba(98,191,74,.12);
+  text-shadow:none;
+}
+.timer-duration{
+  color:rgba(255,255,255,.56);
+  font-size:clamp(28px,3.1vw,54px);
+  line-height:1;
+  font-weight:460;
+  letter-spacing:0;
+  margin-top:26px;
 }
 .timer-status{
   min-height:18px;
@@ -2104,30 +2108,92 @@ body.event-mode .sync-pill.error{
   font-weight:850;
   letter-spacing:0;
   text-transform:uppercase;
-  margin-top:4px;
+  margin-top:34px;
 }
 .timer-end-mark{
   display:none;
-  font-size:clamp(36px,4vw,72px);
+  font-size:clamp(32px,3.6vw,64px);
   line-height:1;
   font-weight:900;
   color:var(--green-lt);
   letter-spacing:0;
   text-transform:uppercase;
-  margin-top:2px;
+  margin-top:34px;
   text-shadow:0 0 32px rgba(98,191,74,.26);
 }
-.timer-stage.is-running .timer-orbit::after{animation:timerGlow 2.2s ease-in-out infinite}
+.timer-ring-control{
+  --ring-size:clamp(156px,16vw,250px);
+  width:var(--ring-size);
+  height:var(--ring-size);
+  position:relative;
+  display:grid;
+  place-items:center;
+  border:0;
+  padding:0;
+  border-radius:50%;
+  background:transparent;
+  color:var(--green-lt);
+  cursor:pointer;
+  transition:transform .18s ease,color .18s ease,filter .18s ease;
+}
+.timer-ring-control:hover{transform:scale(1.025);filter:brightness(1.08)}
+.timer-ring-control:active{transform:scale(.98)}
+.timer-ring{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+.timer-ring-track,
+.timer-ring-progress{
+  fill:none;
+  stroke-width:8;
+  vector-effect:non-scaling-stroke;
+}
+.timer-ring-track{
+  stroke:rgba(255,255,255,.11);
+}
+.timer-ring-progress{
+  stroke:var(--green-lt);
+  stroke-linecap:round;
+  stroke-dasharray:1;
+  stroke-dashoffset:var(--timer-progress);
+  transform:rotate(-90deg);
+  transform-origin:50% 50%;
+  transition:stroke-dashoffset .24s linear,stroke .18s ease,filter .18s ease;
+  filter:drop-shadow(0 0 12px rgba(98,191,74,.2));
+}
+.timer-ring-icon{
+  position:relative;
+  z-index:2;
+  width:44%;
+  height:44%;
+  display:grid;
+  place-items:center;
+  color:currentColor;
+  font-size:calc(var(--ring-size) * .26);
+  line-height:1;
+  font-weight:760;
+}
+.timer-ring-icon svg{
+  width:100%;
+  height:100%;
+  display:block;
+  fill:currentColor;
+}
+.timer-stage.is-running .timer-display{color:var(--white)}
+.timer-stage.is-running .timer-ring-progress{animation:timerGlow 2.2s ease-in-out infinite}
 .timer-stage.is-paused .timer-status{color:var(--amber)}
+.timer-stage.is-paused .timer-ring-control{color:var(--amber)}
+.timer-stage.is-paused .timer-ring-progress{stroke:var(--amber);filter:drop-shadow(0 0 12px rgba(231,174,73,.18))}
 .timer-stage.is-done{
   border-color:rgba(98,191,74,.36);
 }
-.timer-stage.is-done::after{animation:timerEndFlash 1.6s ease-out 2 forwards}
-.timer-stage.is-done .timer-orbit::before{
-  background:rgba(255,255,255,.1);
-}
-.timer-stage.is-done .timer-orbit::after{filter:brightness(1.35);box-shadow:0 0 34px rgba(98,191,74,.32)}
-.timer-stage.is-done .timer-display{color:var(--white);animation:timerDigitsEnd 1.05s ease-out 2}
+.timer-stage.is-done::after{animation:timerEndFlash 1.2s ease-out 1 forwards}
+.timer-stage.is-done .timer-display{color:var(--white);animation:timerDigitsEnd 1.05s ease-out 1}
+.timer-stage.is-done .timer-ring-control{animation:timerDoneRing .95s ease-out 1}
+.timer-stage.is-done .timer-ring-progress{filter:drop-shadow(0 0 22px rgba(98,191,74,.38))}
 .timer-stage.is-done .timer-status{display:none}
 .timer-stage.is-done .timer-end-mark{display:block;animation:timerEndPop .75s cubic-bezier(.18,.9,.2,1) both}
 .event-switcher{
@@ -2479,13 +2545,17 @@ body.presentation-mode.presentation-timer .timer-stage{
   cursor:default;
 }
 body.presentation-mode.presentation-timer .timer-stage-inner{
-  width:min(1360px,calc(100% - 96px));
+  width:min(1480px,calc(100% - 104px));
+  padding:72px 0 68px;
 }
 body.presentation-mode.presentation-timer .timer-brand{font-size:58px;left:42px;top:38px}
-body.presentation-mode.presentation-timer .timer-topic{font-size:30px;margin-bottom:18px}
-body.presentation-mode.presentation-timer .timer-orbit{width:min(1180px,100%);padding-bottom:48px}
-body.presentation-mode.presentation-timer .timer-display{font-size:clamp(150px,18vw,340px);font-weight:500}
-body.presentation-mode.presentation-timer .timer-status{font-size:17px;margin-top:18px}
+body.presentation-mode.presentation-timer .timer-apple-title{font-size:clamp(78px,8.2vw,154px)}
+body.presentation-mode.presentation-timer .timer-topic{font-size:32px;margin-top:18px}
+body.presentation-mode.presentation-timer .timer-apple-divider{margin:72px 0 66px}
+body.presentation-mode.presentation-timer .timer-display{font-size:clamp(170px,18vw,350px);font-weight:420}
+body.presentation-mode.presentation-timer .timer-duration{font-size:clamp(38px,3.4vw,64px)}
+body.presentation-mode.presentation-timer .timer-status{font-size:17px;margin-top:38px}
+body.presentation-mode.presentation-timer .timer-ring-control{--ring-size:clamp(210px,18vw,310px)}
 body.presentation-mode.presentation-splash .splash-view.theme-dark .splash-mark,
 body.presentation-mode.presentation-splash .splash-view.theme-light .splash-mark{
   font-size:clamp(130px,16vw,260px);
@@ -2642,11 +2712,16 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
 }
 @keyframes timerEndFlash{
   0%,100%{opacity:0}
-  38%{opacity:.85}
+  38%{opacity:.28}
 }
 @keyframes timerDigitsEnd{
   0%,100%{transform:scale(1)}
   45%{transform:scale(1.018)}
+}
+@keyframes timerDoneRing{
+  0%{transform:scale(1)}
+  42%{transform:scale(1.035);filter:brightness(1.18)}
+  100%{transform:scale(1);filter:brightness(1)}
 }
 @keyframes timerEndPop{
   from{opacity:0;transform:translateY(12px) scale(.96)}
@@ -2699,11 +2774,16 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .timer-actions{justify-content:flex-start;flex-wrap:wrap}
   .timer-actions-divider{display:none}
   .timer-stage{min-height:calc(100dvh - 310px)}
-  .timer-stage-inner{width:calc(100% - 28px);gap:18px;padding:70px 0 30px}
+  .timer-stage-inner{width:calc(100% - 28px);padding:66px 0 32px}
   .timer-brand{font-size:34px;left:18px;top:18px}
-  .timer-topic{font-size:14px}
-  .timer-orbit{width:100%;padding-bottom:30px}
-  .timer-display{font-size:clamp(64px,20vw,120px)}
+  .timer-apple-title{font-size:clamp(42px,16vw,72px)}
+  .timer-topic{font-size:14px;margin-top:10px}
+  .timer-apple-divider{margin:34px 0 34px}
+  .timer-apple-main{grid-template-columns:1fr;gap:30px}
+  .timer-ring-control{--ring-size:132px;justify-self:end}
+  .timer-display{font-size:clamp(70px,22vw,126px)}
+  .timer-duration{font-size:28px;margin-top:14px}
+  .timer-status,.timer-end-mark{margin-top:22px}
   .event-switcher{align-items:stretch;flex-direction:column;margin-bottom:16px}
   .event-tabs{width:100%}
   .event-tab{flex:1;padding:0 10px}
@@ -3971,12 +4051,24 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   <div class="timer-stage" id="timer-stage" onclick="fullscreenTimerStage()" aria-label="Таймер штурма">
     <div class="timer-brand">драфт<span>.</span></div>
     <div class="timer-stage-inner">
+      <div class="timer-apple-title">Таймеры</div>
       <div class="timer-topic" id="timer-topic-view">Штурм</div>
-      <div class="timer-orbit" aria-hidden="true">
-        <div class="timer-display" id="timer-display">15:00</div>
+      <div class="timer-apple-divider" aria-hidden="true"></div>
+      <div class="timer-apple-main">
+        <div class="timer-time-block">
+          <div class="timer-display" id="timer-display">15:00</div>
+          <div class="timer-duration" id="timer-duration">15 мин</div>
+          <div class="timer-status" id="timer-status">Готов к старту</div>
+          <div class="timer-end-mark" id="timer-end-mark">Время вышло</div>
+        </div>
+        <button class="timer-ring-control" id="timer-ring-action" type="button" onclick="event.stopPropagation();toggleTimerRun()" aria-label="Старт">
+          <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+            <circle class="timer-ring-track" cx="60" cy="60" r="52" pathLength="1"></circle>
+            <circle class="timer-ring-progress" cx="60" cy="60" r="52" pathLength="1"></circle>
+          </svg>
+          <span class="timer-ring-icon" id="timer-ring-icon" aria-hidden="true"></span>
+        </button>
       </div>
-      <div class="timer-status" id="timer-status">Готов к старту</div>
-      <div class="timer-end-mark" id="timer-end-mark">Время вышло</div>
     </div>
   </div>
 </div>
@@ -5756,6 +5848,28 @@ function formatTimerTime(sec){
   const pad=n=>String(n).padStart(2,'0');
   return h>0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
+function timerDurationLabel(sec){
+  const safe=clampTimerSeconds(sec);
+  const h=Math.floor(safe/3600);
+  const m=Math.floor((safe%3600)/60);
+  const s=safe%60;
+  if(h>0){
+    const parts=[`${h} ч`];
+    if(m) parts.push(`${m} мин`);
+    if(s) parts.push(`${s} с`);
+    return parts.join(' ');
+  }
+  if(m>0){
+    return s ? `${m} мин ${s} с` : `${m} мин`;
+  }
+  return `${s} с`;
+}
+function timerActionIcon(status){
+  if(status==='running'){
+    return '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="13" y="9" width="8" height="30" rx="2"></rect><rect x="27" y="9" width="8" height="30" rx="2"></rect></svg>';
+  }
+  return '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 10.5v27l22-13.5-22-13.5Z"></path></svg>';
+}
 function timerFromForm(){
   const topic=(document.getElementById('timer-topic')?.value||'').trim() || 'Штурм';
   const parsed=parseTimerSeconds(document.getElementById('timer-time')?.value||'');
@@ -5901,8 +6015,11 @@ function updateTimerDisplay(){
 
   const topic=DB.timer.topic || 'Штурм';
   const display=document.getElementById('timer-display');
+  const duration=document.getElementById('timer-duration');
   const topicView=document.getElementById('timer-topic-view');
   const status=document.getElementById('timer-status');
+  const ringAction=document.getElementById('timer-ring-action');
+  const ringIcon=document.getElementById('timer-ring-icon');
   const cnt=document.getElementById('timer-cnt');
   const note=document.getElementById('timer-note');
 
@@ -5910,8 +6027,15 @@ function updateTimerDisplay(){
   stage.classList.add('is-'+computed.status);
   stage.style.setProperty('--timer-progress', computed.progress.toFixed(5));
   if(display) display.textContent=formatTimerTime(computed.remaining);
+  if(duration) duration.textContent=timerDurationLabel(computed.duration);
   if(topicView) topicView.textContent=topic;
   if(status) status.textContent=timerStatusText(computed.status);
+  if(ringIcon) ringIcon.innerHTML=timerActionIcon(computed.status);
+  if(ringAction){
+    const actionLabel=computed.status==='running' ? 'Пауза' : computed.status==='paused' ? 'Продолжить' : 'Старт';
+    ringAction.setAttribute('aria-label', actionLabel);
+    ringAction.title=actionLabel;
+  }
   if(cnt) cnt.innerHTML=`<span style="color:var(--green)">${formatTimerTime(computed.remaining)}</span>`;
   if(note) note.textContent=computed.status==='running' ? 'Штурм идёт' : computed.status==='done' ? 'Время вышло' : 'Штурм · оффлайн';
 }
@@ -5933,7 +6057,7 @@ function renderTimer(){
   if(startBtn){
     const isRunning=computed.status==='running';
     const label=computed.status==='paused' ? 'Продолжить' : isRunning ? 'Пауза' : 'Старт';
-    startBtn.innerHTML=`<span class="btn-ico">${isRunning ? '▮▮' : '▶'}</span>${label}`;
+    startBtn.innerHTML=`<span class="btn-ico">${timerActionIcon(computed.status)}</span>${label}`;
     startBtn.disabled=false;
   }
   if(resetBtn) resetBtn.disabled=computed.status==='idle' && computed.remaining===computed.duration;
