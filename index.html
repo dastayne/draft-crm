@@ -1844,90 +1844,170 @@ header::before{
 }
 .event-tab:hover{color:var(--white);background:rgba(255,255,255,.05)}
 .event-tab.active{color:var(--green-lt);background:rgba(98,191,74,.13)}
+/* ── SPLASH V2 ── */
+.splash-theme-btns{
+  display:flex;gap:8px;align-items:center;
+}
+.splash-theme-btn{
+  padding:6px 16px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  border:1px solid var(--border2);color:var(--gray1);background:transparent;
+  transition:all .18s;cursor:pointer;font-family:var(--font-main);
+}
+.splash-theme-btn.active{border-color:var(--green);color:var(--green);background:rgba(98,191,74,.07)}
+.splash-theme-btn:hover:not(.active){border-color:var(--white);color:var(--white)}
+
 .splash-view{
   min-height:calc(100vh - 190px);
-  display:grid;
-  place-items:center;
-  overflow:hidden;
+  display:grid;place-items:center;
+  overflow:hidden;position:relative;isolation:isolate;
+  cursor:pointer;
+  border:1px solid rgba(98,191,74,.12);
+}
+
+/* ── ТЕМА: ТЁМНАЯ ── */
+.splash-view.theme-dark{
+  background:#050505;
+}
+.splash-view.theme-dark::before{
+  content:'';position:absolute;inset:0;
   background:
-    linear-gradient(90deg,rgba(98,191,74,.08) 1px,transparent 1px),
-    linear-gradient(180deg,rgba(98,191,74,.055) 1px,transparent 1px),
-    #050505;
-  background-size:72px 72px;
-  border:1px solid rgba(98,191,74,.16);
-  position:relative;
-  isolation:isolate;
-}
-.splash-view::before{
-  content:'';
-  position:absolute;
-  inset:8%;
-  border:1px solid rgba(98,191,74,.18);
-  transform:skewX(-10deg);
-  animation:splashFrame 9s ease-in-out infinite;
-}
-.splash-view::after{
-  content:'';
-  position:absolute;
-  left:-30%;
-  right:-30%;
-  top:48%;
-  height:1px;
-  background:linear-gradient(90deg,transparent,rgba(155,255,93,.66),transparent);
-  opacity:.55;
-  animation:splashScan 6.5s linear infinite;
-}
-.splash-inner{
-  position:relative;
-  z-index:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
-  gap:18px;
-  padding:44px;
-}
-.splash-mark{
-  font-family:'Ekran Draft',var(--font-main);
-  font-size:clamp(92px,13vw,190px);
-  line-height:.82;
-  color:var(--white);
-  letter-spacing:-.02em;
-  text-transform:lowercase;
-  text-shadow:0 0 36px rgba(98,191,74,.18);
-  animation:splashPulse 5.8s ease-in-out infinite;
-}
-.splash-mark span{color:var(--green)}
-.splash-subtitle{
-  color:var(--gray1);
-  font-size:clamp(12px,1.15vw,18px);
-  font-weight:850;
-  letter-spacing:.24em;
-  text-transform:uppercase;
-}
-.splash-line{
-  width:min(420px,70vw);
-  height:2px;
-  background:linear-gradient(90deg,transparent,var(--green-lt),transparent);
-  transform-origin:center;
-  animation:splashLine 4.8s ease-in-out infinite;
-}
-.splash-corners{
-  position:absolute;
-  inset:26px;
+    linear-gradient(90deg,rgba(98,191,74,.055) 1px,transparent 1px),
+    linear-gradient(180deg,rgba(98,191,74,.04) 1px,transparent 1px);
+  background-size:80px 80px;
   pointer-events:none;
 }
-.splash-corners span{
-  position:absolute;
-  width:74px;
-  height:74px;
-  border-color:rgba(155,255,93,.42);
-  animation:splashCorner 4.6s ease-in-out infinite;
+.splash-view:-webkit-full-screen{min-height:100vh;border:0}
+.splash-view:fullscreen{min-height:100vh;border:0}
+.splash-view:-webkit-full-screen .splash-theme-btns{display:none!important}
+.splash-view:fullscreen .splash-theme-btns{display:none!important}
+.splash-view.theme-dark .splash-scan{
+  position:absolute;left:-40%;right:-40%;height:1px;top:0;
+  background:linear-gradient(90deg,transparent,rgba(155,255,93,.5),transparent);
+  animation:splashScan 7s linear infinite;pointer-events:none;
 }
-.splash-corners span:nth-child(1){left:0;top:0;border-left:2px solid;border-top:2px solid}
-.splash-corners span:nth-child(2){right:0;top:0;border-right:2px solid;border-top:2px solid;animation-delay:.4s}
-.splash-corners span:nth-child(3){left:0;bottom:0;border-left:2px solid;border-bottom:2px solid;animation-delay:.8s}
-.splash-corners span:nth-child(4){right:0;bottom:0;border-right:2px solid;border-bottom:2px solid;animation-delay:1.2s}
+.splash-view.theme-dark .splash-inner{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px;padding:44px;
+}
+.splash-view.theme-dark .splash-mark{
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:clamp(100px,14vw,210px);
+  line-height:.82;color:#f0f0f0;letter-spacing:-.02em;text-transform:lowercase;
+  text-shadow:0 0 60px rgba(98,191,74,.15),0 0 120px rgba(98,191,74,.06);
+  animation:splashPulse 6s ease-in-out infinite;
+}
+.splash-view.theme-dark .splash-mark span{color:var(--green)}
+.splash-view.theme-dark .splash-line{
+  width:min(480px,68vw);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(155,255,93,.7),transparent);
+  animation:splashLine 5s ease-in-out infinite;
+}
+.splash-view.theme-dark .splash-subtitle{
+  color:#555;font-size:clamp(11px,1vw,15px);font-weight:700;letter-spacing:.28em;text-transform:uppercase;
+}
+.splash-corners{position:absolute;inset:28px;pointer-events:none}
+.splash-corners span{
+  position:absolute;width:56px;height:56px;
+  border-color:rgba(155,255,93,.3);
+  animation:splashCorner 5s ease-in-out infinite;
+}
+.splash-corners span:nth-child(1){left:0;top:0;border-left:1px solid;border-top:1px solid}
+.splash-corners span:nth-child(2){right:0;top:0;border-right:1px solid;border-top:1px solid;animation-delay:.5s}
+.splash-corners span:nth-child(3){left:0;bottom:0;border-left:1px solid;border-bottom:1px solid;animation-delay:1s}
+.splash-corners span:nth-child(4){right:0;bottom:0;border-right:1px solid;border-bottom:1px solid;animation-delay:1.5s}
+
+/* ── ТЕМА: СВЕТЛАЯ ── */
+.splash-view.theme-light{
+  background:#f5f4f0;border-color:rgba(0,0,0,.08);
+}
+.splash-view.theme-light .splash-inner{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px;padding:44px;
+}
+.splash-view.theme-light .splash-mark{
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:clamp(100px,14vw,210px);
+  line-height:.82;color:#0b0b0b;letter-spacing:-.02em;text-transform:lowercase;
+  animation:splashPulse 6s ease-in-out infinite;
+}
+.splash-view.theme-light .splash-mark span{color:#2a7a12}
+.splash-view.theme-light .splash-line{
+  width:min(480px,68vw);height:1px;
+  background:linear-gradient(90deg,transparent,#2a7a12,transparent);
+  animation:splashLine 5s ease-in-out infinite;
+}
+.splash-view.theme-light .splash-subtitle{
+  color:#888;font-size:clamp(11px,1vw,15px);font-weight:700;letter-spacing:.28em;text-transform:uppercase;
+}
+.splash-view.theme-light .splash-corners span{border-color:rgba(0,0,0,.15)}
+.splash-view.theme-light .splash-scan{display:none}
+
+/* ── ТЕМА: КАРТОЧКИ ── */
+.splash-view.theme-cards{
+  background:#080808;border-color:rgba(98,191,74,.1);
+  align-items:center;justify-content:center;
+}
+.splash-view.theme-cards .splash-inner,.splash-view.theme-cards .splash-corners,
+.splash-view.theme-cards .splash-scan,.splash-view.theme-cards .splash-line{display:none!important}
+.splash-cards-track{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+}
+.splash-cards-row{
+  position:absolute;top:0;left:0;
+  display:flex;gap:24px;align-items:center;
+  animation:splashCardsScroll 28s linear infinite;
+  white-space:nowrap;
+  will-change:transform;
+}
+.splash-cards-row:nth-child(2){
+  top:50%;animation-duration:34s;animation-direction:reverse;
+  transform:translateY(-50%);
+}
+.splash-card{
+  flex-shrink:0;
+  width:160px;
+  background:linear-gradient(145deg,#161616,#0e0e0e);
+  border:1px solid rgba(98,191,74,.2);
+  border-radius:12px;
+  padding:20px 16px 16px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  position:relative;overflow:hidden;
+}
+.splash-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--green),transparent);
+  opacity:.6;
+}
+.splash-card-num{
+  font-size:9px;font-weight:700;letter-spacing:2px;color:var(--green);
+  text-transform:uppercase;opacity:.7;
+}
+.splash-card-avatar{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--s3);border:1px solid rgba(98,191,74,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:800;color:var(--gray1);overflow:hidden;
+  flex-shrink:0;
+}
+.splash-card-avatar img{width:100%;height:100%;object-fit:cover}
+.splash-card-name{
+  font-size:13px;font-weight:700;color:var(--white);text-align:center;
+  line-height:1.25;letter-spacing:-.01em;
+}
+.splash-card-role{
+  font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  color:var(--green);opacity:.8;
+}
+.splash-cards-logo{
+  position:absolute;z-index:2;pointer-events:none;
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:clamp(64px,9vw,140px);
+  line-height:.85;color:rgba(240,240,240,.06);letter-spacing:-.02em;
+  text-transform:lowercase;text-align:center;
+  animation:splashPulse 7s ease-in-out infinite;
+  user-select:none;
+}
+.splash-cards-logo span{color:rgba(98,191,74,.14)}
 body.presentation-mode{
   background:#050505;
 }
@@ -1997,11 +2077,15 @@ body.presentation-mode.presentation-splash #view-splash .sec-header{
   display:none;
 }
 body.presentation-mode.presentation-splash .splash-view{
-  min-height:100vh;
-  border:0;
+  min-height:100vh;min-height:100dvh;
+  border:0;cursor:default;
 }
-body.presentation-mode.presentation-splash .splash-mark{
-  font-size:clamp(120px,15vw,230px);
+body.presentation-mode.presentation-splash .splash-view.theme-dark .splash-mark,
+body.presentation-mode.presentation-splash .splash-view.theme-light .splash-mark{
+  font-size:clamp(130px,16vw,260px);
+}
+body.presentation-mode.presentation-splash .splash-theme-btns{
+  display:none;
 }
 body.mode-gate-active{
   min-height:100vh;
@@ -2144,24 +2228,24 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   to{opacity:1;transform:translateX(0)}
 }
 @keyframes splashPulse{
-  0%,100%{filter:brightness(1);transform:scale(1)}
-  50%{filter:brightness(1.14);transform:scale(1.015)}
+  0%,100%{opacity:.88;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.012)}
 }
 @keyframes splashLine{
-  0%,100%{opacity:.42;transform:scaleX(.62)}
-  50%{opacity:.95;transform:scaleX(1)}
+  0%,100%{opacity:.3;transform:scaleX(.5)}
+  50%{opacity:1;transform:scaleX(1)}
 }
 @keyframes splashScan{
-  from{transform:translateY(-42vh) rotate(-8deg)}
-  to{transform:translateY(42vh) rotate(-8deg)}
-}
-@keyframes splashFrame{
-  0%,100%{opacity:.32;transform:skewX(-10deg) scale(.985)}
-  50%{opacity:.72;transform:skewX(-10deg) scale(1.015)}
+  from{transform:translateY(-52vh)}
+  to{transform:translateY(52vh)}
 }
 @keyframes splashCorner{
-  0%,100%{opacity:.36}
-  50%{opacity:.86}
+  0%,100%{opacity:.25}
+  50%{opacity:.7}
+}
+@keyframes splashCardsScroll{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
 }
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
@@ -3408,17 +3492,24 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <div class="sec-title">Заставка</div>
     <div class="sec-actions">
       <span class="sec-actions-note">Петлевой экран для плазмы</span>
-      <button class="btn btn-ghost btn-sm" onclick="toggleFullscreen()">Во весь экран</button>
+      <div class="splash-theme-btns">
+        <button class="splash-theme-btn active" onclick="setSplashTheme('dark',this)">Тёмная</button>
+        <button class="splash-theme-btn" onclick="setSplashTheme('light',this)">Светлая</button>
+        <button class="splash-theme-btn" onclick="setSplashTheme('cards',this)">Карточки</button>
+      </div>
       <button class="btn btn-ghost btn-sm" onclick="openSplashPresentation()">На экран</button>
     </div>
   </div>
-  <div class="splash-view" aria-label="драфт">
+  <div class="splash-view theme-dark" id="splash-view" onclick="splashClickFullscreen()" aria-label="драфт">
+    <div class="splash-scan"></div>
     <div class="splash-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="splash-inner">
       <div class="splash-mark">драфт<span>.</span></div>
       <div class="splash-line"></div>
       <div class="splash-subtitle">закрытый мастермайнд ведущих</div>
     </div>
+    <div class="splash-cards-track" id="splash-cards-track" style="display:none"></div>
+    <div class="splash-cards-logo" id="splash-cards-logo" style="display:none">драфт<span>.</span></div>
   </div>
 </div>
 
@@ -3565,31 +3656,25 @@ function touchDB(){
   return DB._updatedAt;
 }
 function dbForStorage(){
-  // Клонируем DB, но вычищаем base64 у записей у которых уже есть URL в Storage
-  const clone = deep(DB);
-  const clean = arr => (arr||[]).forEach(x => {
-    if(x.photoPath && x.photo && x.photo.startsWith('data:')) x.photo = '';
-  });
-  clean(clone.participants);
-  clean(clone.orgs);
-  clean(clone.prospects);
+  const clone=deep(DB);
+  const clean=arr=>(arr||[]).forEach(x=>{if(x.photoPath&&x.photo&&x.photo.startsWith('data:'))x.photo='';});
+  clean(clone.participants);clean(clone.orgs);clean(clone.prospects);
   return clone;
 }
 function saveLocal(){
   try{
-    localStorage.setItem(KEY, JSON.stringify(dbForStorage()));
+    localStorage.setItem(KEY,JSON.stringify(dbForStorage()));
     return true;
-  } catch(e){
+  }catch(e){
     console.error(e);
-    // Если всё равно не влезло — пробуем агрессивную чистку: убираем все base64
     try{
-      const clone = deep(DB);
-      const strip = arr => (arr||[]).forEach(x => { if(x.photo?.startsWith('data:')) x.photo=''; });
-      strip(clone.participants); strip(clone.orgs); strip(clone.prospects);
-      localStorage.setItem(KEY, JSON.stringify(clone));
-      toast('⚠ Base64-фото убраны из локального кэша, фото грузятся из облака');
+      const clone=deep(DB);
+      const strip=arr=>(arr||[]).forEach(x=>{if(x.photo?.startsWith('data:'))x.photo='';});
+      strip(clone.participants);strip(clone.orgs);strip(clone.prospects);
+      localStorage.setItem(KEY,JSON.stringify(clone));
+      toast('⚠ Base64-фото убраны из кэша, грузятся из облака');
       return true;
-    } catch(e2){
+    }catch(e2){
       console.error(e2);
       toast('⚠ Локальное хранилище переполнено — данные в облаке в порядке');
       return false;
@@ -5058,6 +5143,76 @@ function openRandomizerPresentation(){
   const win=window.open(url.toString(),'draft-randomizer-screen','popup=yes,width=1600,height=900');
   if(!win) toast('Браузер заблокировал новое окно');
 }
+// ── SPLASH THEMES ──────────────────────────────────────────
+let splashTheme = 'dark';
+
+function setSplashTheme(theme, btn){
+  splashTheme = theme;
+  const view = document.getElementById('splash-view');
+  const track = document.getElementById('splash-cards-track');
+  const logo = document.getElementById('splash-cards-logo');
+  if(!view) return;
+  view.className = 'splash-view theme-' + theme;
+  // кнопки
+  document.querySelectorAll('.splash-theme-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // cards track
+  if(theme === 'cards'){
+    track.style.display = 'block';
+    logo.style.display = 'block';
+    renderSplashCards();
+  } else {
+    track.style.display = 'none';
+    logo.style.display = 'none';
+  }
+}
+
+function renderSplashCards(){
+  const track = document.getElementById('splash-cards-track');
+  if(!track) return;
+  const people = (DB.participants||[]).filter(p=>p.name);
+  if(!people.length){ track.innerHTML=''; return; }
+
+  // Дублируем для бесшовного лупа
+  const makeCard = (p, i) => {
+    const nameParts = (p.name||'').trim().split(' ');
+    const first = nameParts[0]||'';
+    const last = nameParts.slice(1).join(' ')||'';
+    const initials = (first[0]||'')+(last[0]||'') || first.slice(0,2);
+    const avatarHtml = p.photo && !p.photo.startsWith('data:')
+      ? `<img src="${p.photo}" alt="">`
+      : p.photo && p.photo.startsWith('data:')
+      ? `<img src="${p.photo}" alt="">`
+      : `<span>${initials.toUpperCase()}</span>`;
+    return `<div class="splash-card">
+      <div class="splash-card-num">#${String(i+1).padStart(2,'0')}</div>
+      <div class="splash-card-avatar">${avatarHtml}</div>
+      <div class="splash-card-name">${(p.name||'').replace(/\s+/,' ').trim()}</div>
+      <div class="splash-card-role">Ведущий</div>
+    </div>`;
+  };
+
+  // Два ряда — первый и второй (разный порядок для визуала)
+  const row1 = [...people, ...people].map((p,i)=>makeCard(p,i%people.length)).join('');
+  const row2 = [...[...people].reverse(), ...[...people].reverse()].map((p,i)=>makeCard(p,i%people.length)).join('');
+
+  track.innerHTML = `
+    <div class="splash-cards-row" style="top:calc(50% - 115px)">${row1}</div>
+    <div class="splash-cards-row" style="top:calc(50% + 20px)">${row2}</div>
+  `;
+}
+
+function splashClickFullscreen(){
+  if(document.fullscreenElement){
+    document.exitFullscreen().catch(()=>{});
+  } else {
+    document.getElementById('splash-view')?.requestFullscreen().catch(()=>{
+      // fallback — fullscreen всей страницы
+      document.documentElement.requestFullscreen().catch(()=>{});
+    });
+  }
+}
+
 function openSplashPresentation(){
   const url=new URL(window.location.href);
   url.searchParams.set('present','splash');
@@ -5422,7 +5577,6 @@ function newestObject(remoteObj={}, localObj={}){
   return l>r ? deep(localObj) : deep(remoteObj);
 }
 function mergeArrayById(remoteArr=[], localArr=[]){
-  // Порядок берём из локального — он главный
   const remoteMap=new Map((Array.isArray(remoteArr)?remoteArr:[]).map(x=>[String(x.id),deep(x)]));
   const result=(Array.isArray(localArr)?localArr:[]).map(item=>{
     const key=String(item.id);
@@ -5433,7 +5587,6 @@ function mergeArrayById(remoteArr=[], localArr=[]){
       ? {...deep(remoteItem),...deep(item)}
       : {...deep(item),...deep(remoteItem)};
   });
-  // Новые записи из remote которых нет локально — добавляем в конец
   remoteMap.forEach(item=>result.push(deep(item)));
   return result;
 }
