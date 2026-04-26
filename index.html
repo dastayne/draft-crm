@@ -2010,8 +2010,8 @@ header::before{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   grid-template-rows:repeat(2,1fr);
-  gap:clamp(8px,1.1vw,16px);
-  padding:clamp(24px,2.8vw,48px) clamp(20px,2.4vw,40px);
+  gap:clamp(14px,1.7vw,30px);
+  padding:clamp(36px,4.2vw,84px) clamp(32px,4vw,82px);
   pointer-events:none;
 }
 
@@ -2020,20 +2020,27 @@ header::before{
   position:relative;
   overflow:hidden;
   border-radius:14px;
-  /* сдвигаем cardFloat на саму карточку, ячейка не двигается */
+  /* ячейка не двигается: только обрезает въезд/выезд */
 }
 
-/* карточка занимает всю ячейку — floating работает через transform */
+/* wrapper плавает по Y, сама карточка ездит по X */
+.splash-fcard-wrap{
+  position:absolute;inset:0;
+  will-change:transform;
+}
+.splash-fcard-wrap.floating{
+  animation:cardFloat var(--float-dur,10s) ease-in-out var(--float-delay,0s) infinite;
+}
 .splash-fcard{
   position:absolute;inset:0;
   border-radius:14px;overflow:hidden;
   background:linear-gradient(180deg,#181818,#090909);
   border:1px solid rgba(255,255,255,.06);
   box-shadow:0 12px 32px rgba(0,0,0,.6);
-  /* floating накладываем JS-классом, не мешаем enter/leave */
-}
-.splash-fcard.floating{
-  animation:cardFloat var(--float-dur,10s) ease-in-out var(--float-delay,0s) infinite;
+  backface-visibility:hidden;
+  contain:paint;
+  transform:translateZ(0);
+  will-change:transform;
 }
 /* въезд справа — через clip внутри ячейки */
 .splash-fcard.entering{
@@ -2051,11 +2058,13 @@ header::before{
   font-family:'Ekran Draft',var(--font-main);
   font-size:clamp(32px,3.5vw,56px);
   color:rgba(255,255,255,.14);letter-spacing:-.04em;
+  overflow:hidden;
 }
 .splash-fcard-photo img{
   width:100%;height:100%;
   object-fit:cover;object-position:top center;
   display:block;
+  transform:translateZ(0);
 }
 .splash-fcard-photo::after{
   content:'';position:absolute;inset:0;
@@ -2066,7 +2075,7 @@ header::before{
 }
 .splash-fcard-name{
   font-size:clamp(11px,.95vw,15px);font-weight:800;
-  color:#fff;line-height:1.18;letter-spacing:-.01em;
+  color:#fff;line-height:1.18;letter-spacing:0;
   text-shadow:0 1px 8px rgba(0,0,0,.9);
 }
 .splash-fcard-role{
@@ -2271,12 +2280,6 @@ body.event-mode #view-randomizer.active,
 body.event-mode #view-splash.active{
   display:block!important;
 }
-.event-exit-btn{
-  display:none;
-}
-body.event-mode .event-exit-btn{
-  display:inline-flex;
-}
 .randomizer-grid.reveal .randomizer-team{
   animation:teamReveal .72s cubic-bezier(.16,.78,.22,1) both;
 }
@@ -2320,8 +2323,8 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
 /* тихое плавание — только translateY, не трогаем X чтобы не путаться */
 @keyframes cardFloat{
   0%,100%{transform:translateY(0)}
-  35%{transform:translateY(-5px)}
-  65%{transform:translateY(3px)}
+  35%{transform:translateY(-3px)}
+  65%{transform:translateY(2px)}
 }
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
@@ -2353,8 +2356,9 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .splash-theme-btn{padding:7px 11px;font-size:9px;letter-spacing:1.1px;min-height:30px}
   .splash-cast-btn{margin-left:6px;padding:0 12px;min-height:34px;font-size:9px}
   /* в режиме карточек на мобиле — сетка 2×3 */
-  .splash-view.theme-cards .splash-fcard{
-    width:42vw;
+  .splash-view.theme-cards .splash-cards-grid{
+    gap:clamp(8px,3vw,14px);
+    padding:clamp(18px,5vw,28px) clamp(16px,4.5vw,24px);
   }
   .splash-fcard-name{font-size:clamp(11px,2.8vw,15px)}
   .mode-gate{padding:28px 18px}
@@ -3373,7 +3377,6 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <button class="event-tab active" id="event-tab-randomizer" type="button" onclick="switchEventTab('randomizer')">Команды</button>
     <button class="event-tab" id="event-tab-splash" type="button" onclick="switchEventTab('splash')">Заставка</button>
   </div>
-  <button class="btn btn-ghost btn-sm" onclick="enterAppMode('gate')">Выбор режима</button>
 </div>
 
 <!-- ── ANALYTICS ── -->
@@ -3548,7 +3551,6 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <div class="sec-title">Деление на команды <span id="rnd-cnt"></span></div>
     <div class="sec-actions">
       <span class="sec-actions-note" id="rnd-note">4 команды · только участники</span>
-      <button class="btn btn-ghost btn-sm event-exit-btn" onclick="enterAppMode('gate')">Выбор режима</button>
       <button class="btn btn-ghost btn-sm" onclick="toggleFullscreen()">Во весь экран</button>
       <button class="btn btn-ghost btn-sm" onclick="openRandomizerPresentation()">На экран</button>
       <button class="btn btn-ghost btn-sm" onclick="resetRandomizer()">Сброс</button>
@@ -5299,6 +5301,33 @@ function stopCarousel(){
   _carouselTimer = null;
 }
 
+function waitForCardImage(cardWrap, timeout=700){
+  const img = cardWrap?.querySelector('img');
+  if(!img || img.complete) return Promise.resolve();
+
+  const timeoutPromise = new Promise(resolve=>setTimeout(resolve, timeout));
+  if(typeof img.decode === 'function'){
+    return Promise.race([
+      img.decode().catch(()=>{}),
+      timeoutPromise
+    ]);
+  }
+
+  return new Promise(resolve=>{
+    let done = false;
+    const finish = ()=>{
+      if(done) return;
+      done = true;
+      img.removeEventListener('load', finish);
+      img.removeEventListener('error', finish);
+      resolve();
+    };
+    img.addEventListener('load', finish, {once:true});
+    img.addEventListener('error', finish, {once:true});
+    setTimeout(finish, timeout);
+  });
+}
+
 function startCarousel(){
   stopCarousel();
   const people = (DB.participants||[]).filter(p=>p.name);
@@ -5358,48 +5387,49 @@ function startCarousel(){
     const p = _carouselQueue[_carouselPtr % _carouselQueue.length];
     _carouselPtr++;
 
-    // Новая карточка: позиционируем за правым краем, без floating пока
-    const newCard = makeCardEl(p, _carouselPtr);
-    // Новая карточка поверх старой, начинает за правым краем ячейки
+    const newWrap = makeCardEl(p, _carouselPtr);
+    const newCard = newWrap.querySelector('.splash-fcard');
+    if(!newCard) return;
     newCard.style.transform = 'translateX(102%)';
-    cell.appendChild(newCard);
+    newWrap.classList.add('floating');
 
-    // Старая: запускаем slide-out влево
-    const oldCard = cell.querySelector('.splash-fcard:not(:last-child)');
-    if(oldCard){
-      oldCard.classList.remove('floating');
-      // Чтобы float transform не мешал, сбрасываем через inline
-      oldCard.style.animation = 'none';
-      oldCard.style.transform = 'translateX(0)';
-      // Форсируем reflow и запускаем slide out
-      void oldCard.offsetWidth;
-      oldCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.55,0,.8,.45)`;
-      oldCard.style.transform = 'translateX(-102%)';
-      setTimeout(()=>oldCard.remove(), CAROUSEL_SLIDE_MS + 50);
-    }
+    waitForCardImage(newWrap).then(()=>{
+      if(splashTheme !== 'cards' || !cell.isConnected) return;
 
-    // Новая: slide-in
-    void newCard.offsetWidth; // reflow
-    newCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.22,1,.36,1)`;
-    newCard.style.transform = 'translateX(0)';
+      const oldWrap = cell.querySelector('.splash-fcard-wrap');
+      const oldCard = oldWrap?.querySelector('.splash-fcard');
+      cell.appendChild(newWrap);
 
-    // После slide-in включаем floating
-    setTimeout(()=>{
-      newCard.style.transition = '';
-      newCard.style.transform  = '';
-      newCard.classList.add('floating');
-    }, CAROUSEL_SLIDE_MS + 60);
+      if(oldCard){
+        void oldCard.offsetWidth;
+        oldCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.55,0,.8,.45)`;
+        oldCard.style.transform = 'translateX(-102%)';
+        setTimeout(()=>oldWrap.remove(), CAROUSEL_SLIDE_MS + 50);
+      }
+
+      void newCard.offsetWidth;
+      newCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.22,1,.36,1)`;
+      newCard.style.transform = 'translateX(0)';
+
+      setTimeout(()=>{
+        newCard.style.transition = '';
+        newCard.style.transform  = '';
+      }, CAROUSEL_SLIDE_MS + 60);
+    });
 
   }, CAROUSEL_SLOT_INTERVAL);
 }
 
 function makeCardEl(p, num){
-  const el = document.createElement('div');
-  el.className = 'splash-fcard';
+  const wrap = document.createElement('div');
+  wrap.className = 'splash-fcard-wrap';
   const dur = (9 + Math.random()*4).toFixed(1);
   const del = (Math.random()*6).toFixed(1);
-  el.style.setProperty('--float-dur', dur+'s');
-  el.style.setProperty('--float-delay', '-'+del+'s');
+  wrap.style.setProperty('--float-dur', dur+'s');
+  wrap.style.setProperty('--float-delay', '-'+del+'s');
+
+  const el = document.createElement('div');
+  el.className = 'splash-fcard';
 
   const nameParts = (p.name||'').trim().split(/\s+/);
   const first = nameParts[0]||'';
@@ -5408,7 +5438,7 @@ function makeCardEl(p, num){
 
   const numStr = String(p.id ?? num).padStart(2,'0');
   const photoHtml = p.photo
-    ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async">`
+    ? `<img src="${esc(p.photo)}" alt="" loading="eager" decoding="async" fetchpriority="low">`
     : initials;
 
   el.innerHTML = `
@@ -5418,7 +5448,8 @@ function makeCardEl(p, num){
       <div class="splash-fcard-name">${esc((p.name||'').trim())}</div>
       <div class="splash-fcard-role">Ведущий</div>
     </div>`;
-  return el;
+  wrap.appendChild(el);
+  return wrap;
 }
 function splashClickFullscreen(){
   if(document.fullscreenElement){
