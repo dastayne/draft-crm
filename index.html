@@ -1657,12 +1657,12 @@ header::before{
 .event-backup-btn{display:none}
 body.event-mode .event-backup-btn{display:inline-flex}
 body.event-mode .sync-pill{
-  min-height:38px;
-  padding:10px 15px;
+  min-height:30px;
+  padding:7px 12px;
   border-color:rgba(255,255,255,.16);
-  font-size:11px;
-  letter-spacing:.1em;
-  box-shadow:0 0 0 1px rgba(255,255,255,.035),0 12px 28px rgba(0,0,0,.24);
+  font-size:10px;
+  letter-spacing:.08em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.03),0 8px 20px rgba(0,0,0,.2);
 }
 body.event-mode .sync-pill.online{
   color:var(--green-lt);
@@ -4205,6 +4205,8 @@ function saveLocal(){
 let appMode = 'gate';
 let eventActiveView = 'randomizer';
 let randomizerLastRenderedCreatedAt = '';
+let randomizerRevealTimer = null;
+let randomizerRevealRun = 0;
 let appLastExternalStateHash = '';
 let appBroadcast = null;
 try{
@@ -5602,8 +5604,13 @@ function renderRandomizer(){
   const teams=(DB.randomizer?.teams||[]).map(ids=>(ids||[]).map(id=>byId.get(String(id))).filter(Boolean));
   const hasTeams=teams.some(team=>team.length);
   const created=randomizerDateLabel(DB.randomizer?.createdAt);
-  const shouldReveal=!!(hasTeams && DB.randomizer?.createdAt && DB.randomizer.createdAt!==randomizerLastRenderedCreatedAt);
+  const renderKey=`${DB.randomizer?.createdAt || ''}:${DB.randomizer?._updatedAt || 0}`;
+  const shouldReveal=!!(hasTeams && DB.randomizer?.createdAt && renderKey!==randomizerLastRenderedCreatedAt);
   board.classList.remove('reveal');
+  if(randomizerRevealTimer){
+    clearTimeout(randomizerRevealTimer);
+    randomizerRevealTimer=null;
+  }
 
   if(!hasTeams){
     board.innerHTML='<div class="randomizer-empty">Команды ещё не собраны</div>';
@@ -5627,11 +5634,17 @@ function renderRandomizer(){
       </div>
     </div>
   `).join('');
-  randomizerLastRenderedCreatedAt=DB.randomizer?.createdAt || '';
+  randomizerLastRenderedCreatedAt=renderKey;
   if(shouldReveal){
+    const revealRun=++randomizerRevealRun;
     requestAnimationFrame(()=>{
+      if(revealRun!==randomizerRevealRun) return;
+      board.classList.remove('reveal');
+      void board.offsetWidth;
       board.classList.add('reveal');
-      setTimeout(()=>board.classList.remove('reveal'),Math.max(2600, 900 + pool.length * 210));
+      randomizerRevealTimer=setTimeout(()=>{
+        if(revealRun===randomizerRevealRun) board.classList.remove('reveal');
+      },Math.max(2600, 900 + pool.length * 210));
     });
   }
   setRandomizerStatus(created ? `Последний расклад: ${created}` : 'Команды собраны','ok');
@@ -6444,7 +6457,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // ─── CLOUD SYNC / BACKUP ───────────────────────────────────
 const SYNC_KEY = 'draft_mm_sync_config_v1';
 const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
-const SYNC_POLL_MS = 500;
+const SYNC_POLL_MS = 1800;
 const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
@@ -6728,6 +6741,7 @@ async function pollCloudNow(silent=true){
   syncPolling=true;
   try{
     if(hasPendingCloudSave()){
+      if(syncSaveTimer) return;
       await pushCloudNow(true);
       return;
     }
@@ -6752,8 +6766,13 @@ function scheduleCloudSave(){
     return;
   }
   clearTimeout(syncSaveTimer);
-  setSyncStatus('Сохраняю','syncing');
-  syncSaveTimer=setTimeout(()=>pushCloudNow(false),90);
+  setSyncStatus('В очереди','syncing');
+  const delay=document.body.classList.contains('event-mode') || document.body.classList.contains('presentation-mode') ? 650 : 140;
+  syncSaveTimer=setTimeout(()=>{
+    syncSaveTimer=null;
+    setSyncStatus('Сохраняю','syncing');
+    pushCloudNow(false);
+  },delay);
 }
 async function pushCloudNow(silent=false){
   if(!syncConfig) return false;
