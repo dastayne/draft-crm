@@ -1984,7 +1984,7 @@ body.event-mode .sync-pill.error{
   pointer-events:none;
 }
 .timer-stage{
-  --timer-progress:0;
+  --timer-remaining:1;
   min-height:calc(100vh - 360px);
   position:relative;
   overflow:hidden;
@@ -1992,9 +1992,11 @@ body.event-mode .sync-pill.error{
   display:grid;
   place-items:center;
   background:
-    linear-gradient(90deg,rgba(98,191,74,.035) 1px,transparent 1px),
-    linear-gradient(180deg,#050505 0%,#0a0a0a 100%);
-  background-size:72px 100%,100% 100%;
+    radial-gradient(circle at 50% 40%,rgba(255,255,255,.075),transparent 31%),
+    radial-gradient(ellipse at 8% 100%,rgba(98,191,74,.18),transparent 36%),
+    linear-gradient(90deg,rgba(98,191,74,.028) 1px,transparent 1px),
+    linear-gradient(180deg,#050506 0%,#090a0a 58%,#030303 100%);
+  background-size:100% 100%,100% 100%,72px 100%,100% 100%;
   border:1px solid rgba(98,191,74,.13);
   cursor:zoom-in;
 }
@@ -2008,10 +2010,8 @@ body.event-mode .sync-pill.error{
   content:'';
   position:absolute;
   inset:0;
-  background:linear-gradient(180deg,transparent 0%,rgba(98,191,74,.08) 50%,transparent 100%);
-  opacity:.35;
-  transform:translateY(-100%);
-  animation:timerScan 8s linear infinite;
+  background:radial-gradient(circle at center,transparent 0%,rgba(0,0,0,.16) 52%,rgba(0,0,0,.62) 100%);
+  opacity:1;
   pointer-events:none;
 }
 .timer-stage::after{
@@ -2067,7 +2067,7 @@ body.event-mode .sync-pill.error{
   margin:0 0 18px;
 }
 .timer-focus{
-  --ring-size:clamp(360px,45vw,620px);
+  --ring-size:clamp(430px,45vw,660px);
   position:relative;
   width:var(--ring-size);
   height:var(--ring-size);
@@ -2079,20 +2079,20 @@ body.event-mode .sync-pill.error{
   position:absolute;
   inset:6%;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.055),rgba(255,255,255,.018) 50%,rgba(98,191,74,.055) 100%);
-  box-shadow:0 0 110px rgba(98,191,74,.13),inset 0 0 80px rgba(255,255,255,.025);
+  background:radial-gradient(circle,rgba(255,255,255,.055),rgba(255,255,255,.018) 52%,rgba(98,191,74,.045) 100%);
+  box-shadow:0 0 130px rgba(98,191,74,.14),inset 0 0 90px rgba(255,255,255,.026);
 }
 .timer-focus-content{
   position:relative;
   z-index:2;
-  width:72%;
+  width:82%;
   min-width:0;
 }
 .timer-display{
   position:relative;
   z-index:2;
   font-family:var(--font-main);
-  font-size:clamp(78px,12vw,156px);
+  font-size:clamp(78px,10.8vw,154px);
   line-height:.9;
   font-weight:330;
   letter-spacing:0;
@@ -2102,12 +2102,17 @@ body.event-mode .sync-pill.error{
 }
 .timer-duration{
   color:rgba(255,255,255,.48);
-  font-size:clamp(16px,1.8vw,28px);
-  line-height:1;
+  font-size:clamp(16px,1.65vw,26px);
+  line-height:1.18;
   font-weight:430;
   letter-spacing:0;
   margin-top:20px;
+  white-space:normal;
+  overflow-wrap:normal;
 }
+.timer-stage.is-long-time .timer-display{font-size:clamp(58px,8.4vw,116px)}
+.timer-stage.is-long-time .timer-focus-content{width:88%}
+.timer-stage.is-long-time .timer-duration{font-size:clamp(15px,1.45vw,22px)}
 .timer-status{
   display:none;
   min-height:18px;
@@ -2145,7 +2150,7 @@ body.event-mode .sync-pill.error{
 .timer-ring-track,
 .timer-ring-progress{
   fill:none;
-  stroke-width:2.8;
+  stroke-width:2.35;
   vector-effect:non-scaling-stroke;
 }
 .timer-ring-track{
@@ -2154,14 +2159,19 @@ body.event-mode .sync-pill.error{
 .timer-ring-progress{
   stroke:var(--green-lt);
   stroke-linecap:round;
-  stroke-dasharray:1;
-  stroke-dashoffset:var(--timer-progress);
-  transform:rotate(-90deg) scaleX(-1);
+  stroke-dasharray:var(--timer-remaining) 1;
+  stroke-dashoffset:0;
+  transform:rotate(-90deg);
   transform-origin:50% 50%;
-  transition:stroke-dashoffset .08s linear,stroke .18s ease,filter .18s ease;
+  transition:stroke .18s ease,filter .18s ease;
+  will-change:stroke-dasharray;
   filter:drop-shadow(0 0 12px rgba(151,255,128,.42)) drop-shadow(0 0 34px rgba(98,191,74,.2));
 }
-.timer-ring-dot{fill:rgba(255,255,255,.92);filter:drop-shadow(0 0 10px rgba(255,255,255,.7))}
+.timer-ring-dot{
+  fill:rgba(255,255,255,.94);
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.72));
+  will-change:transform;
+}
 .timer-deco-actions{
   position:relative;
   z-index:3;
@@ -2562,7 +2572,8 @@ body.presentation-mode.presentation-timer .timer-stage-inner{
   padding:56px 0 58px;
 }
 body.presentation-mode.presentation-timer .timer-focus{--ring-size:clamp(520px,48vw,760px)}
-body.presentation-mode.presentation-timer .timer-display{font-size:clamp(108px,11vw,184px);font-weight:320}
+body.presentation-mode.presentation-timer .timer-display{font-size:clamp(108px,10.4vw,176px);font-weight:320}
+body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-display{font-size:clamp(78px,8.2vw,136px)}
 body.presentation-mode.presentation-timer .timer-duration{font-size:clamp(20px,1.8vw,32px)}
 body.presentation-mode.presentation-timer .timer-deco-btn{width:74px;height:74px}
 body.presentation-mode.presentation-timer .timer-corner-btn{top:42px;width:52px;height:52px}
@@ -2790,9 +2801,11 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .timer-corner-btn{top:16px;width:36px;height:36px;border-radius:13px}
   .timer-corner-btn.left{left:16px}
   .timer-corner-btn.right{right:16px}
-  .timer-focus{--ring-size:min(82vw,390px)}
+  .timer-focus{--ring-size:min(86vw,420px)}
   .timer-topic{font-size:15px;margin-bottom:12px}
   .timer-display{font-size:clamp(58px,18vw,94px)}
+  .timer-stage.is-long-time .timer-display{font-size:clamp(42px,13.5vw,70px)}
+  .timer-stage.is-long-time .timer-focus-content{width:90%}
   .timer-duration{font-size:15px;margin-top:14px}
   .timer-deco-actions{gap:16px}
   .timer-deco-btn{width:54px;height:54px}
@@ -5931,7 +5944,8 @@ function timerComputed(){
   const remaining=Math.ceil(exactRemaining);
   const status=done ? 'done' : (['running','paused','idle'].includes(t.status) ? t.status : 'idle');
   const progress=Math.min(1,Math.max(0,(duration-exactRemaining)/duration));
-  return {duration,remaining,exactRemaining,status,progress,done};
+  const remainingRatio=Math.max(0,1-progress);
+  return {duration,remaining,exactRemaining,status,progress,remainingRatio,done};
 }
 function persistTimerDone(){
   if(DB.timer?.status!=='running') return;
@@ -6059,39 +6073,36 @@ function updateTimerDisplay(){
   const duration=document.getElementById('timer-duration');
   const topicView=document.getElementById('timer-topic-view');
   const status=document.getElementById('timer-status');
-  const ringAction=document.getElementById('timer-ring-action');
-  const ringIcon=document.getElementById('timer-ring-icon');
   const ringDot=document.querySelector('.timer-ring-dot');
   const cnt=document.getElementById('timer-cnt');
   const note=document.getElementById('timer-note');
 
-  stage.classList.remove('is-idle','is-running','is-paused','is-done');
+  stage.classList.remove('is-idle','is-running','is-paused','is-done','is-long-time');
   stage.classList.add('is-'+computed.status);
-  stage.style.setProperty('--timer-progress', computed.progress.toFixed(5));
+  if(formatTimerTime(computed.remaining).length>=7) stage.classList.add('is-long-time');
+  stage.style.setProperty('--timer-remaining', computed.remainingRatio.toFixed(5));
   if(display) display.textContent=formatTimerTime(computed.remaining);
   if(duration) duration.textContent=timerSublineText(computed);
   if(topicView) topicView.textContent=topic;
   if(status) status.textContent=timerStatusText(computed.status);
   if(ringDot){
-    const angle=(-90 - computed.progress*360) * Math.PI / 180;
+    const angle=(-90 + computed.remainingRatio*360) * Math.PI / 180;
     const cx=110 + Math.cos(angle)*96;
     const cy=110 + Math.sin(angle)*96;
     ringDot.setAttribute('cx', cx.toFixed(3));
     ringDot.setAttribute('cy', cy.toFixed(3));
-    ringDot.style.opacity=computed.progress>=.995 ? '0' : '1';
-  }
-  if(ringIcon) ringIcon.innerHTML=timerActionIcon(computed.status);
-  if(ringAction){
-    const actionLabel=computed.status==='running' ? 'Пауза' : computed.status==='paused' ? 'Продолжить' : 'Старт';
-    ringAction.setAttribute('aria-label', actionLabel);
-    ringAction.title=actionLabel;
+    ringDot.style.opacity=computed.remainingRatio<=.004 ? '0' : '1';
   }
   if(cnt) cnt.innerHTML=`<span style="color:var(--green)">${formatTimerTime(computed.remaining)}</span>`;
   if(note) note.textContent=computed.status==='running' ? 'Штурм идёт' : computed.status==='done' ? 'Время вышло' : 'Штурм · оффлайн';
 }
 function ensureTimerLoop(){
   if(timerTick) return;
-  timerTick=setInterval(updateTimerDisplay,80);
+  const step=()=>{
+    updateTimerDisplay();
+    timerTick=requestAnimationFrame(step);
+  };
+  timerTick=requestAnimationFrame(step);
 }
 function renderTimer(){
   normalizeDB();
