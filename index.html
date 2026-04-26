@@ -1654,6 +1654,31 @@ header::before{
 .sync-mini-btn.ghost{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.025);color:var(--gray1)}
 .sync-mini-btn.ghost:hover{border-color:var(--white);color:var(--white);background:rgba(255,255,255,.055)}
 .sync-menu-btn{width:30px;min-width:30px;padding:0;font-size:15px;letter-spacing:0}
+.event-backup-btn{display:none}
+body.event-mode .event-backup-btn{display:inline-flex}
+body.event-mode .sync-pill{
+  min-height:38px;
+  padding:10px 15px;
+  border-color:rgba(255,255,255,.16);
+  font-size:11px;
+  letter-spacing:.1em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.035),0 12px 28px rgba(0,0,0,.24);
+}
+body.event-mode .sync-pill.online{
+  color:var(--green-lt);
+  background:rgba(98,191,74,.1);
+  border-color:rgba(98,191,74,.36);
+}
+body.event-mode .sync-pill.syncing{
+  color:var(--amber);
+  background:rgba(255,193,7,.08);
+  border-color:rgba(255,193,7,.32);
+}
+body.event-mode .sync-pill.error{
+  color:#ff8f88;
+  background:rgba(255,58,48,.08);
+  border-color:rgba(255,58,48,.3);
+}
 @keyframes syncPulse{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
 @media(max-width:760px){.sync-panel{justify-content:flex-start;gap:6px;margin-top:10px}.sync-pill,.sync-mini-btn{min-height:34px;padding:9px 11px;font-size:9px;letter-spacing:.06em}}
 
@@ -1866,6 +1891,43 @@ header::before{
   border-color:rgba(98,191,74,.68);
   box-shadow:0 0 0 3px rgba(98,191,74,.1);
 }
+.timer-presets{
+  grid-column:1/-1;
+  display:flex;
+  gap:6px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-top:2px;
+}
+.timer-preset-btn{
+  min-height:30px;
+  padding:0 11px;
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,.08);
+  background:#0d0d0d;
+  color:var(--gray1);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:0;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .15s;
+}
+.timer-preset-btn:hover{
+  border-color:rgba(98,191,74,.4);
+  color:var(--green-lt);
+  background:rgba(98,191,74,.07);
+}
+.timer-preset-btn.active{
+  border-color:rgba(98,191,74,.5);
+  color:var(--green-lt);
+  background:rgba(98,191,74,.12);
+}
+.timer-preset-btn:disabled{
+  opacity:.42;
+  cursor:default;
+  pointer-events:none;
+}
 .timer-actions{
   display:flex;
   gap:6px;
@@ -1917,7 +1979,7 @@ header::before{
   pointer-events:none;
 }
 .timer-stage{
-  --timer-angle:0deg;
+  --timer-progress:0;
   min-height:calc(100vh - 360px);
   position:relative;
   overflow:hidden;
@@ -1951,20 +2013,20 @@ header::before{
   content:'';
   position:absolute;
   inset:0;
-  background:rgba(255,58,48,.16);
+  background:radial-gradient(circle at center,rgba(98,191,74,.16),transparent 54%);
   opacity:0;
   pointer-events:none;
 }
 .timer-stage-inner{
   position:relative;
   z-index:2;
-  width:min(900px,calc(100% - 56px));
+  width:min(1180px,calc(100% - 64px));
   display:flex;
   flex-direction:column;
   align-items:center;
   text-align:center;
-  gap:26px;
-  padding:72px 0 44px;
+  gap:28px;
+  padding:76px 0 54px;
 }
 .timer-brand{
   position:absolute;
@@ -1982,49 +2044,58 @@ header::before{
 .timer-topic{
   max-width:100%;
   color:var(--gray1);
-  font-size:20px;
+  font-size:clamp(18px,1.7vw,28px);
   line-height:1.25;
   font-weight:760;
   letter-spacing:0;
   text-transform:uppercase;
   overflow-wrap:anywhere;
-  margin-bottom:8px;
+  margin-bottom:2px;
 }
 .timer-orbit{
-  width:min(58vh,430px);
-  min-width:260px;
-  aspect-ratio:1;
+  width:min(980px,100%);
+  min-width:0;
+  min-height:0;
+  aspect-ratio:auto;
   position:relative;
-  display:grid;
-  place-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px 0 38px;
 }
 .timer-orbit::before{
   content:'';
   position:absolute;
-  inset:0;
-  border-radius:50%;
-  background:conic-gradient(var(--green) var(--timer-angle),rgba(255,255,255,.08) 0);
-  filter:drop-shadow(0 0 22px rgba(98,191,74,.2));
+  left:0;right:0;bottom:0;
+  height:4px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  filter:none;
 }
 .timer-orbit::after{
   content:'';
   position:absolute;
-  inset:14px;
-  border-radius:50%;
-  background:#050505;
-  border:1px solid rgba(255,255,255,.06);
+  left:0;bottom:0;
+  width:100%;
+  height:4px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--green),var(--green-lt));
+  transform:scaleX(var(--timer-progress));
+  transform-origin:left center;
+  transition:transform .22s linear,filter .2s;
+  box-shadow:0 0 18px rgba(98,191,74,.22);
 }
 .timer-display{
   position:relative;
   z-index:2;
   font-family:var(--font-main);
-  font-size:min(15vh,144px);
-  line-height:.86;
-  font-weight:650;
+  font-size:clamp(92px,15vw,260px);
+  line-height:.82;
+  font-weight:520;
   letter-spacing:0;
   color:var(--white);
   font-variant-numeric:tabular-nums;
-  text-shadow:0 0 28px rgba(98,191,74,.14);
+  text-shadow:0 0 34px rgba(98,191,74,.12);
 }
 .timer-status{
   min-height:18px;
@@ -2033,33 +2104,32 @@ header::before{
   font-weight:850;
   letter-spacing:0;
   text-transform:uppercase;
-  margin-top:10px;
+  margin-top:4px;
 }
 .timer-end-mark{
   display:none;
   font-size:clamp(36px,4vw,72px);
   line-height:1;
   font-weight:900;
-  color:#ff4f45;
+  color:var(--green-lt);
   letter-spacing:0;
   text-transform:uppercase;
-  margin-top:6px;
-  text-shadow:0 0 32px rgba(255,58,48,.24);
+  margin-top:2px;
+  text-shadow:0 0 32px rgba(98,191,74,.26);
 }
-.timer-stage.is-running .timer-orbit::before{animation:timerGlow 2.2s ease-in-out infinite}
+.timer-stage.is-running .timer-orbit::after{animation:timerGlow 2.2s ease-in-out infinite}
 .timer-stage.is-paused .timer-status{color:var(--amber)}
 .timer-stage.is-done{
-  border-color:rgba(255,58,48,.6);
-  animation:timerEndShake .7s cubic-bezier(.2,.8,.2,1) 2;
+  border-color:rgba(98,191,74,.36);
 }
-.timer-stage.is-done::after{animation:timerEndFlash 1.25s ease-out 3 forwards}
+.timer-stage.is-done::after{animation:timerEndFlash 1.6s ease-out 2 forwards}
 .timer-stage.is-done .timer-orbit::before{
-  background:conic-gradient(#ff4f45 1turn,rgba(255,255,255,.08) 0);
-  filter:drop-shadow(0 0 34px rgba(255,58,48,.34));
+  background:rgba(255,255,255,.1);
 }
-.timer-stage.is-done .timer-display{color:#ff4f45;animation:timerDigitsEnd .8s ease-out 3}
+.timer-stage.is-done .timer-orbit::after{filter:brightness(1.35);box-shadow:0 0 34px rgba(98,191,74,.32)}
+.timer-stage.is-done .timer-display{color:var(--white);animation:timerDigitsEnd 1.05s ease-out 2}
 .timer-stage.is-done .timer-status{display:none}
-.timer-stage.is-done .timer-end-mark{display:block;animation:timerEndPop .65s cubic-bezier(.18,.9,.2,1) both}
+.timer-stage.is-done .timer-end-mark{display:block;animation:timerEndPop .75s cubic-bezier(.18,.9,.2,1) both}
 .event-switcher{
   display:none;
   align-items:center;
@@ -2409,12 +2479,12 @@ body.presentation-mode.presentation-timer .timer-stage{
   cursor:default;
 }
 body.presentation-mode.presentation-timer .timer-stage-inner{
-  width:min(1200px,calc(100% - 84px));
+  width:min(1360px,calc(100% - 96px));
 }
 body.presentation-mode.presentation-timer .timer-brand{font-size:58px;left:42px;top:38px}
 body.presentation-mode.presentation-timer .timer-topic{font-size:30px;margin-bottom:18px}
-body.presentation-mode.presentation-timer .timer-orbit{width:min(68vh,620px)}
-body.presentation-mode.presentation-timer .timer-display{font-size:min(17vh,190px);font-weight:620}
+body.presentation-mode.presentation-timer .timer-orbit{width:min(1180px,100%);padding-bottom:48px}
+body.presentation-mode.presentation-timer .timer-display{font-size:clamp(150px,18vw,340px);font-weight:500}
 body.presentation-mode.presentation-timer .timer-status{font-size:17px;margin-top:18px}
 body.presentation-mode.presentation-splash .splash-view.theme-dark .splash-mark,
 body.presentation-mode.presentation-splash .splash-view.theme-light .splash-mark{
@@ -2572,20 +2642,15 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
 }
 @keyframes timerEndFlash{
   0%,100%{opacity:0}
-  35%{opacity:.95}
+  38%{opacity:.85}
 }
 @keyframes timerDigitsEnd{
   0%,100%{transform:scale(1)}
-  45%{transform:scale(1.045)}
+  45%{transform:scale(1.018)}
 }
 @keyframes timerEndPop{
-  from{opacity:0;transform:translateY(16px) scale(.92)}
+  from{opacity:0;transform:translateY(12px) scale(.96)}
   to{opacity:1;transform:translateY(0) scale(1)}
-}
-@keyframes timerEndShake{
-  0%,100%{transform:translateX(0)}
-  25%{transform:translateX(-5px)}
-  65%{transform:translateX(5px)}
 }
 @keyframes dotGlow{
   0%,100%{opacity:.65;filter:brightness(.9)}
@@ -2629,14 +2694,16 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .randomizer-team{min-height:0;border-radius:14px;padding:14px}
   .timer-panel{grid-template-columns:1fr;padding:14px;gap:12px}
   .timer-form{grid-template-columns:1fr;gap:10px}
+  .timer-presets{gap:5px}
+  .timer-preset-btn{flex:1;min-width:54px}
   .timer-actions{justify-content:flex-start;flex-wrap:wrap}
   .timer-actions-divider{display:none}
   .timer-stage{min-height:calc(100dvh - 310px)}
   .timer-stage-inner{width:calc(100% - 28px);gap:18px;padding:70px 0 30px}
   .timer-brand{font-size:34px;left:18px;top:18px}
   .timer-topic{font-size:14px}
-  .timer-orbit{width:min(44vh,300px);min-width:220px}
-  .timer-display{font-size:min(11vh,92px)}
+  .timer-orbit{width:100%;padding-bottom:30px}
+  .timer-display{font-size:clamp(64px,20vw,120px)}
   .event-switcher{align-items:stretch;flex-direction:column;margin-bottom:16px}
   .event-tabs{width:100%}
   .event-tab{flex:1;padding:0 10px}
@@ -3647,6 +3714,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <div class="sync-panel">
       <button class="sync-mini-btn ghost mode-back-btn" type="button" onclick="enterAppMode('gate')">Выбор режима</button>
       <span class="sync-pill local" id="sync-status" title="Статус синхронизации">Локально</span>
+      <button class="sync-mini-btn ghost event-backup-btn" type="button" onclick="exportData()" title="Скачать аварийный JSON-бэкап">Бэкап</button>
       <button class="sync-mini-btn ghost sync-menu-btn" type="button" title="Синхронизация и бэкапы" onclick="openSyncMenu(event)">⋯</button>
     </div>
   </div>
@@ -3885,12 +3953,18 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
         <label for="timer-time">Время</label>
         <input id="timer-time" type="text" inputmode="numeric" placeholder="10:00" autocomplete="off">
       </div>
+      <div class="timer-presets" aria-label="Быстрые пресеты таймера">
+        <button class="timer-preset-btn" type="button" data-minutes="3" onclick="setTimerPreset(3)">3 мин</button>
+        <button class="timer-preset-btn" type="button" data-minutes="5" onclick="setTimerPreset(5)">5 мин</button>
+        <button class="timer-preset-btn" type="button" data-minutes="7" onclick="setTimerPreset(7)">7 мин</button>
+        <button class="timer-preset-btn" type="button" data-minutes="10" onclick="setTimerPreset(10)">10 мин</button>
+        <button class="timer-preset-btn" type="button" data-minutes="15" onclick="setTimerPreset(15)">15 мин</button>
+      </div>
     </div>
     <div class="timer-actions">
       <button class="btn btn-solid btn-sm timer-primary" type="button" onclick="createTimer()"><span class="btn-ico">＋</span>Создать</button>
       <span class="timer-actions-divider" aria-hidden="true"></span>
-      <button class="btn btn-solid btn-sm" id="timer-start-btn" type="button" onclick="startTimer()"><span class="btn-ico">▶</span>Старт</button>
-      <button class="btn btn-ghost btn-sm" id="timer-pause-btn" type="button" onclick="pauseTimer()"><span class="btn-ico">Ⅱ</span>Пауза</button>
+      <button class="btn btn-solid btn-sm" id="timer-start-btn" type="button" onclick="toggleTimerRun()"><span class="btn-ico">▶</span>Старт</button>
       <button class="btn btn-ghost btn-sm" id="timer-reset-btn" type="button" onclick="resetTimer()"><span class="btn-ico">↺</span>Сброс</button>
     </div>
   </div>
@@ -4153,6 +4227,39 @@ function broadcastAppState(reason='update'){
     appBroadcast.postMessage({key:KEY,value:JSON.stringify(DB),reason,ts:Date.now()});
   } catch {}
 }
+
+let wakeLockSentinel = null;
+async function syncWakeLock(){
+  const wantsLock = (document.body.classList.contains('event-mode') || document.body.classList.contains('presentation-mode')) && document.visibilityState === 'visible';
+  if(!wantsLock){
+    if(wakeLockSentinel){
+      try{ await wakeLockSentinel.release(); }catch{}
+      wakeLockSentinel=null;
+    }
+    return;
+  }
+  if(wakeLockSentinel || !('wakeLock' in navigator)) return;
+  try{
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener('release',()=>{ wakeLockSentinel=null; },{once:true});
+  } catch {}
+}
+
+const photoPreloadCache = new Map();
+function preloadEventPhotos(){
+  const photos=(DB.participants||[])
+    .map(p=>p?.photo)
+    .filter(src=>src && !String(src).startsWith('data:'));
+  photos.slice(0,90).forEach(src=>{
+    if(photoPreloadCache.has(src)) return;
+    const img=new Image();
+    img.decoding='async';
+    img.loading='eager';
+    img.src=src;
+    photoPreloadCache.set(src,img);
+  });
+}
+
 function save(){
   const localSaved=saveLocal();
   broadcastAppState('save');
@@ -4199,6 +4306,7 @@ function switchTab(name, btn){
   if(name==='orgs') renderOrgs();
   if(name==='randomizer') renderRandomizer();
   if(name==='club') renderClub();
+  syncWakeLock();
 }
 
 function switchEventTab(name){
@@ -4212,8 +4320,10 @@ function switchEventTab(name){
   if(eventActiveView === 'timer') renderTimer();
   if(eventActiveView === 'splash'){
     updateSplashMeta?.();
+    preloadEventPhotos();
     if(splashTheme==='cards') startCarousel?.();
   }
+  syncWakeLock();
 }
 
 function enterAppMode(mode){
@@ -4221,13 +4331,16 @@ function enterAppMode(mode){
   if(mode==='gate'){
     appMode='gate';
     document.body.classList.add('mode-gate-active');
+    syncWakeLock();
     return;
   }
   if(mode==='event'){
     appMode='event';
     document.body.classList.add('event-mode');
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    preloadEventPhotos();
     switchEventTab(eventActiveView);
+    syncWakeLock();
     return;
   }
   appMode='crm';
@@ -4238,6 +4351,7 @@ function enterAppMode(mode){
   } else {
     updateAnalytics();
   }
+  syncWakeLock();
 }
 
 // ─── INSTAGRAM ──────────────────────────────────────────────
@@ -5685,6 +5799,16 @@ function createTimer(){
   });
   toast('Таймер создан');
 }
+function setTimerPreset(minutes){
+  const computed=timerComputed();
+  if(computed.status==='running'){
+    toast('Поставь таймер на паузу, потом выбери пресет');
+    return;
+  }
+  const timeInput=document.getElementById('timer-time');
+  if(timeInput) timeInput.value=formatTimerTime(minutes*60);
+  createTimer();
+}
 function startTimer(){
   normalizeDB();
   const computed=timerComputed();
@@ -5712,6 +5836,11 @@ function startTimer(){
     });
   }
   toast('Таймер запущен');
+}
+function toggleTimerRun(){
+  const computed=timerComputed();
+  if(computed.status==='running') pauseTimer();
+  else startTimer();
 }
 function pauseTimer(){
   normalizeDB();
@@ -5766,7 +5895,7 @@ function updateTimerDisplay(){
 
   stage.classList.remove('is-idle','is-running','is-paused','is-done');
   stage.classList.add('is-'+computed.status);
-  stage.style.setProperty('--timer-angle', `${(computed.progress*360).toFixed(2)}deg`);
+  stage.style.setProperty('--timer-progress', computed.progress.toFixed(5));
   if(display) display.textContent=formatTimerTime(computed.remaining);
   if(topicView) topicView.textContent=topic;
   if(status) status.textContent=timerStatusText(computed.status);
@@ -5786,15 +5915,19 @@ function renderTimer(){
 
   const computed=timerComputed();
   const startBtn=document.getElementById('timer-start-btn');
-  const pauseBtn=document.getElementById('timer-pause-btn');
   const resetBtn=document.getElementById('timer-reset-btn');
+  const presetBtns=document.querySelectorAll('.timer-preset-btn');
   if(startBtn){
-    const label=computed.status==='paused' ? 'Продолжить' : computed.status==='running' ? 'Идёт' : 'Старт';
-    startBtn.innerHTML=`<span class="btn-ico">▶</span>${label}`;
-    startBtn.disabled=computed.status==='running';
+    const isRunning=computed.status==='running';
+    const label=computed.status==='paused' ? 'Продолжить' : isRunning ? 'Пауза' : 'Старт';
+    startBtn.innerHTML=`<span class="btn-ico">${isRunning ? '▮▮' : '▶'}</span>${label}`;
+    startBtn.disabled=false;
   }
-  if(pauseBtn) pauseBtn.disabled=computed.status!=='running';
   if(resetBtn) resetBtn.disabled=computed.status==='idle' && computed.remaining===computed.duration;
+  presetBtns.forEach(btn=>{
+    btn.disabled=computed.status==='running';
+    btn.classList.toggle('active', Math.round(+btn.dataset.minutes*60)===computed.duration);
+  });
   updateTimerDisplay();
   ensureTimerLoop();
 }
@@ -5843,6 +5976,7 @@ function setSplashTheme(theme, btn){
   if(meta)  meta.style.display  = isCards ? 'none' : 'flex';
 
   if(isCards){
+    preloadEventPhotos();
     // Даём браузеру layout-тик чтобы grid получил размеры после display:grid
     requestAnimationFrame(()=>requestAnimationFrame(()=>startCarousel()));
   } else {
@@ -5907,6 +6041,7 @@ function waitForCardImage(cardWrap, timeout=700){
 
 function startCarousel(){
   stopCarousel();
+  preloadEventPhotos();
   const people = (DB.participants||[]).filter(p=>p.name);
   if(!people.length) return;
 
@@ -6063,6 +6198,7 @@ function applyPresentationMode(){
   document.body.classList.remove('mode-gate-active','event-mode');
   document.body.classList.add('presentation-mode','presentation-'+present);
   appMode='presentation';
+  preloadEventPhotos();
   document.title=(present==='splash' ? 'Заставка' : present==='timer' ? 'Таймер' : 'Команды')+' · драфт';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -6073,6 +6209,7 @@ function applyPresentationMode(){
     updateSplashMeta?.();
     if(splashTheme==='cards') startCarousel?.();
   }
+  syncWakeLock();
   return true;
 }
 function applyInitialMode(){
@@ -6436,8 +6573,14 @@ function mergeCloudState(remote, local){
 function setSyncStatus(text, state='local'){
   const el=document.getElementById('sync-status');
   if(!el)return;
-  el.textContent=text;
+  const cleanText = state==='online' && !hasPendingCloudSave() ? 'Сохранено' : text;
+  el.textContent=cleanText;
   el.className='sync-pill '+state;
+  el.title=state==='online'
+    ? 'Все изменения сохранены в Supabase'
+    : state==='syncing'
+      ? 'Есть локальные изменения, синхронизация в процессе или в очереди'
+      : 'Статус синхронизации';
 }
 function hashData(data){ try{return JSON.stringify(data)}catch{return String(Date.now())} }
 function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); renderProspects(); renderOrgs(); renderRandomizer(); renderTimer(); renderClub(); }
@@ -6661,12 +6804,21 @@ window.addEventListener('online',()=>{
 });
 window.addEventListener('focus',()=>{
   if(syncConfig) pollCloudNow(true);
+  syncWakeLock();
 });
 document.addEventListener('visibilitychange',()=>{
+  syncWakeLock();
   if(document.visibilityState==='visible' && syncConfig){
     if(syncReady && syncClient) pollCloudNow(true);
     else initCloudSync(true);
     startCloudPolling();
+  }
+});
+document.addEventListener('fullscreenchange',syncWakeLock);
+window.addEventListener('pagehide',()=>{
+  if(wakeLockSentinel){
+    try{ wakeLockSentinel.release(); }catch{}
+    wakeLockSentinel=null;
   }
 });
 
@@ -6678,6 +6830,7 @@ function exportData(){
   a.download='draft-crm-backup-'+date+'.json';
   document.body.appendChild(a); a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  toast('Аварийный бэкап скачан');
 }
 function importData(){ document.getElementById('backup-input')?.click(); }
 function onBackupSelected(e){
