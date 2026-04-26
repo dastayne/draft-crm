@@ -1869,11 +1869,20 @@ header::before{
 .splash-theme-btn.active{color:#0a1a08;background:var(--green-lt)}
 .splash-theme-btn:hover:not(.active){color:var(--white)}
 .splash-cast-btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
   padding:0 16px;min-height:38px;border-radius:999px;
   border:1px solid var(--green-dim);background:rgba(98,191,74,.06);color:var(--green-lt);
   font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
   transition:all .15s;cursor:pointer;font-family:var(--font-main);margin-left:10px;
+}
+.splash-cast-btn::before{
+  content:'';
+  display:inline-block;
+  width:15px;height:12px;
+  background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 12'%3E%3Crect x='0' y='0' width='15' height='9' rx='1.2' fill='none' stroke='black' stroke-width='1.4'/%3E%3Cpath d='M0 7.5q2.5 0 4 2.5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M0 5q4.5 0 6.5 5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M0 2.5q7 0 9 8' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 12'%3E%3Crect x='0' y='0' width='15' height='9' rx='1.2' fill='none' stroke='black' stroke-width='1.4'/%3E%3Cpath d='M0 7.5q2.5 0 4 2.5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M0 5q4.5 0 6.5 5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M0 2.5q7 0 9 8' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  flex-shrink:0;
 }
 .splash-cast-btn:hover{background:var(--green);border-color:var(--green);color:#081308}
 
@@ -5254,10 +5263,9 @@ function setSplashTheme(theme, btn){
   if(badge) badge.style.display = isCards ? 'block' : 'none';
   if(meta)  meta.style.display  = isCards ? 'none' : 'flex';
 
-  initSplashStripes();
-
   if(isCards){
-    startCarousel();
+    // Даём браузеру layout-тик чтобы grid получил размеры после display:grid
+    requestAnimationFrame(()=>requestAnimationFrame(()=>startCarousel()));
   } else {
     stopCarousel();
   }
@@ -5314,24 +5322,23 @@ function startCarousel(){
   }
   _carouselPtr = 0;
 
-  // Первая отрисовка — все ячейки, карточки появляются сразу на месте
+  // Первая отрисовка — все ячейки сразу, не блокируем event loop
   grid.innerHTML = '';
   _carouselSlots = [];
+  const frag = document.createDocumentFragment();
   for(let i=0;i<totalSlots;i++){
     const p = _carouselQueue[_carouselPtr % _carouselQueue.length];
     _carouselSlots.push(_carouselPtr % _carouselQueue.length);
     _carouselPtr++;
-
     const cell = document.createElement('div');
     cell.className = 'splash-cell';
     cell.dataset.slot = i;
-
     const card = makeCardEl(p, i+1);
-    // При первом показе — без slide, сразу floating
     card.classList.add('floating');
     cell.appendChild(card);
-    grid.appendChild(cell);
+    frag.appendChild(cell);
   }
+  grid.appendChild(frag); // одна DOM-операция вместо N
 
   _carouselSlotPtr = 0;
 
