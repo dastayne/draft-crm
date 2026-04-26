@@ -1986,29 +1986,30 @@ body.event-mode .event-exit-btn{
   display:inline-flex;
 }
 .randomizer-grid.reveal .randomizer-team{
-  animation:teamReveal .42s cubic-bezier(.18,.8,.24,1) both;
+  animation:teamReveal .72s cubic-bezier(.16,.78,.22,1) both;
 }
-.randomizer-grid.reveal .randomizer-team:nth-child(2){animation-delay:.08s}
-.randomizer-grid.reveal .randomizer-team:nth-child(3){animation-delay:.16s}
-.randomizer-grid.reveal .randomizer-team:nth-child(4){animation-delay:.24s}
+.randomizer-grid.reveal .randomizer-team:nth-child(2){animation-delay:.12s}
+.randomizer-grid.reveal .randomizer-team:nth-child(3){animation-delay:.24s}
+.randomizer-grid.reveal .randomizer-team:nth-child(4){animation-delay:.36s}
 .randomizer-grid.reveal .randomizer-member{
   opacity:0;
-  transform:translateY(10px);
-  animation:memberReveal .42s cubic-bezier(.18,.8,.24,1) forwards;
+  transform:translateX(-16px);
+  animation:memberReveal .58s cubic-bezier(.16,.78,.22,1) forwards;
+  animation-delay:calc(.42s + (var(--reveal-index,0) * .14s));
 }
-.randomizer-grid.reveal .randomizer-member:nth-child(1){animation-delay:.18s}
-.randomizer-grid.reveal .randomizer-member:nth-child(2){animation-delay:.24s}
-.randomizer-grid.reveal .randomizer-member:nth-child(3){animation-delay:.30s}
-.randomizer-grid.reveal .randomizer-member:nth-child(4){animation-delay:.36s}
-.randomizer-grid.reveal .randomizer-member:nth-child(5){animation-delay:.42s}
-.randomizer-grid.reveal .randomizer-member:nth-child(6){animation-delay:.48s}
-.randomizer-grid.reveal .randomizer-member:nth-child(n+7){animation-delay:.54s}
+body.presentation-mode .randomizer-grid.reveal .randomizer-team{
+  animation-duration:.95s;
+}
+body.presentation-mode .randomizer-grid.reveal .randomizer-member{
+  animation-duration:.74s;
+  animation-delay:calc(.68s + (var(--reveal-index,0) * .20s));
+}
 @keyframes teamReveal{
-  from{opacity:0;transform:translateY(18px);filter:brightness(.8)}
+  from{opacity:0;transform:translateY(24px);filter:brightness(.72)}
   to{opacity:1;transform:translateY(0);filter:brightness(1)}
 }
 @keyframes memberReveal{
-  to{opacity:1;transform:translateY(0)}
+  to{opacity:1;transform:translateX(0)}
 }
 @keyframes clubIn{to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){
@@ -3007,8 +3008,8 @@ body.event-mode .event-exit-btn{
       <div class="mode-card-text">Участники, потенциальные, организаторы, оплаты, комментарии и синхронизация.</div>
     </button>
     <button class="mode-card" type="button" onclick="enterAppMode('event')">
-      <div class="mode-card-kicker">Оффлайн-ивент</div>
-      <div class="mode-card-title">Команды</div>
+      <div class="mode-card-kicker">Оффлайн-режим</div>
+      <div class="mode-card-title">драфт</div>
       <div class="mode-card-text">Публичный режим без внутренней кухни: деление участников и вывод на экран.</div>
     </button>
   </div>
@@ -3370,12 +3371,16 @@ function saveLocal(){
 }
 let appMode = 'gate';
 let randomizerLastRenderedCreatedAt = '';
+let appLastExternalStateHash = '';
 let appBroadcast = null;
 try{
   appBroadcast = new BroadcastChannel('draft-crm-live');
   appBroadcast.onmessage = e=>{
     if(!e?.data || e.data.key!==KEY || !e.data.value) return;
     try{
+      const h=hashData(e.data.value);
+      if(h===appLastExternalStateHash) return;
+      appLastExternalStateHash=h;
       DB=JSON.parse(e.data.value);
       normalizeDB();
       refreshAll();
@@ -4602,10 +4607,10 @@ function setRandomizerStatus(text,state=''){
   el.textContent=text||'';
   el.className='randomizer-status '+state;
 }
-function randomizerMemberMarkup(p){
+function randomizerMemberMarkup(p,revealIndex=0){
   const idx=DB.participants.indexOf(p)+1;
   return `
-    <div class="randomizer-member">
+    <div class="randomizer-member" style="--reveal-index:${revealIndex}">
       <div class="randomizer-avatar">${p.photo ? `<img src="${p.photo}" alt="">` : makeInitials(p.name)}</div>
       <div>
         <div class="randomizer-member-name">${esc(p.name)}</div>
@@ -4645,10 +4650,10 @@ function renderRandomizer(){
     <div class="randomizer-team">
       <div class="randomizer-team-head">
         <div class="randomizer-team-title">Команда ${i+1}</div>
-        <div class="randomizer-team-meta">${team.length} чел</div>
+      <div class="randomizer-team-meta">${team.length} чел</div>
       </div>
       <div class="randomizer-members">
-        ${team.map(randomizerMemberMarkup).join('')}
+        ${team.map((p,j)=>randomizerMemberMarkup(p,(j*RANDOMIZER_TEAM_COUNT)+i)).join('')}
       </div>
     </div>
   `).join('');
@@ -4656,7 +4661,7 @@ function renderRandomizer(){
   if(shouldReveal){
     requestAnimationFrame(()=>{
       board.classList.add('reveal');
-      setTimeout(()=>board.classList.remove('reveal'),1400);
+      setTimeout(()=>board.classList.remove('reveal'),Math.max(2600, 900 + pool.length * 210));
     });
   }
   setRandomizerStatus(created ? `Последний расклад: ${created}` : 'Команды собраны','ok');
@@ -4766,6 +4771,9 @@ function applyInitialMode(){
 window.addEventListener('storage', e=>{
   if(e.key!==KEY || !e.newValue) return;
   try{
+    const h=hashData(e.newValue);
+    if(h===appLastExternalStateHash) return;
+    appLastExternalStateHash=h;
     DB=JSON.parse(e.newValue);
     normalizeDB();
     refreshAll();
@@ -4972,7 +4980,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // ─── CLOUD SYNC / BACKUP ───────────────────────────────────
 const SYNC_KEY = 'draft_mm_sync_config_v1';
 const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
-const SYNC_POLL_MS = 4500;
+const SYNC_POLL_MS = 1800;
 const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
