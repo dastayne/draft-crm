@@ -6903,7 +6903,7 @@ async function initCloudSync(force=false){
         syncLastHash = hashData(DB);
       } else {
         syncApplyingRemote=true;
-        DB = pendingNow ? mergeCloudState(data.data, localForMerge) : data.data;
+        DB = mergeCloudState(data.data, localForMerge);
         normalizeDB(); saveLocal(); refreshAll();
         syncApplyingRemote=false;
         syncLastHash = hashData(DB);
@@ -7103,15 +7103,56 @@ function exportData(){
   toast('Аварийный бэкап скачан');
 }
 function importData(){ document.getElementById('backup-input')?.click(); }
+function prepareBackupForRestore(data){
+  DB=deep(data);
+  normalizeDB();
+  const ts=Date.now();
+  DB._deleted={participants:{},prospects:{},orgs:{}};
+  [DB.participants,DB.prospects,DB.orgs].forEach(arr=>{
+    (arr||[]).forEach(item=>{
+      item._updatedAt=ts;
+      if(item.photo) item.photoUpdatedAt=Math.max(+item.photoUpdatedAt||0,ts);
+    });
+  });
+  if(DB.randomizer && typeof DB.randomizer === 'object') DB.randomizer._updatedAt=ts;
+  if(DB.timer && typeof DB.timer === 'object') DB.timer._updatedAt=ts;
+  DB._updatedAt=ts;
+}
+async function restoreBackupData(data){
+  clearTimeout(syncSaveTimer);
+  syncSaveTimer=null;
+  prepareBackupForRestore(data);
+  syncApplyingRemote=true;
+  saveLocal();
+  broadcastAppState('restore-backup');
+  refreshAll();
+  syncApplyingRemote=false;
+  markPendingCloudSave();
+  setSyncStatus('Восстанавливаю','syncing');
+  let pushed=false;
+  if(syncConfig){
+    if(!window.supabase) await ensureSupabaseSdk();
+    if(!syncClient) syncClient=makeSyncClient();
+    pushed=await pushCloudNow(false);
+  }
+  if(pushed){
+    toast(`Бэкап восстановлен: ${DB.participants.length} участников, отправлено в Supabase`);
+  } else {
+    toast(`Бэкап восстановлен локально: ${DB.participants.length} участников. Синк в очереди`);
+  }
+}
 function onBackupSelected(e){
   const file=e.target.files?.[0]; if(!file)return;
   const reader=new FileReader();
-  reader.onload=ev=>{
+  reader.onload=async ev=>{
     try{
       const data=JSON.parse(ev.target.result);
       if(!data || !Array.isArray(data.participants) || !Array.isArray(data.orgs)) throw new Error('bad json');
-      if(!confirm('Заменить текущие данные данными из бэкапа?')) return;
-      DB=data; normalizeDB(); save(); refreshAll(); toast('Бэкап загружен');
+      if(!confirm('Заменить текущие данные данными из бэкапа и принудительно восстановить их в Supabase?')){
+        e.target.value='';
+        return;
+      }
+      await restoreBackupData(data);
     }catch(err){ toast('Не понял JSON-файл'); }
     e.target.value='';
   };
