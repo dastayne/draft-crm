@@ -3348,16 +3348,20 @@ let _prid = 1;
 
 function normalizeDB(){
   if(!DB || typeof DB !== 'object') DB = deep(DEFAULTS);
+  if(typeof DB._updatedAt === 'undefined') DB._updatedAt = 0;
   if(!DB.settings) DB.settings = deep(DEFAULTS.settings);
   if(!DB.randomizer || typeof DB.randomizer !== 'object') DB.randomizer = {teams:[], createdAt:''};
   if(!Array.isArray(DB.randomizer.teams)) DB.randomizer.teams = [];
   if(typeof DB.randomizer.createdAt === 'undefined') DB.randomizer.createdAt = '';
+  if(typeof DB.randomizer._updatedAt === 'undefined') DB.randomizer._updatedAt = 0;
   if(!Array.isArray(DB.participants)) DB.participants = [];
   if(!Array.isArray(DB.prospects)) DB.prospects = [];
   if(!Array.isArray(DB.orgs)) DB.orgs = [];
   [DB.participants, DB.prospects, DB.orgs].forEach(arr => arr.forEach(x => {
     if(typeof x.top === 'undefined') x.top = false;
     if(typeof x.photo === 'undefined') x.photo = '';
+    if(typeof x.photoPath === 'undefined') x.photoPath = '';
+    if(typeof x._updatedAt === 'undefined') x._updatedAt = 0;
   }));
   _pid = Math.max(0,...DB.participants.map(x=>+x.id||0),0)+1;
   _oid = Math.max(0,...DB.orgs.map(x=>+x.id||0),0)+1;
@@ -3365,9 +3369,25 @@ function normalizeDB(){
 }
 normalizeDB();
 
+function touchRecord(item){
+  const ts=Date.now();
+  if(item && typeof item === 'object') item._updatedAt=ts;
+  DB._updatedAt=ts;
+  return ts;
+}
+function touchDB(){
+  DB._updatedAt=Date.now();
+  return DB._updatedAt;
+}
 function saveLocal(){
-  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
-  catch(e){ toast('⚠ Хранилище переполнено — удали лишние фото'); }
+  try{
+    localStorage.setItem(KEY, JSON.stringify(DB));
+    return true;
+  } catch(e){
+    console.error(e);
+    toast('⚠ Хранилище переполнено — изменения уйдут в облако, но нужно облегчить фото');
+    return false;
+  }
 }
 let appMode = 'gate';
 let randomizerLastRenderedCreatedAt = '';
@@ -3394,10 +3414,11 @@ function broadcastAppState(reason='update'){
   } catch {}
 }
 function save(){
-  saveLocal();
+  const localSaved=saveLocal();
   broadcastAppState('save');
   markPendingCloudSave();
   scheduleCloudSave();
+  return localSaved;
 }
 function nextRecordId(arr){
   const maxId=Math.max(0,...(arr||[]).map(x=>+x.id||0),0);
@@ -3705,6 +3726,7 @@ function toggleTop(type,id){
   const item=arr.find(x=>x.id===id);
   if(!item)return;
   item.top=!item.top;
+  touchRecord(item);
   save();
   if(type==='participant') renderParticipants();
   if(type==='prospect') renderProspects();
@@ -3733,11 +3755,13 @@ function sortItems(list,type,sort){
 function deleteProspect(id){
   if(!confirm('Удалить потенциального участника?'))return;
   DB.prospects=DB.prospects.filter(x=>x.id!==id);
+  touchDB();
   save(); renderProspects(); updateAnalytics(); toast('Удалено');
 }
 function deleteOrg(id){
   if(!confirm('Удалить организатора?'))return;
   DB.orgs=DB.orgs.filter(x=>x.id!==id);
+  touchDB();
   save(); renderOrgs(); updateAnalytics(); toast('Удалено');
 }
 function renderParticipants(){
@@ -3817,13 +3841,14 @@ function renderParticipants(){
         document.querySelectorAll('#p-list .p-table-row').forEach(c=>c.classList.remove('drag-over'));
         row.classList.add('drag-over');
       });
-      row.addEventListener('drop', e=>{
+    row.addEventListener('drop', e=>{
         e.preventDefault();
         const tgtIdx=DB.participants.indexOf(p);
         if(dragSrcIdx===null||dragSrcIdx===tgtIdx)return;
         const [moved]=DB.participants.splice(dragSrcIdx,1);
         DB.participants.splice(tgtIdx,0,moved);
         dragSrcIdx=null;
+        touchDB();
         save(); renderParticipants(); pulsePlacedRow('participants',moved.id);
       });
     }
@@ -3926,6 +3951,7 @@ function updateP(id,field,val){
   const p=DB.participants.find(x=>x.id===id);
   if(!p)return;
   p[field]=val;
+  touchRecord(p);
   save(); updateAnalytics();
   document.getElementById('badge-p').textContent=DB.participants.length;
 }
@@ -3935,17 +3961,64 @@ function cycleStatus(id){
   if(!p)return;
   const c=['','paid','waiting','canceled'];
   p.status=c[(c.indexOf(p.status)+1)%c.length];
+  touchRecord(p);
   save(); renderParticipants();
 }
 
 function deleteP(id){
   if(!confirm('Удалить участника?'))return;
   DB.participants=DB.participants.filter(x=>x.id!==id);
+  touchDB();
   save(); renderParticipants();
   toast('Участник удалён');
 }
 
 // ─── PHOTO / CROP EDITOR ─────────────────────────────────────
+const PHOTO_BUCKET = 'draft-photos';
+
+function dataUrlToBlob(dataUrl){
+  const parts=dataUrl.split(',');
+  const meta=parts[0]||'';
+  const mime=(meta.match(/data:([^;]+)/)||[])[1] || 'image/jpeg';
+  const bin=atob(parts[1]||'');
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new Blob([bytes],{type:mime});
+}
+function photoStoragePath(type,id){
+  const folder=type==='org' ? 'orgs' : 'participants';
+  return `${folder}/${id}-${Date.now()}.jpg`;
+}
+async function uploadPhotoToStorage(type,id,dataUrl){
+  if(!syncConfig) return null;
+  if(!window.supabase){
+    const sdkReady=await ensureSupabaseSdk();
+    if(!sdkReady) return null;
+  }
+  if(!syncClient) syncClient=makeSyncClient();
+  if(!syncClient) return null;
+  const path=photoStoragePath(type,id);
+  const blob=dataUrlToBlob(dataUrl);
+  const {error}=await syncClient.storage
+    .from(PHOTO_BUCKET)
+    .upload(path,blob,{contentType:'image/jpeg',upsert:true});
+  if(error) throw error;
+  const {data}=syncClient.storage.from(PHOTO_BUCKET).getPublicUrl(path);
+  return {path,url:data?.publicUrl||''};
+}
+async function removePhotoFromStorage(path){
+  if(!path || !syncConfig) return;
+  try{
+    if(!window.supabase){
+      const sdkReady=await ensureSupabaseSdk();
+      if(!sdkReady) return;
+    }
+    if(!syncClient) syncClient=makeSyncClient();
+    if(syncClient) await syncClient.storage.from(PHOTO_BUCKET).remove([path]);
+  } catch(err){
+    console.warn('Не удалось удалить фото из Storage',err);
+  }
+}
 function getPhotoEntity(type,id){
   const list = type === 'org' ? DB.orgs : DB.participants;
   return list.find(x=>x.id===id);
@@ -3973,14 +4046,18 @@ function triggerPhoto(id,type='participant'){
   inp.click();
 }
 
-function deletePhoto(id,type='participant'){
+async function deletePhoto(id,type='participant'){
   const p=getPhotoEntity(type,id);
   if(!p || !p.photo){ toast('Фото уже нет'); return; }
   if(!confirm('Удалить фото?')) return;
+  const oldPath=p.photoPath||'';
   p.photo='';
+  p.photoPath='';
   p.photoUpdatedAt=Date.now();
+  touchRecord(p);
   refreshPhotoEntity(p,type);
   save();
+  if(oldPath) removePhotoFromStorage(oldPath);
   if(syncReady && syncClient){
     clearTimeout(syncSaveTimer);
     setSyncStatus('Сохраняю','syncing');
@@ -4106,7 +4183,7 @@ function cancelCrop(){
   cropState={img:null,x:0,y:0,scale:1,minScale:1,dragging:false,lastX:0,lastY:0};
 }
 
-function saveCrop(){
+async function saveCrop(){
   const img=cropState.img;
   if(!img || !photoTargetId){ cancelCrop(); return; }
   const srcCv=document.getElementById('crop-canvas');
@@ -4122,11 +4199,33 @@ function saveCrop(){
   const targetType=photoTargetType || 'participant';
   const p=getPhotoEntity(targetType,photoTargetId);
   if(p){
+    const oldPath=p.photoPath||'';
     p.photo=data;
+    p.photoPath='';
     p.photoUpdatedAt=Date.now();
+    touchRecord(p);
     document.getElementById('crop-overlay').classList.remove('open');
     document.getElementById('photo-input').value='';
     refreshPhotoEntity(p,targetType);
+    let storageSaved=false;
+    if(syncConfig){
+      try{
+        setSyncStatus('Фото...','syncing');
+        const uploaded=await uploadPhotoToStorage(targetType,p.id,data);
+        if(uploaded?.url){
+          p.photo=uploaded.url;
+          p.photoPath=uploaded.path;
+          p.photoUpdatedAt=Date.now();
+          touchRecord(p);
+          storageSaved=true;
+          refreshPhotoEntity(p,targetType);
+          if(oldPath) removePhotoFromStorage(oldPath);
+        }
+      } catch(err){
+        console.error(err);
+        toast('Storage не принял фото, сохраню локально');
+      }
+    }
     save();
     if(syncReady && syncClient){
       clearTimeout(syncSaveTimer);
@@ -4135,7 +4234,7 @@ function saveCrop(){
     }
     photoTargetId=null;
     photoTargetType='participant';
-    toast('Фото обновлено');
+    toast(storageSaved ? 'Фото загружено в Storage' : 'Фото обновлено');
   } else {
     cancelCrop();
   }
@@ -4281,6 +4380,7 @@ function renderProspects(){
         const [moved]=DB.prospects.splice(dragSrcProspectIdx,1);
         DB.prospects.splice(tgtIdx,0,moved);
         dragSrcProspectIdx=null;
+        touchDB();
         save(); renderProspects(); pulsePlacedRow('prospects',moved.id);
       });
     }
@@ -4298,14 +4398,16 @@ function cyclePr(id){
   const p=DB.prospects.find(x=>x.id===id); if(!p)return;
   const c=['','sent','replied','yes','no'];
   p.status=c[(c.indexOf(p.status||'')+1)%c.length];
+  touchRecord(p);
   save(); renderProspects(); updateAnalytics();
 }
 function movePrToP(id){
   const p=DB.prospects.find(x=>x.id===id); if(!p)return;
   const tgt=DB.settings.targetCount||40;
   if(DB.participants.length>=tgt){toast('Места заполнены!');return;}
-  DB.participants.push({id:nextRecordId(DB.participants),name:p.name,phone:'',instagram:p.contact||'',amount:0,status:'',comment:p.comment||'',photo:'',top:!!p.top});
+  DB.participants.push({id:nextRecordId(DB.participants),name:p.name,phone:'',instagram:p.contact||'',amount:0,status:'',comment:p.comment||'',photo:'',photoPath:'',top:!!p.top,_updatedAt:Date.now()});
   DB.prospects=DB.prospects.filter(x=>x.id!==id);
+  touchDB();
   save(); renderProspects(); renderParticipants(); updateAnalytics();
   toast(`${p.name} добавлен в участники`);
 }
@@ -4475,6 +4577,7 @@ function renderOrgs(){
         const [moved]=DB.orgs.splice(dragSrcOrgIdx,1);
         DB.orgs.splice(tgtIdx,0,moved);
         dragSrcOrgIdx=null;
+        touchDB();
         save(); renderOrgs(); pulsePlacedRow('orgs',moved.id);
       });
     }
@@ -4490,7 +4593,7 @@ function renderOrgs(){
 
 function toggleNotif(id){
   const o=DB.orgs.find(x=>x.id===id); if(!o)return;
-  o.notified=!o.notified; save(); renderOrgs(); updateAnalytics();
+  o.notified=!o.notified; touchRecord(o); save(); renderOrgs(); updateAnalytics();
   toast(o.notified?'Уведомлён':'Снято уведомление');
 }
 function ctxOrg(e,id){
@@ -4718,14 +4821,17 @@ function randomizeTeams(){
   DB.randomizer={
     createdAt:new Date().toISOString(),
     teams:teams.map(team=>team.map(p=>p.id)),
-    lockedPair:RANDOMIZER_LOCKED_NAMES
+    lockedPair:RANDOMIZER_LOCKED_NAMES,
+    _updatedAt:Date.now()
   };
+  touchDB();
   save();
   renderRandomizer();
   toast('Команды собраны');
 }
 function resetRandomizer(){
-  DB.randomizer={teams:[],createdAt:''};
+  DB.randomizer={teams:[],createdAt:'',_updatedAt:Date.now()};
+  touchDB();
   save();
   renderRandomizer();
   toast('Расклад сброшен');
@@ -4953,22 +5059,35 @@ function saveModal(){
   if(!name){toast('Введи имя!');return;}
   if(_modalType==='participant'){
     const d={name,phone:v('f-phone'),instagram:v('f-ig'),amount:+v('f-amt')||0,status:v('f-status'),top:v('f-top')==='1',comment:v('f-comment')};
-    if(_modalEdit){ Object.assign(DB.participants.find(x=>x.id===_modalEdit.id),d); }
+    if(_modalEdit){
+      const item=DB.participants.find(x=>x.id===_modalEdit.id);
+      Object.assign(item,d);
+      touchRecord(item);
+    }
     else {
       const tgt=DB.settings.targetCount||40;
       if(DB.participants.length>=tgt){toast('Места заполнены!');return;}
-      DB.participants.push({id:nextRecordId(DB.participants),photo:'',...d});
+      DB.participants.push({id:nextRecordId(DB.participants),photo:'',photoPath:'',_updatedAt:Date.now(),...d});
+      touchDB();
     }
     save();renderParticipants();
   } else if(_modalType==='prospect'){
     const d={name,contact:v('f-contact'),status:v('f-pstatus'),top:v('f-top')==='1',comment:v('f-comment')};
-    if(_modalEdit){ Object.assign(DB.prospects.find(x=>x.id===_modalEdit.id),d); }
-    else { DB.prospects.push({id:nextRecordId(DB.prospects),...d}); }
+    if(_modalEdit){
+      const item=DB.prospects.find(x=>x.id===_modalEdit.id);
+      Object.assign(item,d);
+      touchRecord(item);
+    }
+    else { DB.prospects.push({id:nextRecordId(DB.prospects),_updatedAt:Date.now(),...d}); touchDB(); }
     save();renderProspects();
   } else if(_modalType==='org'){
     const d={name,phone:v('f-phone'),instagram:v('f-ig'),notified:v('f-notif')==='1',comment:v('f-comment')};
-    if(_modalEdit){ Object.assign(DB.orgs.find(x=>x.id===_modalEdit.id),d); }
-    else { DB.orgs.push({id:nextRecordId(DB.orgs),photo:'',...d}); }
+    if(_modalEdit){
+      const item=DB.orgs.find(x=>x.id===_modalEdit.id);
+      Object.assign(item,d);
+      touchRecord(item);
+    }
+    else { DB.orgs.push({id:nextRecordId(DB.orgs),photo:'',photoPath:'',_updatedAt:Date.now(),...d}); touchDB(); }
     save();renderOrgs();
   }
   closeModal(); updateAnalytics(); toast('Сохранено ✓');
@@ -5060,7 +5179,7 @@ function applyRemoteState(next,{silent=false,updatedAt=''}={}){
   const h=hashData(next);
   if(h===syncLastHash) return false;
   syncApplyingRemote=true;
-  DB=next;
+  DB=mergeCloudState(next,DB);
   normalizeDB();
   saveLocal();
   refreshAll();
@@ -5071,13 +5190,25 @@ function applyRemoteState(next,{silent=false,updatedAt=''}={}){
   if(!silent) toast('Обновлено с другого устройства');
   return true;
 }
+function recordUpdatedAt(item){
+  return Math.max(+item?._updatedAt||0,+item?.photoUpdatedAt||0);
+}
+function newestObject(remoteObj={}, localObj={}){
+  const r=+remoteObj?._updatedAt||0;
+  const l=+localObj?._updatedAt||0;
+  return l>r ? deep(localObj) : deep(remoteObj);
+}
 function mergeArrayById(remoteArr=[], localArr=[]){
   const result=(Array.isArray(remoteArr)?remoteArr:[]).map(x=>deep(x));
   const pos=new Map(result.map((x,i)=>[String(x.id),i]));
   (Array.isArray(localArr)?localArr:[]).forEach(item=>{
     const key=String(item.id);
     if(pos.has(key)){
-      result[pos.get(key)]={...result[pos.get(key)],...deep(item)};
+      const i=pos.get(key);
+      const remoteItem=result[i];
+      result[i]=recordUpdatedAt(item)>recordUpdatedAt(remoteItem)
+        ? {...deep(remoteItem),...deep(item)}
+        : {...deep(item),...deep(remoteItem)};
     } else {
       result.push(deep(item));
     }
@@ -5088,11 +5219,12 @@ function mergeCloudState(remote, local){
   const base=remote && typeof remote==='object' ? remote : {};
   const mine=local && typeof local==='object' ? local : {};
   return {
+    _updatedAt:Math.max(+base._updatedAt||0,+mine._updatedAt||0),
     settings:{...(base.settings||{}),...(mine.settings||{})},
     participants:mergeArrayById(base.participants,mine.participants),
     orgs:mergeArrayById(base.orgs,mine.orgs),
     prospects:mergeArrayById(base.prospects,mine.prospects),
-    randomizer:{...(base.randomizer||{}),...(mine.randomizer||{})}
+    randomizer:newestObject(base.randomizer||{},mine.randomizer||{})
   };
 }
 function setSyncStatus(text, state='local'){

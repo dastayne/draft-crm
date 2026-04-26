@@ -33,4 +33,59 @@ values ('main', '{}'::jsonb)
 on conflict (id) do nothing;
 
 -- Включает realtime-события для таблицы.
-alter publication supabase_realtime add table public.draft_crm_state;
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'draft_crm_state'
+  ) then
+    alter publication supabase_realtime add table public.draft_crm_state;
+  end if;
+end $$;
+
+-- Storage для фотографий. Фото хранятся отдельно, а в JSON остаётся только ссылка.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'draft-photos',
+  'draft-photos',
+  true,
+  5242880,
+  array['image/jpeg','image/png','image/webp']
+)
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "draft_photos_read" on storage.objects;
+drop policy if exists "draft_photos_insert" on storage.objects;
+drop policy if exists "draft_photos_update" on storage.objects;
+drop policy if exists "draft_photos_delete" on storage.objects;
+
+create policy "draft_photos_read"
+  on storage.objects
+  for select
+  to anon
+  using (bucket_id = 'draft-photos');
+
+create policy "draft_photos_insert"
+  on storage.objects
+  for insert
+  to anon
+  with check (bucket_id = 'draft-photos');
+
+create policy "draft_photos_update"
+  on storage.objects
+  for update
+  to anon
+  using (bucket_id = 'draft-photos')
+  with check (bucket_id = 'draft-photos');
+
+create policy "draft_photos_delete"
+  on storage.objects
+  for delete
+  to anon
+  using (bucket_id = 'draft-photos');
