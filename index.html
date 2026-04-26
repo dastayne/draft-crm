@@ -3564,14 +3564,36 @@ function touchDB(){
   DB._updatedAt=Date.now();
   return DB._updatedAt;
 }
+function dbForStorage(){
+  // Клонируем DB, но вычищаем base64 у записей у которых уже есть URL в Storage
+  const clone = deep(DB);
+  const clean = arr => (arr||[]).forEach(x => {
+    if(x.photoPath && x.photo && x.photo.startsWith('data:')) x.photo = '';
+  });
+  clean(clone.participants);
+  clean(clone.orgs);
+  clean(clone.prospects);
+  return clone;
+}
 function saveLocal(){
   try{
-    localStorage.setItem(KEY, JSON.stringify(DB));
+    localStorage.setItem(KEY, JSON.stringify(dbForStorage()));
     return true;
   } catch(e){
     console.error(e);
-    toast('⚠ Хранилище переполнено — изменения уйдут в облако, но нужно облегчить фото');
-    return false;
+    // Если всё равно не влезло — пробуем агрессивную чистку: убираем все base64
+    try{
+      const clone = deep(DB);
+      const strip = arr => (arr||[]).forEach(x => { if(x.photo?.startsWith('data:')) x.photo=''; });
+      strip(clone.participants); strip(clone.orgs); strip(clone.prospects);
+      localStorage.setItem(KEY, JSON.stringify(clone));
+      toast('⚠ Base64-фото убраны из локального кэша, фото грузятся из облака');
+      return true;
+    } catch(e2){
+      console.error(e2);
+      toast('⚠ Локальное хранилище переполнено — данные в облаке в порядке');
+      return false;
+    }
   }
 }
 let appMode = 'gate';
@@ -5300,7 +5322,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 // ─── CLOUD SYNC / BACKUP ───────────────────────────────────
 const SYNC_KEY = 'draft_mm_sync_config_v1';
 const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
-const SYNC_POLL_MS = 1800;
+const SYNC_POLL_MS = 500;
 const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
@@ -5400,20 +5422,19 @@ function newestObject(remoteObj={}, localObj={}){
   return l>r ? deep(localObj) : deep(remoteObj);
 }
 function mergeArrayById(remoteArr=[], localArr=[]){
-  const result=(Array.isArray(remoteArr)?remoteArr:[]).map(x=>deep(x));
-  const pos=new Map(result.map((x,i)=>[String(x.id),i]));
-  (Array.isArray(localArr)?localArr:[]).forEach(item=>{
+  // Порядок берём из локального — он главный
+  const remoteMap=new Map((Array.isArray(remoteArr)?remoteArr:[]).map(x=>[String(x.id),deep(x)]));
+  const result=(Array.isArray(localArr)?localArr:[]).map(item=>{
     const key=String(item.id);
-    if(pos.has(key)){
-      const i=pos.get(key);
-      const remoteItem=result[i];
-      result[i]=recordUpdatedAt(item)>recordUpdatedAt(remoteItem)
-        ? {...deep(remoteItem),...deep(item)}
-        : {...deep(item),...deep(remoteItem)};
-    } else {
-      result.push(deep(item));
-    }
+    const remoteItem=remoteMap.get(key);
+    remoteMap.delete(key);
+    if(!remoteItem) return deep(item);
+    return recordUpdatedAt(item)>recordUpdatedAt(remoteItem)
+      ? {...deep(remoteItem),...deep(item)}
+      : {...deep(item),...deep(remoteItem)};
   });
+  // Новые записи из remote которых нет локально — добавляем в конец
+  remoteMap.forEach(item=>result.push(deep(item)));
   return result;
 }
 function mergeCloudState(remote, local){
