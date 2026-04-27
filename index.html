@@ -5000,7 +5000,7 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
       </div>
       <div class="jury-ideas" id="jury-ideas"></div>
       <div class="jury-actions">
-        <button class="btn btn-ghost btn-sm" type="button" onclick="addJuryIdea()">+ Идея</button>
+        <button class="btn btn-ghost btn-sm" id="jury-add-idea-btn" type="button" onclick="addJuryIdea()">+ Идея</button>
         <button class="btn btn-solid btn-sm" type="button" onclick="submitJuryScores()">Отправить оценки</button>
       </div>
       <div class="jury-status" id="jury-status"></div>
@@ -5277,7 +5277,8 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
       <span class="sec-actions-note" id="pitch-note">Жюри · идеи · средний балл</span>
       <div class="pitch-admin-actions">
         <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
-        <button class="btn btn-ghost btn-sm" type="button" onclick="exportPitchCsv()">⇩ Таблица</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="exportPitchExcel()">⇩ Excel</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="printPitchPdf()">▤ PDF</button>
         <button class="btn btn-ghost btn-sm" type="button" onclick="resetPitchScores()">Сброс оценок</button>
         <button class="btn btn-solid btn-sm" type="button" onclick="openJurySite()">Открыть жюри</button>
       </div>
@@ -5307,6 +5308,8 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
       <span class="sec-actions-note" id="pitchboard-note">Live · средний балл жюри</span>
       <button class="btn btn-ghost btn-sm event-screen-btn" onclick="fullscreenPitchboard()"><span class="btn-ico">⛶</span>Во весь экран</button>
       <button class="btn btn-ghost btn-sm event-screen-btn" onclick="openPitchboardPresentation()"><span class="btn-ico">▣</span>На экран</button>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="exportPitchExcel()">⇩ Excel</button>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="printPitchPdf()">▤ PDF</button>
       <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
     </div>
   </div>
@@ -8319,6 +8322,7 @@ let pitchChannel = null;
 let pitchReloadTimer = null;
 let pitchOpenDetails = new Set();
 let pitchPublicRpcAvailable = true;
+let juryIdeaCreateInFlight = false;
 
 function isJuryHost(){
   const params=new URLSearchParams(window.location.search);
@@ -8333,6 +8337,7 @@ function hydratePitchPublicCache(){
     if(!cached || !Array.isArray(cached.teams) || !Array.isArray(cached.ideas)) return false;
     pitchState.teams=cached.teams;
     pitchState.ideas=cached.ideas;
+    if(!document.body.classList.contains('jury-mode') && Array.isArray(cached.scores)) pitchState.scores=cached.scores;
     if(!pitchState.selectedTeamId || !pitchState.teams.some(t=>String(t.id)===String(pitchState.selectedTeamId))){
       pitchState.selectedTeamId=pitchState.teams[0]?.id || '';
     }
@@ -8344,13 +8349,15 @@ function hydratePitchPublicCache(){
     return false;
   }
 }
-function cachePitchPublicData(){
+function cachePitchPublicData(includeScores=false){
   try{
-    localStorage.setItem(PITCH_PUBLIC_CACHE_KEY,JSON.stringify({
+    const payload={
       teams:pitchState.teams,
       ideas:pitchState.ideas,
       savedAt:Date.now()
-    }));
+    };
+    if(includeScores) payload.scores=pitchState.scores;
+    localStorage.setItem(PITCH_PUBLIC_CACHE_KEY,JSON.stringify(payload));
   }catch{}
 }
 async function fullscreenPitchboard(){
@@ -8411,6 +8418,12 @@ function pitchIdeasForTeam(teamId){
   return pitchState.ideas
     .filter(idea=>String(idea.team_id)===String(teamId))
     .sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+}
+function uniquePitchIdeaCount(ideas){
+  return new Set((ideas||[]).map(idea=>String(idea.sort_order || idea.title || idea.id))).size;
+}
+function nextPitchIdeaOrder(ideas){
+  return Math.max(0,...(ideas||[]).map(idea=>+idea.sort_order||0)) + 1;
 }
 function pitchScoresForIdea(ideaId){
   return pitchState.scores.filter(score=>String(score.idea_id)===String(ideaId));
@@ -8493,6 +8506,7 @@ async function loadPitchData(silent=true){
       const scoresRes=await supabaseQuery(client.from('pitch_scores').select('id,team_id,idea_id,judge_name,score,updated_at').order('updated_at',{ascending:false}),'Данные долго грузятся');
       if(scoresRes.error) throw scoresRes.error;
       pitchState.scores=scoresRes.data||[];
+      cachePitchPublicData(true);
       renderPitchAdmin();
       renderPitchDashboard();
     }
@@ -8774,41 +8788,223 @@ function renderPitchDashboard(){
   </div>
   <div class="pitchboard-grid">${cards}</div>`;
 }
-function csvCell(value){
-  const text=String(value ?? '');
-  return /[;"\n\r]/.test(text) ? `"${text.replace(/"/g,'""')}"` : text;
+function reportEsc(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
-function exportPitchCsv(){
+function pitchReportJudges(){
+  return [...new Set(
+    pitchState.scores
+      .map(v=>(v.judge_name||'').trim())
+      .filter(Boolean)
+  )].sort((a,b)=>a.localeCompare(b,'ru'));
+}
+function pitchReportVoteMap(ideaId){
+  const byJudge=new Map();
+  pitchScoresForIdea(ideaId)
+    .slice()
+    .sort((a,b)=>String(a.updated_at||'').localeCompare(String(b.updated_at||'')))
+    .forEach(v=>{
+      const judge=(v.judge_name||'').trim();
+      const score=+v.score||0;
+      if(judge && score>0) byJudge.set(judge,score);
+    });
+  return byJudge;
+}
+function pitchReportTeamData(team, judges){
+  const rows=pitchIdeasForTeam(team.id).map(idea=>{
+    const votes=pitchReportVoteMap(idea.id);
+    const scores=judges.map(judge=>votes.get(judge)||0);
+    const filled=scores.filter(Boolean);
+    const avg=filled.length ? Math.round((filled.reduce((sum,v)=>sum+v,0)/filled.length)*10)/10 : null;
+    return {idea,votes,scores,avg,voteCount:filled.length};
+  });
+  const voted=rows.filter(row=>row.avg!==null);
+  const avg=voted.length ? Math.round((voted.reduce((sum,row)=>sum+row.avg,0)/voted.length)*10)/10 : null;
+  const sum=voted.length ? Math.round(voted.reduce((total,row)=>total+row.avg,0)*10)/10 : null;
+  const totalVotes=rows.reduce((total,row)=>total+row.voteCount,0);
+  return {team,rows,avg,sum,totalVotes};
+}
+function pitchReportFilename(ext){
+  const date=new Date().toISOString().slice(0,10);
+  return `draft-jury-scores-${date}.${ext}`;
+}
+function buildPitchReportHtml(mode='excel'){
   if(!pitchState.teams.length){
+    return '';
+  }
+  const judges=pitchReportJudges();
+  const teams=pitchState.teams
+    .slice()
+    .sort((a,b)=>(a.sort_order||0)-(b.sort_order||0) || String(a.name).localeCompare(String(b.name),'ru'))
+    .map(team=>pitchReportTeamData(team,judges));
+  const allIdeas=teams.flatMap(team=>team.rows.map(row=>({
+    team:team.team,
+    idea:row.idea,
+    avg:row.avg,
+    voteCount:row.voteCount
+  })));
+  const scoredIdeas=allIdeas
+    .filter(item=>item.avg!==null)
+    .sort((a,b)=>b.avg-a.avg || b.voteCount-a.voteCount || String(a.team.name).localeCompare(String(b.team.name),'ru'));
+  const totalVotes=teams.reduce((sum,team)=>sum+team.totalVotes,0);
+  const overall=scoredIdeas.length ? Math.round((scoredIdeas.reduce((sum,item)=>sum+item.avg,0)/scoredIdeas.length)*10)/10 : null;
+  const generated=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const topHtml=scoredIdeas.slice(0,3).map((item,index)=>`
+    <div class="top-card">
+      <div class="top-medal">${['1','2','3'][index]}</div>
+      <div>
+        <b>${reportEsc(item.idea.title)} · ${reportEsc(item.team.name)}</b>
+        <span>${pitchScoreLabel(item.avg)} средний балл · ${item.voteCount} голосов</span>
+      </div>
+    </div>`).join('') || '<div class="muted">Пока нет оцененных идей</div>';
+  const teamSections=teams.map(teamData=>{
+    const headerCells=judges.map(judge=>`<th class="judge">${reportEsc(judge)}</th>`).join('');
+    const rows=teamData.rows.map(row=>`
+      <tr>
+        <td class="idea-name">${reportEsc(row.idea.title)}</td>
+        ${judges.map((judge,index)=>`<td class="score">${row.scores[index] || '—'}</td>`).join('')}
+        <td class="votes">${row.voteCount}</td>
+        <td class="avg">${row.avg===null ? '—' : pitchScoreLabel(row.avg)}</td>
+      </tr>`).join('');
+    const totalColspan=Math.max(1,1+judges.length);
+    return `<section class="team-section">
+      <div class="team-head">
+        <div>
+          <div class="team-kicker">Команда</div>
+          <h2>${reportEsc(teamData.team.name)}</h2>
+        </div>
+        <div class="team-score">${pitchScoreLabel(teamData.avg)}</div>
+      </div>
+      <div class="team-summary">
+        <span>Сумма средних: <b>${teamData.sum===null ? '—' : pitchScoreLabel(teamData.sum)}</b></span>
+        <span>Средний балл команды: <b>${pitchScoreLabel(teamData.avg)}</b></span>
+        <span>Голосов: <b>${teamData.totalVotes}</b></span>
+        <span>${teamData.team.voting_closed ? 'Голосование закрыто' : 'Голосование открыто'}</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="idea-col">Идея</th>
+            ${headerCells}
+            <th>Голосов</th>
+            <th>Средний</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows || `<tr><td colspan="${3+judges.length}" class="empty">Идей пока нет</td></tr>`}
+          <tr class="total-row">
+            <td colspan="${totalColspan}">Сумма по команде</td>
+            <td>${teamData.totalVotes}</td>
+            <td>${teamData.sum===null ? '—' : pitchScoreLabel(teamData.sum)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>`;
+  }).join('');
+  const printScript=mode==='pdf' ? `<script>window.addEventListener('load',()=>setTimeout(()=>{window.focus();window.print();},350));<\/script>` : '';
+  return `<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Отчет оценок жюри · драфт</title>
+<style>
+  @page{size:A4 landscape;margin:12mm}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f4f6f2;color:#101210;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif;font-size:13px;line-height:1.35}
+  .report{padding:26px 30px 34px}
+  .hero{background:#0b0d0b;color:#f5f7f1;border-radius:20px;padding:26px 28px;margin-bottom:18px;position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-120px;top:-160px;width:420px;height:420px;background:radial-gradient(circle,rgba(98,191,74,.36),rgba(98,191,74,0) 64%);pointer-events:none}
+  .brand{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#90d97b;font-weight:800;margin-bottom:18px}
+  h1{margin:0;font-size:44px;line-height:.95;letter-spacing:-1.4px}
+  .meta{margin-top:10px;color:#aeb6ac;font-size:14px}
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+  .metric{background:#fff;border:1px solid #dfe6dc;border-radius:14px;padding:14px 16px}
+  .metric b{display:block;font-size:28px;line-height:1;color:#1e7d26;margin-bottom:5px}
+  .metric span{color:#697066;text-transform:uppercase;font-size:10px;letter-spacing:1px;font-weight:800}
+  .top{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 20px}
+  .top-card{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #dfe6dc;border-radius:14px;padding:12px 14px}
+  .top-medal{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#62bf4a;color:#092006;font-weight:900;flex:0 0 auto}
+  .top-card b{display:block;font-size:14px}
+  .top-card span,.muted{display:block;color:#727a70;font-size:12px;margin-top:2px}
+  .team-section{background:#fff;border:1px solid #dfe6dc;border-radius:16px;padding:16px;margin:0 0 16px;break-inside:avoid;page-break-inside:avoid}
+  .team-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:8px}
+  .team-kicker{color:#7a8277;font-size:10px;letter-spacing:1.6px;text-transform:uppercase;font-weight:900}
+  h2{margin:2px 0 0;font-size:27px;line-height:1;color:#101210}
+  .team-score{font-size:34px;line-height:1;color:#62bf4a;font-weight:900}
+  .team-summary{display:flex;gap:10px;flex-wrap:wrap;margin:9px 0 12px;color:#5f665d}
+  .team-summary span{border:1px solid #e1e8df;border-radius:999px;padding:6px 10px;background:#f8faf7}
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #dce5d8;border-radius:12px;overflow:hidden}
+  th{background:#132312;color:#dff6d8;text-align:center;padding:10px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.9px;border-right:1px solid rgba(255,255,255,.12)}
+  th.idea-col{text-align:left;min-width:170px}
+  th.judge{min-width:82px}
+  td{padding:10px 8px;border-top:1px solid #e5ebe2;border-right:1px solid #edf2ea;text-align:center}
+  td.idea-name{text-align:left;font-weight:850;color:#111}
+  td.score{font-weight:850;color:#101210}
+  td.votes{color:#596257}
+  td.avg{font-weight:950;color:#1e7d26;font-size:15px}
+  tr:nth-child(even) td{background:#fbfcfa}
+  .total-row td{background:#eef8eb!important;font-weight:950;color:#12390f}
+  .empty{color:#7b8278;text-align:left}
+  @media print{body{background:#fff}.report{padding:0}.hero,.metric,.top-card,.team-section{box-shadow:none}.top-card{break-inside:avoid;page-break-inside:avoid}}
+</style>
+</head>
+<body>
+  <main class="report">
+    <section class="hero">
+      <div class="brand">драфт · отчет жюри</div>
+      <h1>Итоговая таблица оценок</h1>
+      <div class="meta">Сформировано ${reportEsc(generated)}</div>
+    </section>
+    <section class="summary">
+      <div class="metric"><b>${teams.length}</b><span>команд</span></div>
+      <div class="metric"><b>${pitchState.ideas.length}</b><span>идей</span></div>
+      <div class="metric"><b>${judges.length}</b><span>жюри</span></div>
+      <div class="metric"><b>${pitchScoreLabel(overall)}</b><span>средний балл</span></div>
+    </section>
+    <section class="top">${topHtml}</section>
+    ${teamSections}
+  </main>
+  ${printScript}
+</body>
+</html>`;
+}
+function exportPitchExcel(){
+  const html=buildPitchReportHtml('excel');
+  if(!html){
     toast('Нет команд для экспорта');
     return;
   }
-  const rows=[['Команда','Статус','Идея','Средний балл','Голосов','Жюри','Оценки']];
-  pitchState.teams.forEach(team=>{
-    pitchIdeasForTeam(team.id).forEach(idea=>{
-      const votes=pitchScoresForIdea(idea.id).sort((a,b)=>String(a.judge_name).localeCompare(String(b.judge_name),'ru'));
-      const avg=pitchAverage(idea.id);
-      rows.push([
-        team.name,
-        team.voting_closed ? 'Голосование закрыто' : 'Открыто',
-        idea.title,
-        avg===null ? '' : pitchScoreLabel(avg),
-        votes.length,
-        votes.map(v=>v.judge_name).join(', '),
-        votes.map(v=>`${v.judge_name}: ${v.score}`).join(' | ')
-      ]);
-    });
-  });
-  const csv='\uFEFF'+rows.map(row=>row.map(csvCell).join(';')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const blob=new Blob(['\uFEFF'+html],{type:'application/vnd.ms-excel;charset=utf-8'});
   const a=document.createElement('a');
-  const date=new Date().toISOString().slice(0,10);
   a.href=URL.createObjectURL(blob);
-  a.download='draft-pitch-results-'+date+'.csv';
+  a.download=pitchReportFilename('xls');
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
-  toast('Итоговая таблица скачана');
+  toast('Excel-отчет скачан');
+}
+function printPitchPdf(){
+  const html=buildPitchReportHtml('pdf');
+  if(!html){
+    toast('Нет команд для PDF');
+    return;
+  }
+  const popup=window.open('', 'draft-pitch-report', 'width=1280,height=900');
+  if(!popup){
+    toast('Браузер заблокировал PDF-окно');
+    return;
+  }
+  popup.document.open();
+  popup.document.write(html);
+  popup.document.close();
+}
+function exportPitchCsv(){
+  exportPitchExcel();
 }
 function selectJuryTeam(id){
   pitchState.selectedTeamId=id;
@@ -8835,11 +9031,13 @@ function renderJuryApp(){
   const teamSelect=document.getElementById('jury-team');
   const ideasEl=document.getElementById('jury-ideas');
   const statusEl=document.getElementById('jury-status');
+  const addBtn=document.getElementById('jury-add-idea-btn');
   if(nameInput && !nameInput.value) nameInput.value=localStorage.getItem(JURY_NAME_KEY)||'';
   if(!teamSelect || !ideasEl) return;
   if(!pitchState.teams.length){
     teamSelect.innerHTML='<option value="">Команды пока не добавлены</option>';
     ideasEl.innerHTML='<div class="pitch-empty">Попроси ведущего добавить команды в CRM.</div>';
+    if(addBtn) addBtn.disabled=true;
     return;
   }
   teamSelect.innerHTML=pitchState.teams.map(team=>`<option value="${team.id}" ${String(team.id)===String(pitchState.selectedTeamId)?'selected':''}>${esc(team.name)}${team.voting_closed?' · закрыто':''}</option>`).join('');
@@ -8849,6 +9047,10 @@ function renderJuryApp(){
   if(statusEl && closed) statusEl.textContent='Голосование по этой команде закрыто';
   else if(statusEl && statusEl.textContent==='Голосование по этой команде закрыто') statusEl.textContent='';
   const ideas=pitchIdeasForTeam(teamId);
+  if(addBtn){
+    addBtn.disabled=closed || juryIdeaCreateInFlight || uniquePitchIdeaCount(ideas)>=PITCH_MAX_IDEAS;
+    addBtn.textContent=juryIdeaCreateInFlight ? 'Добавляю...' : '+ Идея';
+  }
   ideasEl.innerHTML=ideas.map(idea=>{
     const selected=+pitchState.juryScores[String(idea.id)]||0;
     const buttons=Array.from({length:10},(_,i)=>{
@@ -8864,19 +9066,30 @@ function renderJuryApp(){
 async function addJuryIdea(){
   const teamId=pitchState.selectedTeamId;
   if(!teamId){toast('Сначала выбери команду');return;}
+  if(juryIdeaCreateInFlight){toast('Идея уже создаётся');return;}
   const team=pitchState.teams.find(t=>String(t.id)===String(teamId));
   if(team?.voting_closed){toast('Голосование по этой команде закрыто');return;}
   const ideas=pitchIdeasForTeam(teamId);
-  if(ideas.length>=PITCH_MAX_IDEAS){toast('Максимум 10 идей на команду');return;}
+  if(uniquePitchIdeaCount(ideas)>=PITCH_MAX_IDEAS){toast('Максимум 10 идей на команду');return;}
+  const next=nextPitchIdeaOrder(ideas);
+  if(next>PITCH_MAX_IDEAS){toast('Максимум 10 идей на команду');return;}
+  juryIdeaCreateInFlight=true;
+  renderJuryApp();
   try{
     const client=await ensurePitchClient();
-    const next=ideas.length+1;
-    const {error}=await supabaseQuery(client.from('pitch_ideas').insert({team_id:teamId,title:`Идея ${next}`,sort_order:next}),'Идея долго сохраняется');
+    const payload={team_id:teamId,title:`Идея ${next}`,sort_order:next};
+    const {error}=await supabaseQuery(
+      client.from('pitch_ideas').upsert(payload,{onConflict:'team_id,sort_order',ignoreDuplicates:true}),
+      'Идея долго сохраняется'
+    );
     if(error) throw error;
     await loadPitchData(true);
   } catch(err){
     console.error(err);
     toast('Не удалось добавить идею');
+  } finally {
+    juryIdeaCreateInFlight=false;
+    renderJuryApp();
   }
 }
 async function submitJuryScores(){
