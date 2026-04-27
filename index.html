@@ -1983,6 +1983,288 @@ body.event-mode .sync-pill.error{
   cursor:default;
   pointer-events:none;
 }
+.pitch-layout{
+  display:grid;
+  grid-template-columns:minmax(280px,360px) minmax(0,1fr);
+  gap:14px;
+}
+.pitch-panel{
+  background:var(--s1);
+  border:1px solid rgba(255,255,255,.08);
+  border-top:1px solid rgba(98,191,74,.24);
+  padding:16px;
+}
+.pitch-panel-title{
+  color:var(--white);
+  font-size:18px;
+  font-weight:850;
+  letter-spacing:0;
+  margin-bottom:12px;
+}
+.pitch-add-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  margin-bottom:14px;
+}
+.pitch-input{
+  width:100%;
+  height:42px;
+  border:1px solid rgba(255,255,255,.09);
+  background:#0c0c0c;
+  color:var(--white);
+  padding:0 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:720;
+  outline:none;
+}
+.pitch-input:focus{
+  border-color:rgba(98,191,74,.62);
+  box-shadow:0 0 0 3px rgba(98,191,74,.1);
+}
+.pitch-team-list{
+  display:grid;
+  gap:7px;
+}
+.pitch-team-btn{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  border:1px solid rgba(255,255,255,.08);
+  background:#0c0c0c;
+  color:var(--gray1);
+  padding:0 12px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:820;
+  cursor:pointer;
+  text-align:left;
+}
+.pitch-team-btn.active{
+  color:var(--green-lt);
+  border-color:rgba(98,191,74,.42);
+  background:rgba(98,191,74,.1);
+}
+.pitch-team-meta{
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.pitch-results{
+  display:grid;
+  gap:10px;
+}
+.pitch-result-card{
+  border:1px solid rgba(255,255,255,.08);
+  background:#0c0c0c;
+  border-radius:10px;
+  overflow:hidden;
+}
+.pitch-result-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:12px;
+  padding:13px 14px;
+}
+.pitch-result-title{
+  color:var(--white);
+  font-size:15px;
+  font-weight:850;
+  min-width:0;
+}
+.pitch-result-score{
+  color:var(--green-lt);
+  font-size:22px;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.pitch-result-votes{
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:850;
+  text-transform:uppercase;
+}
+.pitch-detail-btn{
+  min-height:30px;
+  border:1px solid rgba(255,255,255,.08);
+  background:transparent;
+  color:var(--gray1);
+  border-radius:6px;
+  padding:0 10px;
+  font-size:10px;
+  font-weight:850;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.pitch-detail-btn:hover{color:var(--green-lt);border-color:rgba(98,191,74,.38)}
+.pitch-breakdown{
+  display:none;
+  border-top:1px solid rgba(255,255,255,.07);
+  padding:10px 14px 13px;
+}
+.pitch-result-card.open .pitch-breakdown{display:block}
+.pitch-vote-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:6px 0;
+  color:var(--gray1);
+  font-size:13px;
+  border-bottom:1px solid rgba(255,255,255,.045);
+}
+.pitch-vote-row:last-child{border-bottom:0}
+.pitch-empty{
+  color:var(--gray1);
+  border:1px dashed rgba(255,255,255,.12);
+  padding:24px;
+  text-align:center;
+  background:rgba(255,255,255,.018);
+}
+.jury-app{
+  display:none;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(98,191,74,.15),transparent 26%),
+    radial-gradient(circle at 82% 4%,rgba(255,255,255,.06),transparent 22%),
+    linear-gradient(180deg,#050505,#0b0b0b);
+  color:var(--white);
+  padding:28px 18px 48px;
+}
+body.jury-mode{
+  background:#050505;
+}
+body.jury-mode header,
+body.jury-mode nav,
+body.jury-mode main,
+body.jury-mode .mode-gate{
+  display:none!important;
+}
+body.jury-mode .jury-app{
+  display:block;
+}
+.jury-shell{
+  width:min(720px,100%);
+  margin:0 auto;
+}
+.jury-logo{
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:46px;
+  line-height:.9;
+  color:rgba(255,255,255,.82);
+  letter-spacing:0;
+  text-transform:lowercase;
+  margin-bottom:8px;
+}
+.jury-logo span{color:var(--green)}
+.jury-kicker{
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:24px;
+}
+.jury-card{
+  border:1px solid rgba(98,191,74,.2);
+  background:rgba(16,16,16,.86);
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+  border-radius:14px;
+  padding:18px;
+}
+.jury-field{margin-bottom:14px}
+.jury-label{
+  display:block;
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:850;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+.jury-input,
+.jury-select{
+  width:100%;
+  height:46px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#090909;
+  color:var(--white);
+  border-radius:9px;
+  padding:0 13px;
+  font-size:16px;
+  font-weight:720;
+  outline:none;
+}
+.jury-ideas{
+  display:grid;
+  gap:12px;
+  margin-top:16px;
+}
+.jury-idea{
+  border:1px solid rgba(255,255,255,.08);
+  background:#0b0b0b;
+  border-radius:12px;
+  padding:13px;
+}
+.jury-idea-title{
+  color:var(--white);
+  font-size:15px;
+  font-weight:850;
+  margin-bottom:10px;
+}
+.score-grid{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:5px;
+}
+.score-btn{
+  aspect-ratio:1;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.025);
+  color:var(--gray1);
+  border-radius:7px;
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+}
+.score-btn.active{
+  color:#081006;
+  background:var(--green-lt);
+  border-color:var(--green-lt);
+}
+.jury-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+.jury-actions .btn{min-height:44px}
+.jury-status{
+  margin-top:12px;
+  min-height:18px;
+  color:var(--green-lt);
+  font-size:12px;
+  font-weight:850;
+}
+@media(max-width:760px){
+  .pitch-layout{grid-template-columns:1fr}
+  .pitch-add-row{grid-template-columns:1fr}
+  .pitch-result-head{grid-template-columns:minmax(0,1fr) auto;gap:8px}
+  .pitch-result-votes{grid-column:1/2}
+  .pitch-detail-btn{grid-column:2/3;grid-row:2/3}
+  .jury-app{padding:22px 12px 36px}
+  .jury-logo{font-size:40px}
+  .jury-card{padding:14px;border-radius:12px}
+  .score-grid{grid-template-columns:repeat(5,1fr);gap:7px}
+  .score-btn{min-height:44px;aspect-ratio:auto}
+  .jury-actions{display:grid;grid-template-columns:1fr}
+  .jury-actions .btn{width:100%;justify-content:center}
+}
 .timer-stage{
   min-height:calc(100vh - 360px);
   position:relative;
@@ -3787,6 +4069,29 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
 </head>
 <body class="mode-gate-active">
 
+<div class="jury-app" id="jury-app">
+  <div class="jury-shell">
+    <div class="jury-logo">драфт<span>.</span></div>
+    <div class="jury-kicker">оценка идей · фокус-группа</div>
+    <div class="jury-card">
+      <div class="jury-field">
+        <label class="jury-label" for="jury-name">Имя и фамилия</label>
+        <input class="jury-input" id="jury-name" type="text" maxlength="80" autocomplete="name" placeholder="Например, Иван Петров">
+      </div>
+      <div class="jury-field">
+        <label class="jury-label" for="jury-team">Команда</label>
+        <select class="jury-select" id="jury-team" onchange="selectJuryTeam(this.value)"></select>
+      </div>
+      <div class="jury-ideas" id="jury-ideas"></div>
+      <div class="jury-actions">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="addJuryIdea()">+ Идея</button>
+        <button class="btn btn-solid btn-sm" type="button" onclick="submitJuryScores()">Отправить оценки</button>
+      </div>
+      <div class="jury-status" id="jury-status"></div>
+    </div>
+  </div>
+</div>
+
 <div class="mode-gate" id="mode-gate">
   <div>
     <div class="mode-gate-logo">драфт<span>.</span></div>
@@ -3829,6 +4134,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   <button class="tab" onclick="switchTab('prospects',this)">Потенциально <span class="badge muted" id="badge-pr">0</span></button>
   <button class="tab" onclick="switchTab('orgs',this)">Организаторы <span class="badge muted" id="badge-o">0</span></button>
   <button class="tab" onclick="switchTab('club',this)">Клуб</button>
+  <button class="tab" onclick="switchTab('pitch',this)">Оценки</button>
   <button class="tab" onclick="switchTab('randomizer',this)">Команды</button>
 </nav>
 
@@ -4034,6 +4340,32 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <div class="randomizer-status" id="rnd-status"></div>
   </div>
   <div class="randomizer-grid" id="rnd-board"></div>
+</div>
+
+<!-- PITCH SCORES -->
+<div class="view" id="view-pitch">
+  <div class="sec-header">
+    <div class="sec-title">Оценки <span id="pitch-cnt"></span></div>
+    <div class="sec-actions">
+      <span class="sec-actions-note" id="pitch-note">Жюри · идеи · средний балл</span>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
+      <button class="btn btn-solid btn-sm" type="button" onclick="openJurySite()">Открыть жюри</button>
+    </div>
+  </div>
+  <div class="pitch-layout">
+    <section class="pitch-panel">
+      <div class="pitch-panel-title">Команды</div>
+      <div class="pitch-add-row">
+        <input class="pitch-input" id="pitch-team-name" type="text" maxlength="80" placeholder="Название команды">
+        <button class="btn btn-solid btn-sm" type="button" onclick="addPitchTeam()">+ Команда</button>
+      </div>
+      <div class="pitch-team-list" id="pitch-team-list"></div>
+    </section>
+    <section class="pitch-panel">
+      <div class="pitch-panel-title" id="pitch-result-title">Итоги</div>
+      <div class="pitch-results" id="pitch-results"></div>
+    </section>
+  </div>
 </div>
 
 <!-- TIMER -->
@@ -4445,6 +4777,10 @@ function switchTab(name, btn){
   if(name==='orgs') renderOrgs();
   if(name==='randomizer') renderRandomizer();
   if(name==='club') renderClub();
+  if(name==='pitch'){
+    loadPitchData(true);
+    startPitchAutoRefresh();
+  }
   syncWakeLock();
 }
 
@@ -6435,6 +6771,10 @@ function applyPresentationMode(){
   return true;
 }
 function applyInitialMode(){
+  if(isJuryHost()){
+    enterJuryMode();
+    return;
+  }
   if(applyPresentationMode()) return;
   const params=new URLSearchParams(window.location.search);
   const mode=params.get('mode');
@@ -6668,6 +7008,7 @@ const SYNC_KEY = 'draft_mm_sync_config_v1';
 const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
 const RESTORE_LOCK_KEY = 'draft_mm_restore_lock_v1';
 const SYNC_POLL_MS = 1800;
+const PITCH_REFRESH_MS = 6000;
 const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
@@ -6876,6 +7217,243 @@ function refreshAll(){ normalizeDB(); updateAnalytics(); renderParticipants(); r
 function canUseSupabase(){ return !!(window.supabase && syncConfig?.url && syncConfig?.anonKey && syncConfig?.rowId); }
 function makeSyncClient(){ if(!canUseSupabase()) return null; return window.supabase.createClient(syncConfig.url, syncConfig.anonKey); }
 
+// ─── PITCH / JURY SCORES ───────────────────────────────────────────────
+const JURY_APP_URL = 'https://draft-crm-jury.vercel.app/';
+const JURY_NAME_KEY = 'draft_jury_name_v1';
+const PITCH_MAX_IDEAS = 10;
+let pitchState = {teams:[], ideas:[], scores:[], selectedTeamId:'', juryScores:{}};
+let pitchRefreshTimer = null;
+
+function isJuryHost(){
+  const params=new URLSearchParams(window.location.search);
+  return location.hostname.includes('jury') || location.pathname.replace(/\/+$/,'')==='/jury' || params.get('mode')==='jury';
+}
+function openJurySite(){
+  window.open(JURY_APP_URL,'_blank','noopener');
+}
+function startPitchAutoRefresh(){
+  if(pitchRefreshTimer) return;
+  pitchRefreshTimer=setInterval(()=>{
+    const pitchOpen=document.getElementById('view-pitch')?.classList.contains('active');
+    if(document.body.classList.contains('jury-mode') || pitchOpen) loadPitchData(true);
+  },PITCH_REFRESH_MS);
+}
+function enterJuryMode(){
+  appMode='jury';
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer');
+  document.body.classList.add('jury-mode');
+  document.title='Оценка идей · драфт';
+  loadPitchData(true);
+  startPitchAutoRefresh();
+}
+async function ensurePitchClient(){
+  if(!window.supabase){
+    const ok=await ensureSupabaseSdk();
+    if(!ok) throw new Error('Supabase SDK не загрузился');
+  }
+  if(!syncClient) syncClient=makeSyncClient();
+  if(!syncClient) throw new Error('Нет подключения к Supabase');
+  return syncClient;
+}
+function pitchIdeasForTeam(teamId){
+  return pitchState.ideas
+    .filter(idea=>String(idea.team_id)===String(teamId))
+    .sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+}
+function pitchScoresForIdea(ideaId){
+  return pitchState.scores.filter(score=>String(score.idea_id)===String(ideaId));
+}
+function pitchAverage(ideaId){
+  const votes=pitchScoresForIdea(ideaId);
+  if(!votes.length) return null;
+  const avg=votes.reduce((sum,v)=>sum+(+v.score||0),0)/votes.length;
+  return Math.round(avg*10)/10;
+}
+async function loadPitchData(silent=true){
+  try{
+    const client=await ensurePitchClient();
+    const includeScores=!document.body.classList.contains('jury-mode');
+    const requests=[
+      client.from('pitch_teams').select('id,name,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
+      client.from('pitch_ideas').select('id,team_id,title,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true})
+    ];
+    if(includeScores) requests.push(client.from('pitch_scores').select('id,team_id,idea_id,judge_name,score,updated_at').order('updated_at',{ascending:false}));
+    const [teamsRes,ideasRes,scoresRes]=await Promise.all(requests);
+    if(teamsRes.error) throw teamsRes.error;
+    if(ideasRes.error) throw ideasRes.error;
+    if(scoresRes?.error) throw scoresRes.error;
+    pitchState.teams=teamsRes.data||[];
+    pitchState.ideas=ideasRes.data||[];
+    if(includeScores) pitchState.scores=scoresRes?.data||[];
+    if(!pitchState.selectedTeamId || !pitchState.teams.some(t=>String(t.id)===String(pitchState.selectedTeamId))){
+      pitchState.selectedTeamId=pitchState.teams[0]?.id || '';
+    }
+    renderPitchAdmin();
+    renderJuryApp();
+    if(!silent) toast('Оценки обновлены');
+  } catch(err){
+    console.error(err);
+    const msg='Нужны таблицы оценок в Supabase';
+    const res=document.getElementById('pitch-results');
+    if(res) res.innerHTML=`<div class="pitch-empty">${msg}. Прогони блок SQL из supabase_setup.sql.</div>`;
+    const status=document.getElementById('jury-status');
+    if(status) status.textContent=msg;
+    if(!silent) toast(msg);
+  }
+}
+async function addPitchTeam(){
+  const input=document.getElementById('pitch-team-name');
+  const name=(input?.value||'').trim();
+  if(!name){toast('Введи название команды');return;}
+  try{
+    const client=await ensurePitchClient();
+    const sort=(pitchState.teams||[]).length+1;
+    const {data:team,error}=await client.from('pitch_teams').insert({name,sort_order:sort}).select().single();
+    if(error) throw error;
+    const ideas=Array.from({length:5},(_,i)=>({team_id:team.id,title:`Идея ${i+1}`,sort_order:i+1}));
+    const {error:ideaError}=await client.from('pitch_ideas').insert(ideas);
+    if(ideaError) throw ideaError;
+    if(input) input.value='';
+    pitchState.selectedTeamId=team.id;
+    await loadPitchData(true);
+    toast('Команда добавлена');
+  } catch(err){
+    console.error(err);
+    toast('Не удалось добавить команду');
+  }
+}
+function selectPitchTeam(id){
+  pitchState.selectedTeamId=id;
+  renderPitchAdmin();
+}
+function togglePitchDetails(ideaId){
+  document.querySelector(`[data-pitch-idea="${ideaId}"]`)?.classList.toggle('open');
+}
+function renderPitchAdmin(){
+  const teamList=document.getElementById('pitch-team-list');
+  const results=document.getElementById('pitch-results');
+  const title=document.getElementById('pitch-result-title');
+  const cnt=document.getElementById('pitch-cnt');
+  if(cnt) cnt.textContent=pitchState.teams.length ? pitchState.teams.length : '';
+  if(teamList){
+    if(!pitchState.teams.length){
+      teamList.innerHTML='<div class="pitch-empty">Добавь команды после штурма. Для каждой команды появятся 5 идей.</div>';
+    } else {
+      teamList.innerHTML=pitchState.teams.map(team=>{
+        const ideas=pitchIdeasForTeam(team.id);
+        const active=String(team.id)===String(pitchState.selectedTeamId);
+        return `<button class="pitch-team-btn ${active?'active':''}" type="button" onclick="selectPitchTeam('${team.id}')">
+          <span>${esc(team.name)}</span><span class="pitch-team-meta">${ideas.length} идей</span>
+        </button>`;
+      }).join('');
+    }
+  }
+  const team=pitchState.teams.find(t=>String(t.id)===String(pitchState.selectedTeamId));
+  if(title) title.textContent=team ? `Итоги · ${team.name}` : 'Итоги';
+  if(!results) return;
+  if(!team){
+    results.innerHTML='<div class="pitch-empty">Пока нет команд для оценки.</div>';
+    return;
+  }
+  const ideas=pitchIdeasForTeam(team.id);
+  if(!ideas.length){
+    results.innerHTML='<div class="pitch-empty">У команды пока нет идей.</div>';
+    return;
+  }
+  results.innerHTML=ideas.map(idea=>{
+    const avg=pitchAverage(idea.id);
+    const votes=pitchScoresForIdea(idea.id).sort((a,b)=>String(a.judge_name).localeCompare(String(b.judge_name),'ru'));
+    const breakdown=votes.length
+      ? votes.map(v=>`<div class="pitch-vote-row"><span>${esc(v.judge_name)}</span><b>${+v.score||0}</b></div>`).join('')
+      : '<div class="pitch-vote-row"><span>Пока нет голосов</span><b>—</b></div>';
+    return `<article class="pitch-result-card" data-pitch-idea="${idea.id}">
+      <div class="pitch-result-head">
+        <div class="pitch-result-title">${esc(idea.title)}</div>
+        <div class="pitch-result-score">${avg===null?'—':avg}</div>
+        <div class="pitch-result-votes">${votes.length} голосов</div>
+        <button class="pitch-detail-btn" type="button" onclick="togglePitchDetails('${idea.id}')">Подробнее</button>
+      </div>
+      <div class="pitch-breakdown">${breakdown}</div>
+    </article>`;
+  }).join('');
+}
+function selectJuryTeam(id){
+  pitchState.selectedTeamId=id;
+  pitchState.juryScores={};
+  renderJuryApp();
+}
+function setJuryScore(ideaId,score){
+  pitchState.juryScores[String(ideaId)]=score;
+  renderJuryApp();
+}
+function renderJuryApp(){
+  if(!document.body.classList.contains('jury-mode')) return;
+  const nameInput=document.getElementById('jury-name');
+  const teamSelect=document.getElementById('jury-team');
+  const ideasEl=document.getElementById('jury-ideas');
+  if(nameInput && !nameInput.value) nameInput.value=localStorage.getItem(JURY_NAME_KEY)||'';
+  if(!teamSelect || !ideasEl) return;
+  if(!pitchState.teams.length){
+    teamSelect.innerHTML='<option value="">Команды пока не добавлены</option>';
+    ideasEl.innerHTML='<div class="pitch-empty">Попроси ведущего добавить команды в CRM.</div>';
+    return;
+  }
+  teamSelect.innerHTML=pitchState.teams.map(team=>`<option value="${team.id}" ${String(team.id)===String(pitchState.selectedTeamId)?'selected':''}>${esc(team.name)}</option>`).join('');
+  const teamId=pitchState.selectedTeamId || pitchState.teams[0]?.id;
+  const ideas=pitchIdeasForTeam(teamId);
+  ideasEl.innerHTML=ideas.map(idea=>{
+    const selected=+pitchState.juryScores[String(idea.id)]||0;
+    const buttons=Array.from({length:10},(_,i)=>{
+      const score=i+1;
+      return `<button class="score-btn ${selected===score?'active':''}" type="button" onclick="setJuryScore('${idea.id}',${score})">${score}</button>`;
+    }).join('');
+    return `<div class="jury-idea">
+      <div class="jury-idea-title">${esc(idea.title)}</div>
+      <div class="score-grid">${buttons}</div>
+    </div>`;
+  }).join('');
+}
+async function addJuryIdea(){
+  const teamId=pitchState.selectedTeamId;
+  if(!teamId){toast('Сначала выбери команду');return;}
+  const ideas=pitchIdeasForTeam(teamId);
+  if(ideas.length>=PITCH_MAX_IDEAS){toast('Максимум 10 идей на команду');return;}
+  try{
+    const client=await ensurePitchClient();
+    const next=ideas.length+1;
+    const {error}=await client.from('pitch_ideas').insert({team_id:teamId,title:`Идея ${next}`,sort_order:next});
+    if(error) throw error;
+    await loadPitchData(true);
+  } catch(err){
+    console.error(err);
+    toast('Не удалось добавить идею');
+  }
+}
+async function submitJuryScores(){
+  const judge=(document.getElementById('jury-name')?.value||'').trim();
+  const teamId=pitchState.selectedTeamId;
+  if(!judge){document.getElementById('jury-status').textContent='Введи имя и фамилию';return;}
+  if(!teamId){document.getElementById('jury-status').textContent='Команда не выбрана';return;}
+  const ideas=pitchIdeasForTeam(teamId);
+  const rows=ideas
+    .map(idea=>({idea,score:+pitchState.juryScores[String(idea.id)]||0}))
+    .filter(x=>x.score>=1 && x.score<=10)
+    .map(x=>({team_id:teamId,idea_id:x.idea.id,judge_name:judge,score:x.score,updated_at:new Date().toISOString()}));
+  if(!rows.length){document.getElementById('jury-status').textContent='Поставь хотя бы одну оценку';return;}
+  try{
+    const client=await ensurePitchClient();
+    localStorage.setItem(JURY_NAME_KEY,judge);
+    const {error}=await client.from('pitch_scores').upsert(rows,{onConflict:'team_id,idea_id,judge_name'});
+    if(error) throw error;
+    pitchState.juryScores={};
+    await loadPitchData(true);
+    document.getElementById('jury-status').textContent='Оценки отправлены';
+  } catch(err){
+    console.error(err);
+    document.getElementById('jury-status').textContent='Не удалось отправить. Проверь интернет';
+  }
+}
+
 function openSyncSetup(){
   const current = syncConfig || {};
   const url = prompt('Supabase Project URL', current.url || 'https://xxxx.supabase.co');
@@ -7079,7 +7657,7 @@ async function pushCloudNow(silent=false){
   const h=hashData(DB);
   syncLastHash=h;
   const updatedAt=new Date().toISOString();
-  const payload={id:syncConfig.rowId,data:deep(DB),updated_at:updatedAt};
+  const payload={id:syncConfig.rowId,data:dbForStorage(),updated_at:updatedAt};
   try{
     const {error}=await syncClient.from('draft_crm_state').upsert(payload,{onConflict:'id'});
     if(error) throw error;
@@ -7642,7 +8220,7 @@ renderOrgs();
 renderRandomizer();
 renderTimer();
 applyInitialMode();
-initCloudSync();
+if(!isJuryHost()) initCloudSync();
 updateSplashMeta?.();
 </script>
 </body>
