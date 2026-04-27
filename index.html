@@ -3298,12 +3298,12 @@ body.jury-mode .jury-app{
   display:none;
   position:relative;
   z-index:3;
-  width:min(1320px,calc(100% - 72px));
+  width:min(1760px,calc(100% - 72px));
   min-height:min(720px,76vh);
   margin:auto;
   place-items:center;
   text-align:center;
-  overflow:hidden;
+  overflow:visible;
 }
 .splash-view.theme-improv .splash-improv{display:grid}
 .splash-improv::before,
@@ -3338,6 +3338,7 @@ body.jury-mode .jury-app{
   gap:22px;
   justify-items:center;
   padding:24px;
+  max-width:100%;
 }
 .splash-improv-kicker{
   color:rgba(255,255,255,.48);
@@ -3347,17 +3348,25 @@ body.jury-mode .jury-app{
   text-transform:uppercase;
 }
 .splash-improv-word{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:nowrap;
+  width:100%;
   color:var(--white);
-  font-size:clamp(54px,10vw,178px);
+  max-width:100%;
+  font-size:132px;
   line-height:.82;
   font-weight:950;
-  letter-spacing:-.055em;
+  letter-spacing:-.08em;
+  white-space:nowrap;
   text-transform:uppercase;
   text-shadow:0 0 34px rgba(255,255,255,.08),0 0 72px rgba(98,191,74,.18);
   animation:improvWord 5.8s ease-in-out infinite;
 }
 .splash-improv-word span{
   display:inline-block;
+  flex:0 0 auto;
   animation:improvLetter 3.4s ease-in-out infinite;
   animation-delay:calc(var(--i) * .055s);
 }
@@ -3392,6 +3401,12 @@ body.jury-mode .jury-app{
   0%,100%{opacity:.28;transform:scaleX(.62)}
   50%{opacity:1;transform:scaleX(1)}
 }
+@media(max-width:1600px){
+  .splash-improv-word{font-size:112px}
+}
+@media(max-width:1200px){
+  .splash-improv-word{font-size:82px}
+}
 @media(prefers-reduced-motion:reduce){
   .splash-improv::before,
   .splash-improv::after,
@@ -3410,6 +3425,7 @@ body.jury-mode .jury-app{
   .splash-rule-text{font-size:15px}
   .splash-improv{width:calc(100% - 28px);min-height:56vh}
   .splash-improv-card{gap:16px;padding:16px}
+  .splash-improv-word{font-size:34px;letter-spacing:-.09em}
 }
 
 /* логотип в левом верхнем углу */
@@ -7169,19 +7185,26 @@ function resetRandomizer(){
   renderRandomizer();
   toast('Расклад сброшен');
 }
+const EVENT_PRESENTATION_TARGET = 'draft-event-screen';
+function openEventPresentation(url){
+  const win=window.open(url.toString(),EVENT_PRESENTATION_TARGET,'popup=yes,width=1600,height=900');
+  if(!win) toast('Браузер заблокировал новое окно');
+  else {
+    try{ win.focus(); }catch{}
+  }
+  return win;
+}
 function openRandomizerPresentation(){
   const url=new URL(window.location.href);
   url.searchParams.set('present','randomizer');
   url.hash='';
-  const win=window.open(url.toString(),'draft-randomizer-screen','popup=yes,width=1600,height=900');
-  if(!win) toast('Браузер заблокировал новое окно');
+  openEventPresentation(url);
 }
 function openBlankPresentation(){
   const url=new URL(window.location.href);
   url.searchParams.set('present','blank');
   url.hash='';
-  const win=window.open(url.toString(),'draft-blank-screen','popup=yes,width=1600,height=900');
-  if(!win) toast('Браузер заблокировал новое окно');
+  openEventPresentation(url);
 }
 
 // ─── EVENT TIMER ─────────────────────────────────────────────
@@ -7480,8 +7503,7 @@ function openTimerPresentation(){
   const url=new URL(window.location.href);
   url.searchParams.set('present','timer');
   url.hash='';
-  const win=window.open(url.toString(),'draft-timer-screen','popup=yes,width=1600,height=900');
-  if(!win) toast('Браузер заблокировал новое окно');
+  openEventPresentation(url);
 }
 async function fullscreenTimerStage(){
   try{
@@ -7781,8 +7803,7 @@ function openSplashPresentation(){
   url.searchParams.set('present','splash');
   url.searchParams.set('theme',splashTheme);
   url.hash='';
-  const win=window.open(url.toString(),'draft-splash-screen','popup=yes,width=1600,height=900');
-  if(!win) toast('Браузер заблокировал новое окно');
+  openEventPresentation(url);
 }
 async function toggleFullscreen(){
   try{
@@ -8345,8 +8366,7 @@ function openPitchboardPresentation(){
   const url=new URL(window.location.href);
   url.searchParams.set('present','pitchboard');
   url.hash='';
-  const win=window.open(url.toString(),'draft-pitchboard-screen','popup=yes,width=1600,height=900');
-  if(!win) toast('Браузер заблокировал новое окно');
+  openEventPresentation(url);
 }
 function schedulePitchReload(){
   clearTimeout(pitchReloadTimer);
