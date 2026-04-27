@@ -107,7 +107,6 @@ nav{display:flex;gap:1px;padding:0 56px;border-bottom:1px solid var(--border);ba
 }
 .tab:hover{color:var(--white)}
 .tab.active{color:var(--green-lt);border-bottom-color:var(--green)}
-.tab-pitch{margin-left:auto}
 .badge{
   display:inline-flex;align-items:center;justify-content:center;
   background:var(--green);color:#0a1a08;font-size:9px;font-weight:700;
@@ -2273,46 +2272,70 @@ body.event-mode .sync-pill.error{
   letter-spacing:.16em;
   text-transform:uppercase;
 }
-.pitchboard-leader{
+.pitchboard-topideas{
   display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
-  align-items:center;
-  gap:18px;
-  padding:20px;
+  gap:12px;
+  padding:18px;
   border:1px solid rgba(98,191,74,.28);
   background:linear-gradient(135deg,rgba(98,191,74,.14),rgba(255,255,255,.035));
   box-shadow:0 24px 72px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05);
 }
-.pitchboard-rank{
-  width:54px;
-  height:54px;
+.pitchboard-topideas-title{
+  color:var(--white);
+  font-size:clamp(24px,2.4vw,42px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.035em;
+  text-transform:uppercase;
+}
+.pitchboard-topideas-list{
+  display:grid;
+  gap:8px;
+}
+.pitchboard-topidea{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  min-height:54px;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(0,0,0,.18);
+}
+.pitchboard-medal{
+  width:34px;
+  height:34px;
   display:grid;
   place-items:center;
   border-radius:50%;
-  border:1px solid rgba(98,191,74,.42);
+  border:1px solid rgba(98,191,74,.34);
+  background:rgba(98,191,74,.1);
   color:var(--green-lt);
-  background:rgba(98,191,74,.09);
-  font-size:18px;
-  font-weight:900;
+  font-size:17px;
+  line-height:1;
 }
-.pitchboard-leader-name{
+.pitchboard-topidea-name{
+  min-width:0;
   color:var(--white);
-  font-size:clamp(28px,3.4vw,58px);
-  line-height:.95;
-  font-weight:900;
-  letter-spacing:-.04em;
+  font-size:clamp(16px,1.55vw,26px);
+  font-weight:880;
+  line-height:1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.pitchboard-topidea-team{
+  display:block;
+  margin-top:4px;
+  color:var(--gray1);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.12em;
   text-transform:uppercase;
 }
-.pitchboard-leader-sub{
-  margin-top:7px;
-  color:var(--gray1);
-  font-size:13px;
-  font-weight:760;
-}
-.pitchboard-leader-score{
+.pitchboard-topidea-score{
   color:var(--green-lt);
-  font-size:clamp(44px,5.4vw,96px);
-  line-height:.86;
+  font-size:clamp(24px,2.6vw,44px);
   font-weight:850;
   font-variant-numeric:tabular-nums;
 }
@@ -2332,8 +2355,8 @@ body.event-mode .sync-pill.error{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
 }
 .pitchboard-card.is-top{
-  border-color:rgba(98,191,74,.34);
-  background:linear-gradient(180deg,rgba(98,191,74,.1),rgba(11,11,11,.82) 48%);
+  border-color:rgba(255,255,255,.08);
+  background:rgba(11,11,11,.78);
 }
 .pitchboard-card.is-closed{
   border-color:rgba(196,155,58,.24);
@@ -2406,13 +2429,13 @@ body.event-mode .sync-pill.error{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:20px;
-  height:20px;
+  width:22px;
+  height:22px;
   margin-right:7px;
   border-radius:50%;
   background:rgba(98,191,74,.14);
   color:var(--green-lt);
-  font-size:10px;
+  font-size:12px;
   font-weight:900;
 }
 .pitchboard-closed{
@@ -2549,21 +2572,53 @@ body.jury-mode .jury-app{
 .score-btn{
   aspect-ratio:1;
   border:1px solid rgba(255,255,255,.09);
-  background:rgba(255,255,255,.025);
+  background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.12),rgba(255,255,255,.025) 48%,rgba(0,0,0,.14));
   color:var(--gray1);
-  border-radius:7px;
+  border-radius:50%;
   font-size:13px;
   font-weight:900;
   cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 18px rgba(0,0,0,.18);
+  transition:transform .16s ease,border-color .16s ease,color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+.score-btn::after{
+  content:'';
+  position:absolute;
+  inset:-35%;
+  background:linear-gradient(115deg,transparent 34%,rgba(255,255,255,.55) 48%,transparent 62%);
+  transform:translateX(-130%) rotate(8deg);
+  opacity:0;
+  pointer-events:none;
+}
+.score-btn:hover{
+  color:var(--white);
+  border-color:rgba(144,217,123,.36);
+  transform:translateY(-1px);
+}
+.score-btn:hover::after{
+  opacity:.45;
+  animation:scoreShine .72s ease-out 1;
 }
 .score-btn.active{
   color:#081006;
-  background:var(--green-lt);
+  background:radial-gradient(circle at 34% 24%,#d7ffca 0%,var(--green-lt) 48%,var(--green) 100%);
   border-color:var(--green-lt);
+  box-shadow:0 0 0 3px rgba(144,217,123,.11),0 0 24px rgba(98,191,74,.28),inset 0 1px 0 rgba(255,255,255,.45);
+  transform:translateY(-1px) scale(1.03);
+}
+.score-btn.active::after{
+  opacity:.55;
+  animation:scoreShine .9s ease-out 1;
 }
 .score-btn:disabled{
   opacity:.34;
   cursor:default;
+}
+@keyframes scoreShine{
+  from{transform:translateX(-130%) rotate(8deg)}
+  to{transform:translateX(130%) rotate(8deg)}
 }
 .jury-actions{
   display:flex;
@@ -2588,15 +2643,16 @@ body.jury-mode .jury-app{
   .pitchboard-stage{min-height:calc(100dvh - 270px);padding:16px}
   .pitchboard-top{grid-template-columns:1fr;gap:14px}
   .pitchboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .pitchboard-leader{grid-template-columns:auto minmax(0,1fr);padding:16px}
-  .pitchboard-leader-score{grid-column:1/-1}
+  .pitchboard-topideas{padding:14px}
+  .pitchboard-topidea{grid-template-columns:auto minmax(0,1fr) auto;gap:8px}
+  .pitchboard-medal{width:30px;height:30px;font-size:15px}
   .pitchboard-grid{grid-template-columns:1fr}
   .pitchboard-card{min-height:0}
   .jury-app{padding:22px 12px 36px}
   .jury-logo{font-size:40px}
   .jury-card{padding:14px;border-radius:12px}
   .score-grid{grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
-  .score-btn{min-height:34px;aspect-ratio:auto;border-radius:6px;font-size:11px}
+  .score-btn{min-height:0;aspect-ratio:1;border-radius:50%;font-size:11px}
   .jury-actions{display:grid;grid-template-columns:1fr}
   .jury-actions .btn{width:100%;justify-content:center}
 }
@@ -3002,7 +3058,8 @@ body.jury-mode .jury-app{
 .splash-view.theme-cards .splash-qr,
 .splash-view.theme-cards .splash-stripes,
 .splash-view.theme-cards .splash-meta{display:none!important}
-.splash-view.theme-qr{
+.splash-view.theme-qr,
+.splash-view.theme-rules{
   background:
     radial-gradient(circle at 24% 18%,rgba(98,191,74,.13),transparent 28%),
     radial-gradient(circle at 78% 72%,rgba(98,191,74,.09),transparent 32%),
@@ -3010,14 +3067,25 @@ body.jury-mode .jury-app{
   border:1px solid rgba(98,191,74,.12);
 }
 .splash-view.theme-qr .splash-inner,
+.splash-view.theme-rules .splash-inner,
 .splash-view.theme-qr .splash-line,
+.splash-view.theme-rules .splash-line,
 .splash-view.theme-qr .splash-grid,
+.splash-view.theme-rules .splash-grid,
 .splash-view.theme-qr .splash-aura,
+.splash-view.theme-rules .splash-aura,
 .splash-view.theme-qr .splash-rings,
+.splash-view.theme-rules .splash-rings,
 .splash-view.theme-qr .splash-stripes,
+.splash-view.theme-rules .splash-stripes,
 .splash-view.theme-qr .splash-cards-grid,
+.splash-view.theme-rules .splash-cards-grid,
 .splash-view.theme-qr .splash-cards-badge,
-.splash-view.theme-qr .splash-meta{display:none!important}
+.splash-view.theme-rules .splash-cards-badge,
+.splash-view.theme-qr .splash-rules,
+.splash-view.theme-qr .splash-meta,
+.splash-view.theme-rules .splash-qr,
+.splash-view.theme-rules .splash-meta{display:none!important}
 .splash-qr{
   display:none;
   position:relative;
@@ -3066,6 +3134,80 @@ body.jury-mode .jury-app{
   letter-spacing:.16em;
   text-transform:uppercase;
   overflow-wrap:anywhere;
+}
+.splash-rules{
+  display:none;
+  position:relative;
+  z-index:3;
+  width:min(1220px,calc(100% - 72px));
+  margin:auto;
+}
+.splash-view.theme-rules .splash-rules{display:block}
+.splash-rules-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  padding-bottom:22px;
+  border-bottom:1px solid rgba(255,255,255,.09);
+  margin-bottom:24px;
+}
+.splash-rules-title{
+  color:var(--white);
+  font-size:clamp(42px,6vw,96px);
+  line-height:.86;
+  font-weight:900;
+  letter-spacing:-.045em;
+  text-transform:uppercase;
+}
+.splash-rules-mark{
+  font-family:'Ekran Draft',var(--font-main);
+  color:rgba(255,255,255,.78);
+  font-size:clamp(30px,3.5vw,58px);
+  line-height:.9;
+}
+.splash-rules-mark span{color:var(--green)}
+.splash-rules-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.splash-rule{
+  min-height:64px;
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr);
+  align-items:center;
+  gap:14px;
+  padding:13px 16px 13px 12px;
+  border:1px solid rgba(255,255,255,.075);
+  background:rgba(255,255,255,.028);
+}
+.splash-rule-num{
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  border:1px solid rgba(98,191,74,.35);
+  background:rgba(98,191,74,.08);
+  color:var(--green-lt);
+  font-size:12px;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.splash-rule-text{
+  color:rgba(255,255,255,.86);
+  font-size:clamp(16px,1.5vw,24px);
+  font-weight:760;
+  line-height:1.05;
+}
+@media(max-width:760px){
+  .splash-rules{width:calc(100% - 28px)}
+  .splash-rules-head{align-items:flex-start;flex-direction:column;gap:10px;margin-bottom:14px;padding-bottom:16px}
+  .splash-rules-grid{grid-template-columns:1fr;gap:7px}
+  .splash-rule{min-height:52px;grid-template-columns:34px minmax(0,1fr);gap:10px;padding:10px}
+  .splash-rule-num{width:30px;height:30px;font-size:10px}
+  .splash-rule-text{font-size:15px}
 }
 
 /* логотип в левом верхнем углу */
@@ -4993,6 +5135,7 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
         <button class="splash-theme-btn active" data-splash-theme="dark" onclick="setSplashTheme('dark',this)">Тёмная</button>
         <button class="splash-theme-btn" data-splash-theme="light" onclick="setSplashTheme('light',this)">Светлая</button>
         <button class="splash-theme-btn" data-splash-theme="cards" onclick="setSplashTheme('cards',this)">Карточки</button>
+        <button class="splash-theme-btn" data-splash-theme="rules" onclick="setSplashTheme('rules',this)">Правила</button>
         <button class="splash-theme-btn" data-splash-theme="qr" onclick="setSplashTheme('qr',this)">QR</button>
       </div>
       <button class="splash-cast-btn" onclick="openSplashPresentation()">На экран</button>
@@ -5025,6 +5168,26 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
         <div class="splash-qr-sub">Откройте камеру и перейдите по QR-коду</div>
       </div>
       <div class="splash-qr-url">draft-crm-jury.vercel.app</div>
+    </div>
+    <div class="splash-rules" id="splash-rules">
+      <div class="splash-rules-head">
+        <div>
+          <div class="splash-rules-title">Правила штурма</div>
+        </div>
+        <div class="splash-rules-mark">драфт<span>.</span></div>
+      </div>
+      <div class="splash-rules-grid">
+        <div class="splash-rule"><div class="splash-rule-num">01</div><div class="splash-rule-text">Сначала количество, потом качество</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">02</div><div class="splash-rule-text">Не критикуем во время генерации</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">03</div><div class="splash-rule-text">Развиваем идеи друг друга</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">04</div><div class="splash-rule-text">Фиксируем всё сразу</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">05</div><div class="splash-rule-text">Не спорим слишком рано</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">06</div><div class="splash-rule-text">Говорят все, не только громкие</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">07</div><div class="splash-rule-text">Работаем по таймеру</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">08</div><div class="splash-rule-text">Держим фокус на задаче</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">09</div><div class="splash-rule-text">Отбираем по понятным критериям</div></div>
+        <div class="splash-rule"><div class="splash-rule-num">10</div><div class="splash-rule-text">Упаковываем идеи в готовые концепты</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -7072,16 +7235,16 @@ async function fullscreenTimerStage(){
   }
 }
 // ── SPLASH V4 ──────────────────────────────────────────────
-const SPLASH_THEMES = ['dark','light','cards','qr'];
+const SPLASH_THEMES = ['dark','light','cards','rules','qr'];
 let splashTheme = 'dark';
 let _carouselTimer = null;
 let _carouselQueue = [];   // все участники — крутим по кругу
-let _carouselSlots = [];   // текущий участник в каждой ячейке (индекс в _carouselQueue)
+let _carouselSlots = [];   // текущий участник в каждой ячейке
 let _carouselPtr = 0;      // следующий в очереди
 let _carouselSlotPtr = 0;  // следующая ячейка для замены
 
 function setSplashTheme(theme, btn){
-  if(!['dark','light','cards','qr'].includes(theme)) theme='dark';
+  if(!SPLASH_THEMES.includes(theme)) theme='dark';
   splashTheme = theme;
   const view = document.getElementById('splash-view');
   if(!view) return;
@@ -7091,15 +7254,18 @@ function setSplashTheme(theme, btn){
 
   const isCards = theme === 'cards';
   const isQr = theme === 'qr';
+  const isRules = theme === 'rules';
   const grid   = document.getElementById('splash-cards-grid');
   const badge  = document.getElementById('splash-cards-badge');
   const meta   = view.querySelector('.splash-meta');
   const qr     = document.getElementById('splash-qr');
+  const rules  = document.getElementById('splash-rules');
 
   if(grid)  grid.style.display  = isCards ? 'grid' : 'none';
   if(badge) badge.style.display = isCards ? 'block' : 'none';
-  if(meta)  meta.style.display  = (isCards || isQr) ? 'none' : 'flex';
+  if(meta)  meta.style.display  = (isCards || isQr || isRules) ? 'none' : 'flex';
   if(qr)    qr.style.display    = isQr ? 'grid' : 'none';
+  if(rules) rules.style.display = isRules ? 'block' : 'none';
 
   if(isCards){
     preloadEventPhotos();
@@ -7135,8 +7301,10 @@ function updateSplashMeta(){
 // а slide in/out — на самом .splash-fcard поверх.
 // Ячейка (.splash-cell) никогда не двигается → нет дёрганья.
 
-const CAROUSEL_SLOT_INTERVAL = 3200;  // ms между заменами
+const CAROUSEL_SLOT_INTERVAL = 3600;  // ms между пачками замен
 const CAROUSEL_SLIDE_MS      = 600;   // длительность слайда
+const CAROUSEL_BATCH_DESKTOP = 3;
+const CAROUSEL_BATCH_MOBILE = 2;
 
 function stopCarousel(){
   clearInterval(_carouselTimer);
@@ -7169,6 +7337,40 @@ function waitForCardImage(cardWrap, timeout=700){
     setTimeout(finish, timeout);
   });
 }
+function shuffleInPlace(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function participantKey(p){
+  return String(p?.id || p?.name || '');
+}
+function nextCarouselPerson(visibleKeys=new Set(), attempts=0){
+  if(!_carouselQueue.length) return null;
+  const maxAttempts=Math.max(_carouselQueue.length*2,1);
+  for(let i=0;i<maxAttempts;i++){
+    const p=_carouselQueue[_carouselPtr % _carouselQueue.length];
+    _carouselPtr++;
+    if(_carouselPtr % _carouselQueue.length === 0) shuffleInPlace(_carouselQueue);
+    const key=participantKey(p);
+    if(!visibleKeys.has(key) || attempts>0 || _carouselQueue.length<=visibleKeys.size) return p;
+  }
+  return _carouselQueue[_carouselPtr++ % _carouselQueue.length];
+}
+function visibleCarouselKeys(exceptSlots=[]){
+  const skip=new Set(exceptSlots.map(String));
+  const keys=new Set();
+  _carouselSlots.forEach((p,i)=>{
+    if(p && !skip.has(String(i))) keys.add(participantKey(p));
+  });
+  return keys;
+}
+function carouselDisplayNumber(p){
+  const idx=(DB.participants||[]).filter(x=>x.name).findIndex(x=>String(x.id)===String(p?.id));
+  return String(idx>=0 ? idx+1 : 1).padStart(2,'0');
+}
 
 function startCarousel(){
   stopCarousel();
@@ -7187,21 +7389,19 @@ function startCarousel(){
   grid.style.gridTemplateRows    = `repeat(${rows},1fr)`;
 
   // Перемешиваем очередь
-  _carouselQueue = [...people];
-  for(let i=_carouselQueue.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [_carouselQueue[i],_carouselQueue[j]]=[_carouselQueue[j],_carouselQueue[i]];
-  }
+  _carouselQueue = shuffleInPlace([...people]);
   _carouselPtr = 0;
 
   // Первая отрисовка — все ячейки сразу, не блокируем event loop
   grid.innerHTML = '';
   _carouselSlots = [];
   const frag = document.createDocumentFragment();
+  const firstVisible=new Set();
   for(let i=0;i<totalSlots;i++){
-    const p = _carouselQueue[_carouselPtr % _carouselQueue.length];
-    _carouselSlots.push(_carouselPtr % _carouselQueue.length);
-    _carouselPtr++;
+    const p = nextCarouselPerson(firstVisible);
+    if(!p) break;
+    firstVisible.add(participantKey(p));
+    _carouselSlots.push(p);
     const cell = document.createElement('div');
     cell.className = 'splash-cell';
     cell.dataset.slot = i;
@@ -7214,50 +7414,58 @@ function startCarousel(){
 
   _carouselSlotPtr = 0;
 
-  // Таймер: меняем по одной ячейке за раз
+  // Таймер: меняем пачку ячеек разом, с небольшой паузой между пачками.
   _carouselTimer = setInterval(()=>{
     if(splashTheme !== 'cards'){ stopCarousel(); return; }
     const grid = document.getElementById('splash-cards-grid');
     if(!grid) return;
 
-    const slotIdx = _carouselSlotPtr % totalSlots;
-    _carouselSlotPtr++;
+    const batchSize=Math.min(isMobile ? CAROUSEL_BATCH_MOBILE : CAROUSEL_BATCH_DESKTOP, totalSlots, Math.max(1,people.length-1));
+    const slots=[];
+    for(let i=0;i<batchSize;i++){
+      slots.push((_carouselSlotPtr+i) % totalSlots);
+    }
+    _carouselSlotPtr=(_carouselSlotPtr+batchSize) % totalSlots;
+    const visibleKeys=visibleCarouselKeys(slots);
 
-    const cell = grid.querySelector(`.splash-cell[data-slot="${slotIdx}"]`);
-    if(!cell) return;
+    slots.forEach(slotIdx=>{
+      const cell = grid.querySelector(`.splash-cell[data-slot="${slotIdx}"]`);
+      if(!cell) return;
 
-    // Следующий участник в очереди
-    const p = _carouselQueue[_carouselPtr % _carouselQueue.length];
-    _carouselPtr++;
+      const p = nextCarouselPerson(visibleKeys);
+      if(!p) return;
+      visibleKeys.add(participantKey(p));
+      _carouselSlots[slotIdx]=p;
 
-    const newWrap = makeCardEl(p, _carouselPtr);
-    const newCard = newWrap.querySelector('.splash-fcard');
-    if(!newCard) return;
-    newCard.style.transform = 'translateX(102%)';
-    newWrap.classList.add('floating');
+      const newWrap = makeCardEl(p, slotIdx+1);
+      const newCard = newWrap.querySelector('.splash-fcard');
+      if(!newCard) return;
+      newCard.style.transform = 'translateX(102%)';
+      newWrap.classList.add('floating');
 
-    waitForCardImage(newWrap).then(()=>{
-      if(splashTheme !== 'cards' || !cell.isConnected) return;
+      waitForCardImage(newWrap).then(()=>{
+        if(splashTheme !== 'cards' || !cell.isConnected) return;
 
-      const oldWrap = cell.querySelector('.splash-fcard-wrap');
-      const oldCard = oldWrap?.querySelector('.splash-fcard');
-      cell.appendChild(newWrap);
+        const oldWrap = cell.querySelector('.splash-fcard-wrap');
+        const oldCard = oldWrap?.querySelector('.splash-fcard');
+        cell.appendChild(newWrap);
 
-      if(oldCard){
-        void oldCard.offsetWidth;
-        oldCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.55,0,.8,.45)`;
-        oldCard.style.transform = 'translateX(-102%)';
-        setTimeout(()=>oldWrap.remove(), CAROUSEL_SLIDE_MS + 50);
-      }
+        if(oldCard){
+          void oldCard.offsetWidth;
+          oldCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.55,0,.8,.45)`;
+          oldCard.style.transform = 'translateX(-102%)';
+          setTimeout(()=>oldWrap?.remove(), CAROUSEL_SLIDE_MS + 50);
+        }
 
-      void newCard.offsetWidth;
-      newCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.22,1,.36,1)`;
-      newCard.style.transform = 'translateX(0)';
+        void newCard.offsetWidth;
+        newCard.style.transition = `transform ${CAROUSEL_SLIDE_MS}ms cubic-bezier(.22,1,.36,1)`;
+        newCard.style.transform = 'translateX(0)';
 
-      setTimeout(()=>{
-        newCard.style.transition = '';
-        newCard.style.transform  = '';
-      }, CAROUSEL_SLIDE_MS + 60);
+        setTimeout(()=>{
+          newCard.style.transition = '';
+          newCard.style.transform  = '';
+        }, CAROUSEL_SLIDE_MS + 60);
+      });
     });
 
   }, CAROUSEL_SLOT_INTERVAL);
@@ -7279,7 +7487,7 @@ function makeCardEl(p, num){
   const last  = nameParts.slice(1).join(' ');
   const initials = ((first[0]||'')+(last[0]||'')).toUpperCase() || first.slice(0,2).toUpperCase();
 
-  const numStr = String(p.id ?? num).padStart(2,'0');
+  const numStr = carouselDisplayNumber(p);
   const photoHtml = p.photo
     ? `<img src="${esc(p.photo)}" alt="" loading="eager" decoding="async" fetchpriority="low">`
     : initials;
@@ -7589,6 +7797,7 @@ const PENDING_SYNC_KEY = 'draft_mm_pending_sync_v1';
 const RESTORE_LOCK_KEY = 'draft_mm_restore_lock_v1';
 const SYNC_POLL_MS = 1800;
 const PITCH_REFRESH_MS = 6000;
+const SUPABASE_QUERY_TIMEOUT_MS = 12000;
 const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 const EMBEDDED_SYNC_CONFIG = {
   url: 'https://yzpgwzhsoscctvwgsxxs.supabase.co',
@@ -7619,6 +7828,19 @@ let syncReconnectAttempt = 0;
 let syncSdkLoadPromise = null;
 let syncLastErrorToastAt = 0;
 
+function withTimeout(promise,ms,message){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error(message||'Supabase timeout')),ms))
+  ]);
+}
+function supabaseQuery(query,label='Supabase не ответил'){
+  return withTimeout(query,SUPABASE_QUERY_TIMEOUT_MS,label);
+}
+function isPitchSchemaMissing(error){
+  const text=[error?.message,error?.details,error?.hint,error?.code].filter(Boolean).join(' ');
+  return /voting_closed|closed_at|schema cache|column|PGRST204/i.test(text);
+}
 function markPendingCloudSave(){ try{ localStorage.setItem(PENDING_SYNC_KEY,'1'); }catch{} }
 function clearPendingCloudSave(){ try{ localStorage.removeItem(PENDING_SYNC_KEY); }catch{} }
 function hasPendingCloudSave(){ try{ return localStorage.getItem(PENDING_SYNC_KEY)==='1'; }catch{ return false; } }
@@ -7886,21 +8108,35 @@ async function loadPitchData(silent=true){
   try{
     const client=await ensurePitchClient();
     const includeScores=!document.body.classList.contains('jury-mode');
-    const requests=[
+    let teamsRes=await supabaseQuery(
       client.from('pitch_teams').select('id,name,sort_order,voting_closed,closed_at,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
-      client.from('pitch_ideas').select('id,team_id,title,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true})
-    ];
-    if(includeScores) requests.push(client.from('pitch_scores').select('id,team_id,idea_id,judge_name,score,updated_at').order('updated_at',{ascending:false}));
-    const [teamsRes,ideasRes,scoresRes]=await Promise.all(requests);
+      'Оценки долго грузятся'
+    );
+    if(teamsRes.error && isPitchSchemaMissing(teamsRes.error)){
+      teamsRes=await supabaseQuery(
+        client.from('pitch_teams').select('id,name,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
+        'Оценки долго грузятся'
+      );
+      if(!teamsRes.error) teamsRes.data=(teamsRes.data||[]).map(team=>({voting_closed:false,closed_at:null,...team}));
+    }
     if(teamsRes.error) throw teamsRes.error;
-    if(ideasRes.error) throw ideasRes.error;
-    if(scoresRes?.error) throw scoresRes.error;
     pitchState.teams=teamsRes.data||[];
-    pitchState.ideas=ideasRes.data||[];
-    if(includeScores) pitchState.scores=scoresRes?.data||[];
     if(!pitchState.selectedTeamId || !pitchState.teams.some(t=>String(t.id)===String(pitchState.selectedTeamId))){
       pitchState.selectedTeamId=pitchState.teams[0]?.id || '';
     }
+    renderJuryApp();
+    renderPitchAdmin();
+    renderPitchDashboard();
+
+    const requests=[
+      supabaseQuery(client.from('pitch_ideas').select('id,team_id,title,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),'Идеи долго грузятся')
+    ];
+    if(includeScores) requests.push(supabaseQuery(client.from('pitch_scores').select('id,team_id,idea_id,judge_name,score,updated_at').order('updated_at',{ascending:false}),'Оценки долго грузятся'));
+    const [ideasRes,scoresRes]=await Promise.all(requests);
+    if(ideasRes.error) throw ideasRes.error;
+    if(scoresRes?.error) throw scoresRes.error;
+    pitchState.ideas=ideasRes.data||[];
+    if(includeScores) pitchState.scores=scoresRes?.data||[];
     renderPitchAdmin();
     renderJuryApp();
     renderPitchDashboard();
@@ -7908,7 +8144,7 @@ async function loadPitchData(silent=true){
     if(!silent) toast('Оценки обновлены');
   } catch(err){
     console.error(err);
-    const msg='Нужны таблицы оценок в Supabase';
+    const msg=String(err?.message||'').includes('долго') ? 'Supabase долго отвечает, пробую ещё' : 'Нужны таблицы оценок в Supabase';
     const res=document.getElementById('pitch-results');
     if(res) res.innerHTML=`<div class="pitch-empty">${msg}. Прогони блок SQL из supabase_setup.sql.</div>`;
     const board=document.getElementById('pitchboard-inner');
@@ -7925,10 +8161,10 @@ async function addPitchTeam(){
   try{
     const client=await ensurePitchClient();
     const sort=(pitchState.teams||[]).length+1;
-    const {data:team,error}=await client.from('pitch_teams').insert({name,sort_order:sort}).select().single();
+    const {data:team,error}=await supabaseQuery(client.from('pitch_teams').insert({name,sort_order:sort}).select().single(),'Команда долго сохраняется');
     if(error) throw error;
     const ideas=Array.from({length:5},(_,i)=>({team_id:team.id,title:`Идея ${i+1}`,sort_order:i+1}));
-    const {error:ideaError}=await client.from('pitch_ideas').insert(ideas);
+    const {error:ideaError}=await supabaseQuery(client.from('pitch_ideas').insert(ideas),'Идеи долго сохраняются');
     if(ideaError) throw ideaError;
     if(input) input.value='';
     pitchState.selectedTeamId=team.id;
@@ -7958,7 +8194,7 @@ async function deletePitchTeam(id){
   if(!confirm(`Удалить команду «${team.name}» вместе с идеями и оценками?`)) return;
   try{
     const client=await ensurePitchClient();
-    const {error}=await client.from('pitch_teams').delete().eq('id',id);
+    const {error}=await supabaseQuery(client.from('pitch_teams').delete().eq('id',id),'Команда долго удаляется');
     if(error) throw error;
     pitchOpenDetails.clear();
     if(String(pitchState.selectedTeamId)===String(id)) pitchState.selectedTeamId='';
@@ -7978,7 +8214,7 @@ async function resetPitchScores(teamId=''){
     const client=await ensurePitchClient();
     let query=client.from('pitch_scores').delete().neq('id','00000000-0000-0000-0000-000000000000');
     if(scoped) query=query.eq('team_id',teamId);
-    const {error}=await query;
+    const {error}=await supabaseQuery(query,'Оценки долго сбрасываются');
     if(error) throw error;
     await loadPitchData(true);
     toast(scoped ? 'Оценки команды сброшены' : 'Оценки сброшены');
@@ -7993,10 +8229,10 @@ async function togglePitchTeamClosed(id){
   const closing=!team.voting_closed;
   try{
     const client=await ensurePitchClient();
-    const {error}=await client.from('pitch_teams').update({
+    const {error}=await supabaseQuery(client.from('pitch_teams').update({
       voting_closed:closing,
       closed_at:closing ? new Date().toISOString() : null
-    }).eq('id',id);
+    }).eq('id',id),'Статус голосования долго сохраняется');
     if(error) throw error;
     await loadPitchData(true);
     toast(closing ? 'Голосование закрыто' : 'Голосование открыто');
@@ -8100,6 +8336,17 @@ function pitchTeamStats(team){
     topIdea:votedIdeas.slice().sort((a,b)=>b.avg-a.avg || b.voteCount-a.voteCount)[0] || null
   };
 }
+function pitchAllIdeaStats(){
+  return pitchState.teams.flatMap(team=>
+    pitchIdeasForTeam(team.id).map(idea=>({
+      ...pitchIdeaStats(idea),
+      team
+    }))
+  );
+}
+function pitchMedal(rank){
+  return ['🏆','🥈','🥉'][rank] || `#${rank+1}`;
+}
 function renderPitchDashboard(){
   const board=document.getElementById('pitchboard-inner');
   const cnt=document.getElementById('pitchboard-cnt');
@@ -8111,16 +8358,23 @@ function renderPitchDashboard(){
   }
   const stats=pitchState.teams
     .map(pitchTeamStats)
-    .sort((a,b)=>(b.avg ?? -1)-(a.avg ?? -1) || b.totalVotes-a.totalVotes || String(a.team.name).localeCompare(String(b.team.name),'ru'));
-  const votedTeams=stats.filter(x=>x.avg!==null);
+    .sort((a,b)=>(a.team.sort_order||0)-(b.team.sort_order||0) || String(a.team.name).localeCompare(String(b.team.name),'ru'));
+  const allIdeas=pitchAllIdeaStats();
+  const scoredIdeas=allIdeas
+    .filter(x=>x.avg!==null)
+    .sort((a,b)=>b.avg-a.avg || b.voteCount-a.voteCount || String(a.team.name).localeCompare(String(b.team.name),'ru'));
+  const globalTopIdeas=scoredIdeas.slice(0,3);
   const totalVotes=pitchState.scores.length;
   const totalJudges=new Set(pitchState.scores.map(v=>(v.judge_name||'').trim()).filter(Boolean)).size;
-  const overall=votedTeams.length ? Math.round((votedTeams.reduce((sum,x)=>sum+x.avg,0)/votedTeams.length)*10)/10 : null;
-  const leader=votedTeams[0] || stats[0];
+  const overall=scoredIdeas.length ? Math.round((scoredIdeas.reduce((sum,x)=>sum+x.avg,0)/scoredIdeas.length)*10)/10 : null;
   const updated=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-  const leaderSub=leader?.topIdea
-    ? `Лучшая идея: ${leader.topIdea.idea.title} · ${pitchScoreLabel(leader.topIdea.avg)}`
-    : 'Ждём первые оценки жюри';
+  const globalTopHtml=globalTopIdeas.length
+    ? globalTopIdeas.map((x,rank)=>`<div class="pitchboard-topidea">
+        <div class="pitchboard-medal">${pitchMedal(rank)}</div>
+        <div class="pitchboard-topidea-name">${esc(x.idea.title)}<span class="pitchboard-topidea-team">${esc(x.team.name)}</span></div>
+        <div class="pitchboard-topidea-score">${pitchScoreLabel(x.avg)}</div>
+      </div>`).join('')
+    : '<div class="pitchboard-card-meta">Ждём первые оценки жюри</div>';
   const cards=stats.map((item,index)=>{
     const topIdeas=item.ideas
       .filter(x=>x.avg!==null)
@@ -8128,14 +8382,14 @@ function renderPitchDashboard(){
       .slice(0,3);
     const ideasHtml=topIdeas.length
       ? topIdeas.map((x,rank)=>`<div class="pitchboard-idea is-top">
-          <div class="pitchboard-idea-name"><span class="pitchboard-idea-rank">${rank+1}</span>${esc(x.idea.title)}</div>
+          <div class="pitchboard-idea-name"><span class="pitchboard-idea-rank">${pitchMedal(rank)}</span>${esc(x.idea.title)}</div>
           <div class="pitchboard-idea-score">${pitchScoreLabel(x.avg)}</div>
           <div class="pitchboard-bar"><span style="--w:${Math.max(3,Math.min(100,(x.avg||0)*10))}%"></span></div>
         </div>`).join('')
       : '<div class="pitchboard-card-meta">Пока нет оценок по идеям</div>';
-    return `<article class="pitchboard-card ${index===0 && item.avg!==null?'is-top':''} ${item.votingClosed?'is-closed':''}">
+    return `<article class="pitchboard-card ${item.votingClosed?'is-closed':''}">
       <div class="pitchboard-card-head">
-        <div class="pitchboard-card-rank">#${index+1}</div>
+        <div class="pitchboard-card-rank">команда</div>
         <div class="pitchboard-card-name">${esc(item.team.name)}</div>
         <div class="pitchboard-card-score">${pitchScoreLabel(item.avg)}</div>
       </div>
@@ -8154,15 +8408,11 @@ function renderPitchDashboard(){
     <div class="pitchboard-metric"><b>${pitchState.teams.length}</b><span>команд</span></div>
     <div class="pitchboard-metric"><b>${totalVotes}</b><span>оценок</span></div>
     <div class="pitchboard-metric"><b>${totalJudges}</b><span>жюри</span></div>
-    <div class="pitchboard-metric"><b>${pitchScoreLabel(overall)}</b><span>средний балл</span></div>
+    <div class="pitchboard-metric"><b>${pitchScoreLabel(overall)}</b><span>средний балл идей</span></div>
   </div>
-  <div class="pitchboard-leader">
-    <div class="pitchboard-rank">#1</div>
-    <div>
-      <div class="pitchboard-leader-name">${esc(leader?.team?.name||'—')}</div>
-      <div class="pitchboard-leader-sub">${esc(leaderSub)}</div>
-    </div>
-    <div class="pitchboard-leader-score">${pitchScoreLabel(leader?.avg)}</div>
+  <div class="pitchboard-topideas">
+    <div class="pitchboard-topideas-title">Топ-3 идеи</div>
+    <div class="pitchboard-topideas-list">${globalTopHtml}</div>
   </div>
   <div class="pitchboard-grid">${cards}</div>`;
 }
@@ -8255,7 +8505,7 @@ async function addJuryIdea(){
   try{
     const client=await ensurePitchClient();
     const next=ideas.length+1;
-    const {error}=await client.from('pitch_ideas').insert({team_id:teamId,title:`Идея ${next}`,sort_order:next});
+    const {error}=await supabaseQuery(client.from('pitch_ideas').insert({team_id:teamId,title:`Идея ${next}`,sort_order:next}),'Идея долго сохраняется');
     if(error) throw error;
     await loadPitchData(true);
   } catch(err){
@@ -8279,7 +8529,7 @@ async function submitJuryScores(){
   try{
     const client=await ensurePitchClient();
     localStorage.setItem(JURY_NAME_KEY,judge);
-    const {error}=await client.from('pitch_scores').upsert(rows,{onConflict:'team_id,idea_id,judge_name'});
+    const {error}=await supabaseQuery(client.from('pitch_scores').upsert(rows,{onConflict:'team_id,idea_id,judge_name'}),'Оценки долго отправляются');
     if(error) throw error;
     pitchState.juryScores={};
     await loadPitchData(true);
@@ -8347,7 +8597,10 @@ async function initCloudSync(force=false){
     if(syncChannel && syncClient) await syncClient.removeChannel(syncChannel);
     syncClient = makeSyncClient();
     if(!syncClient) throw new Error('Проверь URL / anon key / Sync ID');
-    const {data,error} = await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
+    const {data,error} = await supabaseQuery(
+      syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle(),
+      'Синк долго отвечает'
+    );
     if(error) throw error;
     if(data?.data){
       const pendingNow=hadPendingLocal || hasPendingCloudSave();
@@ -8434,7 +8687,10 @@ async function pollCloudNow(silent=true){
       if(syncSaveTimer && silent) return;
       clearTimeout(syncSaveTimer);
       syncSaveTimer=null;
-      const {data,error}=await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
+      const {data,error}=await supabaseQuery(
+        syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle(),
+        'Синк долго отвечает'
+      );
       if(error) throw error;
       if(data?.data){
         syncApplyingRemote=true;
@@ -8449,7 +8705,10 @@ async function pollCloudNow(silent=true){
       if(!silent) toast('Обновлено и синхронизировано');
       return;
     }
-    const {data,error}=await syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle();
+    const {data,error}=await supabaseQuery(
+      syncClient.from('draft_crm_state').select('data,updated_at').eq('id', syncConfig.rowId).maybeSingle(),
+      'Синк долго отвечает'
+    );
     if(error) throw error;
     if(data?.data) applyRemoteState(data.data,{silent,updatedAt:data.updated_at});
   } catch(err){
@@ -8495,7 +8754,10 @@ async function pushCloudNow(silent=false){
   const updatedAt=new Date().toISOString();
   const payload={id:syncConfig.rowId,data:dbForStorage(),updated_at:updatedAt};
   try{
-    const {error}=await syncClient.from('draft_crm_state').upsert(payload,{onConflict:'id'});
+    const {error}=await supabaseQuery(
+      syncClient.from('draft_crm_state').upsert(payload,{onConflict:'id'}),
+      'Сохранение долго отвечает'
+    );
     if(error) throw error;
   } catch(error){
     console.error(error);
