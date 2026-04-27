@@ -5277,8 +5277,7 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
       <span class="sec-actions-note" id="pitch-note">Жюри · идеи · средний балл</span>
       <div class="pitch-admin-actions">
         <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
-        <button class="btn btn-ghost btn-sm" type="button" onclick="exportPitchExcel()">⇩ Excel</button>
-        <button class="btn btn-ghost btn-sm" type="button" onclick="printPitchPdf()">▤ PDF</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="printPitchPdf()">⇩ PDF</button>
         <button class="btn btn-ghost btn-sm" type="button" onclick="resetPitchScores()">Сброс оценок</button>
         <button class="btn btn-solid btn-sm" type="button" onclick="openJurySite()">Открыть жюри</button>
       </div>
@@ -5308,8 +5307,7 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
       <span class="sec-actions-note" id="pitchboard-note">Live · средний балл жюри</span>
       <button class="btn btn-ghost btn-sm event-screen-btn" onclick="fullscreenPitchboard()"><span class="btn-ico">⛶</span>Во весь экран</button>
       <button class="btn btn-ghost btn-sm event-screen-btn" onclick="openPitchboardPresentation()"><span class="btn-ico">▣</span>На экран</button>
-      <button class="btn btn-ghost btn-sm" type="button" onclick="exportPitchExcel()">⇩ Excel</button>
-      <button class="btn btn-ghost btn-sm" type="button" onclick="printPitchPdf()">▤ PDF</button>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="printPitchPdf()">⇩ PDF</button>
       <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
     </div>
   </div>
@@ -8829,11 +8827,7 @@ function pitchReportTeamData(team, judges){
   const totalVotes=rows.reduce((total,row)=>total+row.voteCount,0);
   return {team,rows,avg,sum,totalVotes};
 }
-function pitchReportFilename(ext){
-  const date=new Date().toISOString().slice(0,10);
-  return `draft-jury-scores-${date}.${ext}`;
-}
-function buildPitchReportHtml(mode='excel'){
+function buildPitchReportHtml(mode='pdf'){
   if(!pitchState.teams.length){
     return '';
   }
@@ -8973,21 +8967,6 @@ function buildPitchReportHtml(mode='excel'){
 </body>
 </html>`;
 }
-function exportPitchExcel(){
-  const html=buildPitchReportHtml('excel');
-  if(!html){
-    toast('Нет команд для экспорта');
-    return;
-  }
-  const blob=new Blob(['\uFEFF'+html],{type:'application/vnd.ms-excel;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=pitchReportFilename('xls');
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
-  toast('Excel-отчет скачан');
-}
 function printPitchPdf(){
   const html=buildPitchReportHtml('pdf');
   if(!html){
@@ -9002,9 +8981,6 @@ function printPitchPdf(){
   popup.document.open();
   popup.document.write(html);
   popup.document.close();
-}
-function exportPitchCsv(){
-  exportPitchExcel();
 }
 function selectJuryTeam(id){
   pitchState.selectedTeamId=id;
