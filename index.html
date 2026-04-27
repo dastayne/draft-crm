@@ -2582,6 +2582,7 @@ body.jury-mode .jury-app{
   overflow:hidden;
   box-shadow:none;
   transition:transform .14s ease,border-color .14s ease,color .14s ease,background .14s ease;
+  touch-action:manipulation;
 }
 .score-btn::after{
   content:'';
@@ -2600,6 +2601,15 @@ body.jury-mode .jury-app{
 .score-btn:hover::after{
   opacity:.35;
   animation:scoreShine .72s ease-out 1;
+}
+.score-btn:active,
+.score-btn.tap-shine{
+  transform:scale(.94);
+  border-color:rgba(144,217,123,.58);
+}
+.score-btn.tap-shine::after{
+  opacity:.45;
+  animation:scoreShine .62s cubic-bezier(.2,.8,.2,1) 1;
 }
 .score-btn.active{
   color:#081006;
@@ -2620,6 +2630,12 @@ body.jury-mode .jury-app{
   from{transform:translateX(-130%) rotate(8deg)}
   to{transform:translateX(130%) rotate(8deg)}
 }
+@media(prefers-reduced-motion:reduce){
+  .score-btn.tap-shine::after,
+  .jury-actions .btn.tap-shine::after{
+    animation:none;
+  }
+}
 .jury-actions{
   display:flex;
   gap:8px;
@@ -2631,9 +2647,31 @@ body.jury-mode .jury-app{
   border-radius:999px;
   padding:0 20px;
   justify-content:center;
+  position:relative;
+  overflow:hidden;
+  touch-action:manipulation;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,color .16s ease,box-shadow .16s ease;
+}
+.jury-actions .btn::after{
+  content:'';
+  position:absolute;
+  inset:-45%;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.2) 48%,rgba(144,217,123,.32) 54%,transparent 68%);
+  opacity:0;
+  transform:translateX(-125%) rotate(10deg);
+  pointer-events:none;
+}
+.jury-actions .btn:active,
+.jury-actions .btn.tap-shine{
+  transform:translateY(1px) scale(.985);
+}
+.jury-actions .btn.tap-shine::after{
+  opacity:1;
+  animation:scoreShine .72s cubic-bezier(.2,.8,.2,1) 1;
 }
 .jury-actions .btn-solid{
   min-width:210px;
+  box-shadow:0 0 0 1px rgba(144,217,123,.18),0 12px 32px rgba(98,191,74,.16);
 }
 .jury-status{
   margin-top:12px;
@@ -2910,6 +2948,37 @@ body.jury-mode .jury-app{
   background:rgba(255,255,255,.04);
   border:1px solid rgba(255,255,255,.08);
 }
+.event-hold-btn{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:0 16px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.035);
+  color:rgba(255,255,255,.72);
+  font-family:var(--font-main);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .18s,border-color .18s,color .18s,transform .18s;
+}
+.event-hold-btn:hover{
+  color:var(--white);
+  border-color:rgba(144,217,123,.36);
+  background:rgba(98,191,74,.08);
+}
+.event-hold-btn:active{transform:translateY(1px)}
+.event-hold-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--green-lt);
+  box-shadow:0 0 18px rgba(98,191,74,.62);
+}
 .event-tab{
   min-height:38px;
   padding:0 18px;
@@ -2933,7 +3002,11 @@ body.jury-mode .jury-app{
   background:rgba(255,255,255,.025);
   border:1px solid rgba(255,255,255,.07);
   border-radius:999px;padding:3px;
+  max-width:100%;
+  overflow-x:auto;
+  scrollbar-width:none;
 }
+.splash-controls::-webkit-scrollbar{display:none}
 .splash-theme-btn{
   padding:8px 16px;font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
   border:0;color:var(--gray1);background:transparent;border-radius:999px;
@@ -3067,7 +3140,8 @@ body.jury-mode .jury-app{
 .splash-view.theme-cards .splash-stripes,
 .splash-view.theme-cards .splash-meta{display:none!important}
 .splash-view.theme-qr,
-.splash-view.theme-rules{
+.splash-view.theme-rules,
+.splash-view.theme-improv{
   background:
     radial-gradient(circle at 24% 18%,rgba(98,191,74,.13),transparent 28%),
     radial-gradient(circle at 78% 72%,rgba(98,191,74,.09),transparent 32%),
@@ -3094,6 +3168,17 @@ body.jury-mode .jury-app{
 .splash-view.theme-qr .splash-meta,
 .splash-view.theme-rules .splash-qr,
 .splash-view.theme-rules .splash-meta{display:none!important}
+.splash-view.theme-improv .splash-inner,
+.splash-view.theme-improv .splash-line,
+.splash-view.theme-improv .splash-grid,
+.splash-view.theme-improv .splash-aura,
+.splash-view.theme-improv .splash-rings,
+.splash-view.theme-improv .splash-stripes,
+.splash-view.theme-improv .splash-cards-grid,
+.splash-view.theme-improv .splash-cards-badge,
+.splash-view.theme-improv .splash-qr,
+.splash-view.theme-improv .splash-rules,
+.splash-view.theme-improv .splash-meta{display:none!important}
 .splash-qr{
   display:none;
   position:relative;
@@ -3209,6 +3294,113 @@ body.jury-mode .jury-app{
   font-weight:760;
   line-height:1.05;
 }
+.splash-improv{
+  display:none;
+  position:relative;
+  z-index:3;
+  width:min(1320px,calc(100% - 72px));
+  min-height:min(720px,76vh);
+  margin:auto;
+  place-items:center;
+  text-align:center;
+  overflow:hidden;
+}
+.splash-view.theme-improv .splash-improv{display:grid}
+.splash-improv::before,
+.splash-improv::after{
+  content:'';
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  filter:blur(34px);
+  opacity:.34;
+  animation:improvGlow 8s ease-in-out infinite;
+}
+.splash-improv::before{
+  width:34vw;
+  height:34vw;
+  left:4%;
+  bottom:-18%;
+  background:rgba(98,191,74,.28);
+}
+.splash-improv::after{
+  width:26vw;
+  height:26vw;
+  right:8%;
+  top:6%;
+  background:rgba(144,217,123,.18);
+  animation-delay:-3.2s;
+}
+.splash-improv-card{
+  position:relative;
+  z-index:2;
+  display:grid;
+  gap:22px;
+  justify-items:center;
+  padding:24px;
+}
+.splash-improv-kicker{
+  color:rgba(255,255,255,.48);
+  font-size:clamp(11px,1vw,16px);
+  font-weight:850;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.splash-improv-word{
+  color:var(--white);
+  font-size:clamp(54px,10vw,178px);
+  line-height:.82;
+  font-weight:950;
+  letter-spacing:-.055em;
+  text-transform:uppercase;
+  text-shadow:0 0 34px rgba(255,255,255,.08),0 0 72px rgba(98,191,74,.18);
+  animation:improvWord 5.8s ease-in-out infinite;
+}
+.splash-improv-word span{
+  display:inline-block;
+  animation:improvLetter 3.4s ease-in-out infinite;
+  animation-delay:calc(var(--i) * .055s);
+}
+.splash-improv-sub{
+  color:rgba(255,255,255,.62);
+  font-size:clamp(15px,1.7vw,28px);
+  font-weight:760;
+  line-height:1.08;
+  max-width:720px;
+}
+.splash-improv-pulse{
+  width:min(420px,52vw);
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(144,217,123,.78),transparent);
+  box-shadow:0 0 22px rgba(98,191,74,.42);
+  animation:improvLine 3.6s ease-in-out infinite;
+}
+@keyframes improvGlow{
+  0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.24}
+  50%{transform:translate3d(4vw,-3vh,0) scale(1.15);opacity:.42}
+}
+@keyframes improvWord{
+  0%,100%{transform:translateY(0) scale(1);filter:saturate(1)}
+  45%{transform:translateY(-5px) scale(1.012);filter:saturate(1.18)}
+}
+@keyframes improvLetter{
+  0%,100%{transform:translateY(0);color:rgba(255,255,255,.92)}
+  42%{transform:translateY(-10px);color:#ffffff}
+  58%{transform:translateY(0);color:rgba(144,217,123,.9)}
+}
+@keyframes improvLine{
+  0%,100%{opacity:.28;transform:scaleX(.62)}
+  50%{opacity:1;transform:scaleX(1)}
+}
+@media(prefers-reduced-motion:reduce){
+  .splash-improv::before,
+  .splash-improv::after,
+  .splash-improv-word,
+  .splash-improv-word span,
+  .splash-improv-pulse{
+    animation:none;
+  }
+}
 @media(max-width:760px){
   .splash-rules{width:calc(100% - 28px)}
   .splash-rules-head{align-items:flex-start;flex-direction:column;gap:10px;margin-bottom:14px;padding-bottom:16px}
@@ -3216,6 +3408,8 @@ body.jury-mode .jury-app{
   .splash-rule{min-height:52px;grid-template-columns:34px minmax(0,1fr);gap:10px;padding:10px}
   .splash-rule-num{width:30px;height:30px;font-size:10px}
   .splash-rule-text{font-size:15px}
+  .splash-improv{width:calc(100% - 28px);min-height:56vh}
+  .splash-improv-card{gap:16px;padding:16px}
 }
 
 /* логотип в левом верхнем углу */
@@ -3333,7 +3527,37 @@ body.presentation-mode .view{display:none!important}
 body.presentation-mode.presentation-randomizer #view-randomizer,
 body.presentation-mode.presentation-splash #view-splash,
 body.presentation-mode.presentation-timer #view-timer,
-body.presentation-mode.presentation-pitchboard #view-pitchboard{display:block!important;animation:none}
+body.presentation-mode.presentation-pitchboard #view-pitchboard,
+body.presentation-mode.presentation-blank #view-blank{display:block!important;animation:none}
+body.presentation-mode.presentation-blank{
+  background:#000;
+  cursor:none;
+}
+body.presentation-mode.presentation-blank main{
+  padding:0;
+  min-height:100vh;
+  background:#000;
+}
+.blank-screen{
+  min-height:100vh;
+  width:100%;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(circle at 50% 52%,rgba(98,191,74,.035),transparent 34%),
+    #000;
+  overflow:hidden;
+}
+.blank-screen-mark{
+  font-family:'Ekran Draft',var(--font-main);
+  color:rgba(255,255,255,.18);
+  font-size:clamp(44px,6vw,92px);
+  line-height:.86;
+  letter-spacing:-.02em;
+  text-transform:lowercase;
+  user-select:none;
+}
+.blank-screen-mark span{color:rgba(98,191,74,.34)}
 body.presentation-mode .randomizer-header{
   display:flex;
   margin-bottom:24px;
@@ -3661,6 +3885,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   .event-switcher{align-items:stretch;flex-direction:column;margin-bottom:16px}
   .event-tabs{width:100%}
   .event-tab{flex:1;padding:0 10px}
+  .event-hold-btn{width:100%;min-height:40px}
   .splash-view{min-height:calc(100dvh - 240px);border-radius:14px}
   .splash-view .splash-inner{padding:28px 18px;gap:18px}
   .splash-meta{left:18px!important;right:18px!important;bottom:14px!important;font-size:8.5px!important;letter-spacing:.18em!important}
@@ -4822,6 +5047,16 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
     <button class="event-tab" id="event-tab-timer" type="button" onclick="switchEventTab('timer')">Таймеры</button>
     <button class="event-tab" id="event-tab-pitchboard" type="button" onclick="switchEventTab('pitchboard')">Оценки</button>
   </div>
+  <button class="event-hold-btn" type="button" onclick="openBlankPresentation()" title="Открыть тёмную заглушку на плазме">
+    <span class="event-hold-dot" aria-hidden="true"></span>
+    Заглушка
+  </button>
+</div>
+
+<div class="view" id="view-blank" aria-label="Тёмная заглушка">
+  <div class="blank-screen">
+    <div class="blank-screen-mark">драфт<span>.</span></div>
+  </div>
 </div>
 
 <!-- ── ANALYTICS ── -->
@@ -5144,6 +5379,7 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
         <button class="splash-theme-btn" data-splash-theme="light" onclick="setSplashTheme('light',this)">Светлая</button>
         <button class="splash-theme-btn" data-splash-theme="cards" onclick="setSplashTheme('cards',this)">Карточки</button>
         <button class="splash-theme-btn" data-splash-theme="rules" onclick="setSplashTheme('rules',this)">Правила</button>
+        <button class="splash-theme-btn" data-splash-theme="improv" onclick="setSplashTheme('improv',this)">Импровизация</button>
         <button class="splash-theme-btn" data-splash-theme="qr" onclick="setSplashTheme('qr',this)">QR</button>
       </div>
       <button class="splash-cast-btn" onclick="openSplashPresentation()">На экран</button>
@@ -5195,6 +5431,16 @@ body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-displ
         <div class="splash-rule"><div class="splash-rule-num">08</div><div class="splash-rule-text">Держим фокус на задаче</div></div>
         <div class="splash-rule"><div class="splash-rule-num">09</div><div class="splash-rule-text">Отбираем по понятным критериям</div></div>
         <div class="splash-rule"><div class="splash-rule-num">10</div><div class="splash-rule-text">Упаковываем идеи в готовые концепты</div></div>
+      </div>
+    </div>
+    <div class="splash-improv" id="splash-improv">
+      <div class="splash-improv-card">
+        <div class="splash-improv-kicker">режим живой сцены</div>
+        <div class="splash-improv-word" aria-label="Импровизация">
+          <span style="--i:0">И</span><span style="--i:1">М</span><span style="--i:2">П</span><span style="--i:3">Р</span><span style="--i:4">О</span><span style="--i:5">В</span><span style="--i:6">И</span><span style="--i:7">З</span><span style="--i:8">А</span><span style="--i:9">Ц</span><span style="--i:10">И</span><span style="--i:11">Я</span>
+        </div>
+        <div class="splash-improv-pulse" aria-hidden="true"></div>
+        <div class="splash-improv-sub">слушаем, подхватываем, усиливаем</div>
       </div>
     </div>
   </div>
@@ -5536,7 +5782,7 @@ function switchEventTab(name){
 }
 
 function enterAppMode(mode){
-  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard');
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard','presentation-blank');
   if(mode==='gate'){
     appMode='gate';
     document.body.classList.add('mode-gate-active');
@@ -6930,6 +7176,13 @@ function openRandomizerPresentation(){
   const win=window.open(url.toString(),'draft-randomizer-screen','popup=yes,width=1600,height=900');
   if(!win) toast('Браузер заблокировал новое окно');
 }
+function openBlankPresentation(){
+  const url=new URL(window.location.href);
+  url.searchParams.set('present','blank');
+  url.hash='';
+  const win=window.open(url.toString(),'draft-blank-screen','popup=yes,width=1600,height=900');
+  if(!win) toast('Браузер заблокировал новое окно');
+}
 
 // ─── EVENT TIMER ─────────────────────────────────────────────
 const TIMER_DEFAULT_SECONDS = 15 * 60;
@@ -7243,7 +7496,7 @@ async function fullscreenTimerStage(){
   }
 }
 // ── SPLASH V4 ──────────────────────────────────────────────
-const SPLASH_THEMES = ['dark','light','cards','rules','qr'];
+const SPLASH_THEMES = ['dark','light','cards','rules','improv','qr'];
 let splashTheme = 'dark';
 let _carouselTimer = null;
 let _carouselQueue = [];   // все участники — крутим по кругу
@@ -7263,17 +7516,20 @@ function setSplashTheme(theme, btn){
   const isCards = theme === 'cards';
   const isQr = theme === 'qr';
   const isRules = theme === 'rules';
+  const isImprov = theme === 'improv';
   const grid   = document.getElementById('splash-cards-grid');
   const badge  = document.getElementById('splash-cards-badge');
   const meta   = view.querySelector('.splash-meta');
   const qr     = document.getElementById('splash-qr');
   const rules  = document.getElementById('splash-rules');
+  const improv = document.getElementById('splash-improv');
 
   if(grid)  grid.style.display  = isCards ? 'grid' : 'none';
   if(badge) badge.style.display = isCards ? 'block' : 'none';
-  if(meta)  meta.style.display  = (isCards || isQr || isRules) ? 'none' : 'flex';
+  if(meta)  meta.style.display  = (isCards || isQr || isRules || isImprov) ? 'none' : 'flex';
   if(qr)    qr.style.display    = isQr ? 'grid' : 'none';
   if(rules) rules.style.display = isRules ? 'block' : 'none';
+  if(improv) improv.style.display = isImprov ? 'grid' : 'none';
 
   if(isCards){
     preloadEventPhotos();
@@ -7542,12 +7798,12 @@ async function toggleFullscreen(){
 function applyPresentationMode(){
   const params=new URLSearchParams(window.location.search);
   const present=params.get('present');
-  if(present!=='randomizer' && present!=='splash' && present!=='timer' && present!=='pitchboard') return false;
-  document.body.classList.remove('mode-gate-active','event-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard');
+  if(present!=='randomizer' && present!=='splash' && present!=='timer' && present!=='pitchboard' && present!=='blank') return false;
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard','presentation-blank');
   document.body.classList.add('presentation-mode','presentation-'+present);
   appMode='presentation';
   preloadEventPhotos();
-  document.title=(present==='splash' ? 'Заставка' : present==='timer' ? 'Таймер' : present==='pitchboard' ? 'Оценки' : 'Команды')+' · драфт';
+  document.title=(present==='splash' ? 'Заставка' : present==='timer' ? 'Таймер' : present==='pitchboard' ? 'Оценки' : present==='blank' ? 'Заглушка' : 'Команды')+' · драфт';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+present)?.classList.add('active');
@@ -7849,6 +8105,10 @@ function isPitchSchemaMissing(error){
   const text=[error?.message,error?.details,error?.hint,error?.code].filter(Boolean).join(' ');
   return /voting_closed|closed_at|schema cache|column|PGRST204/i.test(text);
 }
+function isPitchPublicRpcMissing(error){
+  const text=[error?.message,error?.details,error?.hint,error?.code].filter(Boolean).join(' ');
+  return /get_pitch_public|Could not find the function|schema cache|function|PGRST202|42883/i.test(text);
+}
 function markPendingCloudSave(){ try{ localStorage.setItem(PENDING_SYNC_KEY,'1'); }catch{} }
 function clearPendingCloudSave(){ try{ localStorage.removeItem(PENDING_SYNC_KEY); }catch{} }
 function hasPendingCloudSave(){ try{ return localStorage.getItem(PENDING_SYNC_KEY)==='1'; }catch{ return false; } }
@@ -8037,6 +8297,7 @@ let pitchRefreshTimer = null;
 let pitchChannel = null;
 let pitchReloadTimer = null;
 let pitchOpenDetails = new Set();
+let pitchPublicRpcAvailable = true;
 
 function isJuryHost(){
   const params=new URLSearchParams(window.location.search);
@@ -8110,7 +8371,7 @@ function startPitchAutoRefresh(){
 }
 function enterJuryMode(){
   appMode='jury';
-  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard');
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard','presentation-blank');
   document.body.classList.add('jury-mode');
   document.title='Оценка идей · драфт';
   hydratePitchPublicCache();
@@ -8154,10 +8415,44 @@ async function fetchPitchTeams(client){
   }
   return teamsRes;
 }
+async function fetchPitchPublicBundle(client){
+  if(!pitchPublicRpcAvailable) return null;
+  const res=await supabaseQuery(client.rpc('get_pitch_public'),'Данные долго грузятся');
+  if(res.error){
+    if(isPitchPublicRpcMissing(res.error)){
+      pitchPublicRpcAvailable=false;
+      return null;
+    }
+    throw res.error;
+  }
+  const payload=typeof res.data==='string' ? JSON.parse(res.data) : res.data;
+  if(!payload || !Array.isArray(payload.teams) || !Array.isArray(payload.ideas)) return null;
+  return {
+    teams:payload.teams.map(team=>({voting_closed:false,closed_at:null,...team})),
+    ideas:payload.ideas
+  };
+}
 async function loadPitchData(silent=true){
   try{
     const client=await ensurePitchClient();
     const includeScores=!document.body.classList.contains('jury-mode');
+    if(!includeScores){
+      const publicBundle=await fetchPitchPublicBundle(client);
+      if(publicBundle){
+        pitchState.teams=publicBundle.teams;
+        pitchState.ideas=publicBundle.ideas;
+        if(!pitchState.selectedTeamId || !pitchState.teams.some(t=>String(t.id)===String(pitchState.selectedTeamId))){
+          pitchState.selectedTeamId=pitchState.teams[0]?.id || '';
+        }
+        cachePitchPublicData();
+        renderJuryApp();
+        renderPitchAdmin();
+        renderPitchDashboard();
+        subscribePitchChanges();
+        if(!silent) toast('Оценки обновлены');
+        return;
+      }
+    }
     const firstRequests=[
       fetchPitchTeams(client),
       supabaseQuery(client.from('pitch_ideas').select('id,team_id,title,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),'Данные долго грузятся')
@@ -8506,6 +8801,14 @@ function setJuryScore(ideaId,score){
   pitchState.juryScores[String(ideaId)]=score;
   renderJuryApp();
 }
+document.addEventListener('pointerdown', e=>{
+  const btn=e.target.closest('.jury-app .score-btn, .jury-app .jury-actions .btn');
+  if(!btn || btn.disabled) return;
+  btn.classList.remove('tap-shine');
+  void btn.offsetWidth;
+  btn.classList.add('tap-shine');
+  window.setTimeout(()=>btn.classList.remove('tap-shine'),760);
+},{passive:true});
 function renderJuryApp(){
   if(!document.body.classList.contains('jury-mode')) return;
   const nameInput=document.getElementById('jury-name');
