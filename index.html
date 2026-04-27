@@ -107,6 +107,7 @@ nav{display:flex;gap:1px;padding:0 56px;border-bottom:1px solid var(--border);ba
 }
 .tab:hover{color:var(--white)}
 .tab.active{color:var(--green-lt);border-bottom-color:var(--green)}
+.tab-pitch{margin-left:auto}
 .badge{
   display:inline-flex;align-items:center;justify-content:center;
   background:var(--green);color:#0a1a08;font-size:9px;font-weight:700;
@@ -2049,6 +2050,11 @@ body.event-mode .sync-pill.error{
   border-color:rgba(98,191,74,.42);
   background:rgba(98,191,74,.1);
 }
+.pitch-team-btn.closed{
+  color:var(--amber);
+  border-color:rgba(196,155,58,.34);
+  background:rgba(196,155,58,.06);
+}
 .pitch-team-meta{
   color:var(--gray2);
   font-size:10px;
@@ -2056,6 +2062,20 @@ body.event-mode .sync-pill.error{
   text-transform:uppercase;
   white-space:nowrap;
 }
+.pitch-admin-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.pitch-admin-actions .btn{min-height:34px}
+.pitch-team-tools{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.pitch-team-tools .btn{min-height:32px}
 .pitch-results{
   display:grid;
   gap:10px;
@@ -2065,6 +2085,10 @@ body.event-mode .sync-pill.error{
   background:#0c0c0c;
   border-radius:10px;
   overflow:hidden;
+}
+.pitch-result-card.is-top-idea{
+  border-color:rgba(98,191,74,.36);
+  background:linear-gradient(135deg,rgba(98,191,74,.09),#0c0c0c 46%);
 }
 .pitch-result-head{
   display:grid;
@@ -2078,6 +2102,21 @@ body.event-mode .sync-pill.error{
   font-size:15px;
   font-weight:850;
   min-width:0;
+}
+.pitch-top-mark{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:24px;
+  height:22px;
+  margin-right:8px;
+  border-radius:999px;
+  background:rgba(98,191,74,.14);
+  color:var(--green-lt);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.04em;
+  vertical-align:middle;
 }
 .pitch-result-score{
   color:var(--green-lt);
@@ -2126,6 +2165,291 @@ body.event-mode .sync-pill.error{
   padding:24px;
   text-align:center;
   background:rgba(255,255,255,.018);
+}
+.pitchboard-stage{
+  min-height:calc(100vh - 260px);
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  padding:28px;
+  border:1px solid rgba(98,191,74,.14);
+  background:
+    radial-gradient(circle at 18% 12%,rgba(98,191,74,.14),transparent 30%),
+    radial-gradient(circle at 84% 6%,rgba(255,255,255,.055),transparent 24%),
+    linear-gradient(90deg,rgba(98,191,74,.025) 1px,transparent 1px),
+    linear-gradient(180deg,#050505 0%,#090a09 58%,#040404 100%);
+  background-size:100% 100%,100% 100%,72px 100%,100% 100%;
+  cursor:zoom-in;
+}
+.pitchboard-stage::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 42%,rgba(0,0,0,.28));
+  pointer-events:none;
+}
+.pitchboard-inner{
+  position:relative;
+  z-index:1;
+  display:grid;
+  gap:22px;
+  max-width:1680px;
+  margin:0 auto;
+}
+.pitchboard-top{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:28px;
+  align-items:end;
+  padding-bottom:20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.pitchboard-kicker{
+  color:var(--green-lt);
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.pitchboard-title{
+  color:var(--white);
+  font-size:clamp(42px,5vw,86px);
+  line-height:.88;
+  font-weight:900;
+  letter-spacing:-.045em;
+  text-transform:uppercase;
+}
+.pitchboard-live{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  min-height:36px;
+  padding:0 14px;
+  border:1px solid rgba(98,191,74,.35);
+  background:rgba(98,191,74,.08);
+  color:var(--green-lt);
+  border-radius:999px;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.pitchboard-live::before{
+  content:'';
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green-lt);
+  box-shadow:0 0 14px rgba(144,217,123,.8);
+  animation:dotGlow 2.2s ease-in-out infinite;
+}
+.pitchboard-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(120px,1fr));
+  gap:10px;
+}
+.pitchboard-metric{
+  min-height:86px;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.075);
+  background:rgba(255,255,255,.028);
+}
+.pitchboard-metric b{
+  display:block;
+  color:var(--white);
+  font-size:clamp(28px,3vw,48px);
+  line-height:1;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+.pitchboard-metric span{
+  display:block;
+  margin-top:7px;
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.pitchboard-leader{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:18px;
+  padding:20px;
+  border:1px solid rgba(98,191,74,.28);
+  background:linear-gradient(135deg,rgba(98,191,74,.14),rgba(255,255,255,.035));
+  box-shadow:0 24px 72px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.pitchboard-rank{
+  width:54px;
+  height:54px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  border:1px solid rgba(98,191,74,.42);
+  color:var(--green-lt);
+  background:rgba(98,191,74,.09);
+  font-size:18px;
+  font-weight:900;
+}
+.pitchboard-leader-name{
+  color:var(--white);
+  font-size:clamp(28px,3.4vw,58px);
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:-.04em;
+  text-transform:uppercase;
+}
+.pitchboard-leader-sub{
+  margin-top:7px;
+  color:var(--gray1);
+  font-size:13px;
+  font-weight:760;
+}
+.pitchboard-leader-score{
+  color:var(--green-lt);
+  font-size:clamp(44px,5.4vw,96px);
+  line-height:.86;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+.pitchboard-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.pitchboard-card{
+  min-height:260px;
+  display:grid;
+  align-content:start;
+  gap:15px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(11,11,11,.78);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+.pitchboard-card.is-top{
+  border-color:rgba(98,191,74,.34);
+  background:linear-gradient(180deg,rgba(98,191,74,.1),rgba(11,11,11,.82) 48%);
+}
+.pitchboard-card.is-closed{
+  border-color:rgba(196,155,58,.24);
+}
+.pitchboard-card-head{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:12px;
+  align-items:start;
+}
+.pitchboard-card-rank{
+  color:var(--gray2);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+.pitchboard-card-name{
+  min-width:0;
+  color:var(--white);
+  font-size:clamp(18px,1.8vw,30px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.035em;
+  text-transform:uppercase;
+}
+.pitchboard-card-score{
+  color:var(--green-lt);
+  font-size:clamp(28px,3vw,52px);
+  line-height:.9;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+.pitchboard-card-meta{
+  color:var(--gray2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+.pitchboard-idea-list{
+  display:grid;
+  gap:9px;
+}
+.pitchboard-idea{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+}
+.pitchboard-idea-name{
+  min-width:0;
+  color:var(--gray1);
+  font-size:13px;
+  font-weight:760;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.pitchboard-idea-score{
+  color:var(--white);
+  font-size:14px;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+.pitchboard-idea.is-top .pitchboard-idea-name,
+.pitchboard-idea.is-top .pitchboard-idea-score{
+  color:var(--green-lt);
+}
+.pitchboard-idea-rank{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:20px;
+  height:20px;
+  margin-right:7px;
+  border-radius:50%;
+  background:rgba(98,191,74,.14);
+  color:var(--green-lt);
+  font-size:10px;
+  font-weight:900;
+}
+.pitchboard-closed{
+  color:var(--amber);
+}
+.pitchboard-bar{
+  grid-column:1/-1;
+  height:4px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.pitchboard-bar span{
+  display:block;
+  width:var(--w,0%);
+  height:100%;
+  background:linear-gradient(90deg,var(--green),var(--green-lt));
+  box-shadow:0 0 16px rgba(98,191,74,.45);
+  transition:width .45s ease;
+}
+.pitchboard-empty{
+  min-height:calc(100vh - 380px);
+  display:grid;
+  place-items:center;
+  text-align:center;
+  color:var(--gray1);
+  border:1px dashed rgba(255,255,255,.12);
+  background:rgba(255,255,255,.018);
+  font-size:18px;
+  font-weight:720;
+}
+.pitchboard-stage:fullscreen{
+  min-height:100vh;
+  border:0;
+  cursor:default;
+}
+.pitchboard-stage:fullscreen .pitchboard-inner{
+  min-height:calc(100vh - 56px);
 }
 .jury-app{
   display:none;
@@ -2237,6 +2561,10 @@ body.jury-mode .jury-app{
   background:var(--green-lt);
   border-color:var(--green-lt);
 }
+.score-btn:disabled{
+  opacity:.34;
+  cursor:default;
+}
 .jury-actions{
   display:flex;
   gap:8px;
@@ -2257,11 +2585,18 @@ body.jury-mode .jury-app{
   .pitch-result-head{grid-template-columns:minmax(0,1fr) auto;gap:8px}
   .pitch-result-votes{grid-column:1/2}
   .pitch-detail-btn{grid-column:2/3;grid-row:2/3}
+  .pitchboard-stage{min-height:calc(100dvh - 270px);padding:16px}
+  .pitchboard-top{grid-template-columns:1fr;gap:14px}
+  .pitchboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pitchboard-leader{grid-template-columns:auto minmax(0,1fr);padding:16px}
+  .pitchboard-leader-score{grid-column:1/-1}
+  .pitchboard-grid{grid-template-columns:1fr}
+  .pitchboard-card{min-height:0}
   .jury-app{padding:22px 12px 36px}
   .jury-logo{font-size:40px}
   .jury-card{padding:14px;border-radius:12px}
-  .score-grid{grid-template-columns:repeat(5,1fr);gap:7px}
-  .score-btn{min-height:44px;aspect-ratio:auto}
+  .score-grid{grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+  .score-btn{min-height:34px;aspect-ratio:auto;border-radius:6px;font-size:11px}
   .jury-actions{display:grid;grid-template-columns:1fr}
   .jury-actions .btn{width:100%;justify-content:center}
 }
@@ -2664,8 +2999,74 @@ body.jury-mode .jury-app{
 .splash-view.theme-cards .splash-grid,
 .splash-view.theme-cards .splash-aura,
 .splash-view.theme-cards .splash-rings,
+.splash-view.theme-cards .splash-qr,
 .splash-view.theme-cards .splash-stripes,
 .splash-view.theme-cards .splash-meta{display:none!important}
+.splash-view.theme-qr{
+  background:
+    radial-gradient(circle at 24% 18%,rgba(98,191,74,.13),transparent 28%),
+    radial-gradient(circle at 78% 72%,rgba(98,191,74,.09),transparent 32%),
+    #050505;
+  border:1px solid rgba(98,191,74,.12);
+}
+.splash-view.theme-qr .splash-inner,
+.splash-view.theme-qr .splash-line,
+.splash-view.theme-qr .splash-grid,
+.splash-view.theme-qr .splash-aura,
+.splash-view.theme-qr .splash-rings,
+.splash-view.theme-qr .splash-stripes,
+.splash-view.theme-qr .splash-cards-grid,
+.splash-view.theme-qr .splash-cards-badge,
+.splash-view.theme-qr .splash-meta{display:none!important}
+.splash-qr{
+  display:none;
+  position:relative;
+  z-index:3;
+  width:min(760px,calc(100% - 48px));
+  margin:auto;
+  text-align:center;
+}
+.splash-view.theme-qr .splash-qr{display:grid;place-items:center;gap:24px}
+.splash-qr-logo{
+  font-family:'Ekran Draft',var(--font-main);
+  font-size:clamp(44px,6vw,92px);
+  line-height:.86;
+  color:var(--white);
+  text-transform:lowercase;
+}
+.splash-qr-logo span{color:var(--green)}
+.splash-qr-box{
+  width:clamp(240px,28vw,430px);
+  aspect-ratio:1;
+  display:grid;
+  place-items:center;
+  padding:18px;
+  background:#f3f3f3;
+  border-radius:18px;
+  box-shadow:0 28px 90px rgba(0,0,0,.5),0 0 80px rgba(98,191,74,.12);
+}
+.splash-qr-box img{display:block;width:100%;height:100%;object-fit:contain}
+.splash-qr-title{
+  color:var(--white);
+  font-size:clamp(22px,2.6vw,44px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.035em;
+  text-transform:uppercase;
+}
+.splash-qr-sub{
+  color:var(--gray1);
+  font-size:clamp(12px,1.1vw,17px);
+  font-weight:760;
+}
+.splash-qr-url{
+  color:var(--green-lt);
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
 
 /* логотип в левом верхнем углу */
 .splash-cards-badge{
@@ -2781,7 +3182,8 @@ body.presentation-mode main{
 body.presentation-mode .view{display:none!important}
 body.presentation-mode.presentation-randomizer #view-randomizer,
 body.presentation-mode.presentation-splash #view-splash,
-body.presentation-mode.presentation-timer #view-timer{display:block!important;animation:none}
+body.presentation-mode.presentation-timer #view-timer,
+body.presentation-mode.presentation-pitchboard #view-pitchboard{display:block!important;animation:none}
 body.presentation-mode .randomizer-header{
   display:flex;
   margin-bottom:24px;
@@ -2830,7 +3232,8 @@ body.presentation-mode.presentation-splash main{
 }
 body.presentation-mode.presentation-splash #view-splash .sec-header,
 body.presentation-mode.presentation-timer #view-timer .sec-header,
-body.presentation-mode.presentation-timer .timer-panel{
+body.presentation-mode.presentation-timer .timer-panel,
+body.presentation-mode.presentation-pitchboard #view-pitchboard .sec-header{
   display:none;
 }
 body.presentation-mode.presentation-splash .splash-view{
@@ -2839,6 +3242,21 @@ body.presentation-mode.presentation-splash .splash-view{
 }
 body.presentation-mode.presentation-timer main{
   padding:0;
+}
+body.presentation-mode.presentation-pitchboard main{
+  padding:0;
+}
+body.presentation-mode.presentation-pitchboard .pitchboard-stage{
+  min-height:100vh;min-height:100dvh;
+  border:0;
+  cursor:default;
+  padding:36px 48px;
+}
+body.presentation-mode.presentation-pitchboard .pitchboard-inner{
+  min-height:calc(100dvh - 72px);
+}
+body.presentation-mode.presentation-pitchboard .pitchboard-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
 }
 body.presentation-mode.presentation-timer .timer-stage{
   min-height:100vh;min-height:100dvh;
@@ -2976,7 +3394,8 @@ body.event-mode .view{
 }
 body.event-mode #view-randomizer.active,
 body.event-mode #view-splash.active,
-body.event-mode #view-timer.active{
+body.event-mode #view-timer.active,
+body.event-mode #view-pitchboard.active{
   display:block!important;
 }
 .randomizer-grid.reveal .randomizer-team{
@@ -4055,6 +4474,112 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   }
   .p-table-row.mobile-drag-placed{animation:draftDropPulse .42s ease-out}
 }
+
+/* Timer minimal mode */
+@keyframes timerAmbientLoop{
+  0%,100%{transform:translate3d(-2%,0,0) scale(1);opacity:.78}
+  50%{transform:translate3d(2%,-1%,0) scale(1.04);opacity:1}
+}
+.timer-stage,
+body.presentation-mode.presentation-timer .timer-stage{
+  background:#030303!important;
+  border-color:rgba(98,191,74,.12)!important;
+}
+.timer-stage::before{
+  content:''!important;
+  position:absolute!important;
+  inset:-18%!important;
+  background:
+    radial-gradient(ellipse at 18% 76%,rgba(98,191,74,.18),transparent 34%),
+    radial-gradient(ellipse at 66% 28%,rgba(98,191,74,.10),transparent 28%),
+    linear-gradient(180deg,#030303,#050505)!important;
+  animation:timerAmbientLoop 9s ease-in-out infinite!important;
+  pointer-events:none!important;
+}
+.timer-stage::after{
+  background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 42%,rgba(0,0,0,.24))!important;
+  opacity:1!important;
+}
+.timer-ring-control,
+.timer-deco-actions,
+.timer-corner-btn{
+  display:none!important;
+}
+.timer-stage-inner,
+body.presentation-mode.presentation-timer .timer-stage-inner{
+  width:min(1280px,calc(100% - 56px))!important;
+  min-height:calc(100vh - 360px);
+  display:grid!important;
+  place-items:center!important;
+  padding:48px 0!important;
+}
+body.presentation-mode.presentation-timer .timer-stage-inner{
+  min-height:100vh!important;
+}
+.timer-focus,
+body.presentation-mode.presentation-timer .timer-focus{
+  width:min(980px,100%)!important;
+  min-height:auto!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.timer-focus::before{display:none!important}
+.timer-focus-content{
+  width:100%!important;
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  text-align:center!important;
+}
+.timer-topic{
+  margin:0 0 24px!important;
+  color:rgba(255,255,255,.56)!important;
+  font-size:clamp(22px,2.2vw,38px)!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+}
+.timer-display,
+body.presentation-mode.presentation-timer .timer-display{
+  color:#f4f4f4!important;
+  font-family:var(--font-main)!important;
+  font-size:clamp(112px,13vw,220px)!important;
+  font-weight:850!important;
+  letter-spacing:0!important;
+  line-height:.85!important;
+  font-variant-numeric:tabular-nums!important;
+  transform:scaleX(.94)!important;
+  transform-origin:center!important;
+}
+.timer-stage.is-long-time .timer-display,
+body.presentation-mode.presentation-timer .timer-stage.is-long-time .timer-display{
+  font-size:clamp(82px,10.2vw,176px)!important;
+}
+.timer-duration{
+  margin-top:26px!important;
+  color:rgba(255,255,255,.46)!important;
+  font-size:clamp(18px,1.8vw,30px)!important;
+  font-weight:650!important;
+  letter-spacing:0!important;
+}
+.timer-status{
+  margin-top:15px!important;
+  color:var(--green-lt)!important;
+  font-size:clamp(12px,1vw,16px)!important;
+  font-weight:850!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+}
+.timer-stage.is-paused .timer-display{color:rgba(255,255,255,.44)!important}
+.timer-stage.is-paused .timer-status{color:rgba(255,255,255,.44)!important}
+.timer-stage.is-done .timer-display{color:#f4f4f4!important}
+@media(max-width:760px){
+  .timer-stage-inner{width:calc(100% - 28px)!important;min-height:calc(100dvh - 310px)!important}
+  .timer-display{font-size:clamp(72px,23vw,118px)!important}
+  .timer-stage.is-long-time .timer-display{font-size:clamp(48px,16vw,80px)!important}
+  .timer-topic{font-size:18px!important;margin-bottom:18px!important}
+  .timer-duration{font-size:16px!important;margin-top:20px!important}
+}
 </style>
 
 <!-- PWA / iPhone app mode -->
@@ -4134,8 +4659,8 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
   <button class="tab" onclick="switchTab('prospects',this)">Потенциально <span class="badge muted" id="badge-pr">0</span></button>
   <button class="tab" onclick="switchTab('orgs',this)">Организаторы <span class="badge muted" id="badge-o">0</span></button>
   <button class="tab" onclick="switchTab('club',this)">Клуб</button>
-  <button class="tab" onclick="switchTab('pitch',this)">Оценки</button>
   <button class="tab" onclick="switchTab('randomizer',this)">Команды</button>
+  <button class="tab tab-pitch" onclick="switchTab('pitch',this)">Оценки</button>
 </nav>
 
 <main>
@@ -4145,6 +4670,7 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <button class="event-tab active" id="event-tab-randomizer" type="button" onclick="switchEventTab('randomizer')">Команды</button>
     <button class="event-tab" id="event-tab-splash" type="button" onclick="switchEventTab('splash')">Заставка</button>
     <button class="event-tab" id="event-tab-timer" type="button" onclick="switchEventTab('timer')">Таймеры</button>
+    <button class="event-tab" id="event-tab-pitchboard" type="button" onclick="switchEventTab('pitchboard')">Оценки</button>
   </div>
 </div>
 
@@ -4348,8 +4874,12 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <div class="sec-title">Оценки <span id="pitch-cnt"></span></div>
     <div class="sec-actions">
       <span class="sec-actions-note" id="pitch-note">Жюри · идеи · средний балл</span>
-      <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
-      <button class="btn btn-solid btn-sm" type="button" onclick="openJurySite()">Открыть жюри</button>
+      <div class="pitch-admin-actions">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="exportPitchCsv()">⇩ Таблица</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="resetPitchScores()">Сброс оценок</button>
+        <button class="btn btn-solid btn-sm" type="button" onclick="openJurySite()">Открыть жюри</button>
+      </div>
     </div>
   </div>
   <div class="pitch-layout">
@@ -4366,6 +4896,22 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
       <div class="pitch-results" id="pitch-results"></div>
     </section>
   </div>
+</div>
+
+<!-- PITCH BOARD -->
+<div class="view" id="view-pitchboard">
+  <div class="sec-header randomizer-header">
+    <div class="sec-title">Оценки <span id="pitchboard-cnt"></span></div>
+    <div class="sec-actions">
+      <span class="sec-actions-note" id="pitchboard-note">Live · средний балл жюри</span>
+      <button class="btn btn-ghost btn-sm event-screen-btn" onclick="fullscreenPitchboard()"><span class="btn-ico">⛶</span>Во весь экран</button>
+      <button class="btn btn-ghost btn-sm event-screen-btn" onclick="openPitchboardPresentation()"><span class="btn-ico">▣</span>На экран</button>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="loadPitchData(false)">↻ Обновить</button>
+    </div>
+  </div>
+  <section class="pitchboard-stage" id="pitchboard-stage" onclick="fullscreenPitchboard()" aria-label="Live-дашборд оценок жюри">
+    <div class="pitchboard-inner" id="pitchboard-inner"></div>
+  </section>
 </div>
 
 <!-- TIMER -->
@@ -4444,9 +4990,10 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <div class="sec-title">Заставка</div>
     <div class="sec-actions">
       <div class="splash-controls" role="tablist" aria-label="Вид заставки">
-        <button class="splash-theme-btn active" onclick="setSplashTheme('dark',this)">Тёмная</button>
-        <button class="splash-theme-btn" onclick="setSplashTheme('light',this)">Светлая</button>
-        <button class="splash-theme-btn" onclick="setSplashTheme('cards',this)">Карточки</button>
+        <button class="splash-theme-btn active" data-splash-theme="dark" onclick="setSplashTheme('dark',this)">Тёмная</button>
+        <button class="splash-theme-btn" data-splash-theme="light" onclick="setSplashTheme('light',this)">Светлая</button>
+        <button class="splash-theme-btn" data-splash-theme="cards" onclick="setSplashTheme('cards',this)">Карточки</button>
+        <button class="splash-theme-btn" data-splash-theme="qr" onclick="setSplashTheme('qr',this)">QR</button>
       </div>
       <button class="splash-cast-btn" onclick="openSplashPresentation()">На экран</button>
     </div>
@@ -4468,6 +5015,17 @@ body.presentation-mode .randomizer-grid.reveal .randomizer-member{
     <!-- карточки: бейдж + сетка -->
     <div class="splash-cards-badge" id="splash-cards-badge" style="display:none">драфт<span>.</span></div>
     <div class="splash-cards-grid" id="splash-cards-grid" style="display:none"></div>
+    <div class="splash-qr" id="splash-qr">
+      <div class="splash-qr-logo">драфт<span>.</span></div>
+      <div class="splash-qr-box">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=720x720&margin=18&data=https%3A%2F%2Fdraft-crm-jury.vercel.app%2F" alt="QR-код для голосования жюри" loading="eager" decoding="async">
+      </div>
+      <div>
+        <div class="splash-qr-title">Оценка идей</div>
+        <div class="splash-qr-sub">Откройте камеру и перейдите по QR-коду</div>
+      </div>
+      <div class="splash-qr-url">draft-crm-jury.vercel.app</div>
+    </div>
   </div>
 </div>
 
@@ -4786,13 +5344,18 @@ function switchTab(name, btn){
 
 function switchEventTab(name){
   if(eventActiveView === 'splash' && name !== 'splash') stopCarousel?.();
-  eventActiveView = name === 'splash' || name === 'timer' ? name : 'randomizer';
+  eventActiveView = name === 'splash' || name === 'timer' || name === 'pitchboard' ? name : 'randomizer';
   document.querySelectorAll('.event-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('event-tab-'+eventActiveView)?.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+eventActiveView)?.classList.add('active');
   if(eventActiveView === 'randomizer') renderRandomizer();
   if(eventActiveView === 'timer') renderTimer();
+  if(eventActiveView === 'pitchboard'){
+    renderPitchDashboard();
+    loadPitchData(true);
+    startPitchAutoRefresh();
+  }
   if(eventActiveView === 'splash'){
     updateSplashMeta?.();
     preloadEventPhotos();
@@ -4802,7 +5365,7 @@ function switchEventTab(name){
 }
 
 function enterAppMode(mode){
-  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer');
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard');
   if(mode==='gate'){
     appMode='gate';
     document.body.classList.add('mode-gate-active');
@@ -6509,6 +7072,7 @@ async function fullscreenTimerStage(){
   }
 }
 // ── SPLASH V4 ──────────────────────────────────────────────
+const SPLASH_THEMES = ['dark','light','cards','qr'];
 let splashTheme = 'dark';
 let _carouselTimer = null;
 let _carouselQueue = [];   // все участники — крутим по кругу
@@ -6517,21 +7081,25 @@ let _carouselPtr = 0;      // следующий в очереди
 let _carouselSlotPtr = 0;  // следующая ячейка для замены
 
 function setSplashTheme(theme, btn){
+  if(!['dark','light','cards','qr'].includes(theme)) theme='dark';
   splashTheme = theme;
   const view = document.getElementById('splash-view');
   if(!view) return;
   view.className = 'splash-view theme-' + theme;
   document.querySelectorAll('.splash-theme-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  (btn || document.querySelector(`.splash-theme-btn[data-splash-theme="${theme}"]`))?.classList.add('active');
 
   const isCards = theme === 'cards';
+  const isQr = theme === 'qr';
   const grid   = document.getElementById('splash-cards-grid');
   const badge  = document.getElementById('splash-cards-badge');
   const meta   = view.querySelector('.splash-meta');
+  const qr     = document.getElementById('splash-qr');
 
   if(grid)  grid.style.display  = isCards ? 'grid' : 'none';
   if(badge) badge.style.display = isCards ? 'block' : 'none';
-  if(meta)  meta.style.display  = isCards ? 'none' : 'flex';
+  if(meta)  meta.style.display  = (isCards || isQr) ? 'none' : 'flex';
+  if(qr)    qr.style.display    = isQr ? 'grid' : 'none';
 
   if(isCards){
     preloadEventPhotos();
@@ -6541,6 +7109,11 @@ function setSplashTheme(theme, btn){
     stopCarousel();
   }
   updateSplashMeta();
+}
+function stepSplashTheme(direction=1){
+  const current=SPLASH_THEMES.indexOf(splashTheme);
+  const next=(current + direction + SPLASH_THEMES.length) % SPLASH_THEMES.length;
+  setSplashTheme(SPLASH_THEMES[next]);
 }
 
 // Генерируем полосы один раз при переключении тёмная/светлая
@@ -6734,6 +7307,7 @@ function splashClickFullscreen(){
 function openSplashPresentation(){
   const url=new URL(window.location.href);
   url.searchParams.set('present','splash');
+  url.searchParams.set('theme',splashTheme);
   url.hash='';
   const win=window.open(url.toString(),'draft-splash-screen','popup=yes,width=1600,height=900');
   if(!win) toast('Браузер заблокировал новое окно');
@@ -6752,18 +7326,24 @@ async function toggleFullscreen(){
 function applyPresentationMode(){
   const params=new URLSearchParams(window.location.search);
   const present=params.get('present');
-  if(present!=='randomizer' && present!=='splash' && present!=='timer') return false;
-  document.body.classList.remove('mode-gate-active','event-mode');
+  if(present!=='randomizer' && present!=='splash' && present!=='timer' && present!=='pitchboard') return false;
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard');
   document.body.classList.add('presentation-mode','presentation-'+present);
   appMode='presentation';
   preloadEventPhotos();
-  document.title=(present==='splash' ? 'Заставка' : present==='timer' ? 'Таймер' : 'Команды')+' · драфт';
+  document.title=(present==='splash' ? 'Заставка' : present==='timer' ? 'Таймер' : present==='pitchboard' ? 'Оценки' : 'Команды')+' · драфт';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+present)?.classList.add('active');
   if(present==='randomizer') renderRandomizer();
   if(present==='timer') renderTimer();
+  if(present==='pitchboard'){
+    renderPitchDashboard();
+    loadPitchData(true);
+    startPitchAutoRefresh();
+  }
   if(present==='splash'){
+    setSplashTheme(params.get('theme')||splashTheme);
     updateSplashMeta?.();
     if(splashTheme==='cards') startCarousel?.();
   }
@@ -7223,6 +7803,9 @@ const JURY_NAME_KEY = 'draft_jury_name_v1';
 const PITCH_MAX_IDEAS = 10;
 let pitchState = {teams:[], ideas:[], scores:[], selectedTeamId:'', juryScores:{}};
 let pitchRefreshTimer = null;
+let pitchChannel = null;
+let pitchReloadTimer = null;
+let pitchOpenDetails = new Set();
 
 function isJuryHost(){
   const params=new URLSearchParams(window.location.search);
@@ -7231,16 +7814,46 @@ function isJuryHost(){
 function openJurySite(){
   window.open(JURY_APP_URL,'_blank','noopener');
 }
+async function fullscreenPitchboard(){
+  try{
+    const el=document.getElementById('pitchboard-stage');
+    if(document.fullscreenElement) await document.exitFullscreen();
+    else await (el?.requestFullscreen?.() || document.documentElement.requestFullscreen());
+  } catch {
+    toast('Браузер не дал включить полный экран');
+  }
+}
+function openPitchboardPresentation(){
+  const url=new URL(window.location.href);
+  url.searchParams.set('present','pitchboard');
+  url.hash='';
+  const win=window.open(url.toString(),'draft-pitchboard-screen','popup=yes,width=1600,height=900');
+  if(!win) toast('Браузер заблокировал новое окно');
+}
+function schedulePitchReload(){
+  clearTimeout(pitchReloadTimer);
+  pitchReloadTimer=setTimeout(()=>loadPitchData(true),260);
+}
+function subscribePitchChanges(){
+  if(!syncClient || pitchChannel) return;
+  pitchChannel = syncClient
+    .channel('draft-pitch-live')
+    .on('postgres_changes', {event:'*', schema:'public', table:'pitch_teams'}, schedulePitchReload)
+    .on('postgres_changes', {event:'*', schema:'public', table:'pitch_ideas'}, schedulePitchReload)
+    .on('postgres_changes', {event:'*', schema:'public', table:'pitch_scores'}, schedulePitchReload)
+    .subscribe();
+}
 function startPitchAutoRefresh(){
   if(pitchRefreshTimer) return;
   pitchRefreshTimer=setInterval(()=>{
     const pitchOpen=document.getElementById('view-pitch')?.classList.contains('active');
-    if(document.body.classList.contains('jury-mode') || pitchOpen) loadPitchData(true);
+    const boardOpen=document.getElementById('view-pitchboard')?.classList.contains('active') || document.body.classList.contains('presentation-pitchboard');
+    if(document.body.classList.contains('jury-mode') || pitchOpen || boardOpen) loadPitchData(true);
   },PITCH_REFRESH_MS);
 }
 function enterJuryMode(){
   appMode='jury';
-  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer');
+  document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard');
   document.body.classList.add('jury-mode');
   document.title='Оценка идей · драфт';
   loadPitchData(true);
@@ -7274,7 +7887,7 @@ async function loadPitchData(silent=true){
     const client=await ensurePitchClient();
     const includeScores=!document.body.classList.contains('jury-mode');
     const requests=[
-      client.from('pitch_teams').select('id,name,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
+      client.from('pitch_teams').select('id,name,sort_order,voting_closed,closed_at,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
       client.from('pitch_ideas').select('id,team_id,title,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true})
     ];
     if(includeScores) requests.push(client.from('pitch_scores').select('id,team_id,idea_id,judge_name,score,updated_at').order('updated_at',{ascending:false}));
@@ -7290,12 +7903,16 @@ async function loadPitchData(silent=true){
     }
     renderPitchAdmin();
     renderJuryApp();
+    renderPitchDashboard();
+    subscribePitchChanges();
     if(!silent) toast('Оценки обновлены');
   } catch(err){
     console.error(err);
     const msg='Нужны таблицы оценок в Supabase';
     const res=document.getElementById('pitch-results');
     if(res) res.innerHTML=`<div class="pitch-empty">${msg}. Прогони блок SQL из supabase_setup.sql.</div>`;
+    const board=document.getElementById('pitchboard-inner');
+    if(board) board.innerHTML=`<div class="pitchboard-empty">${msg}. Прогони блок SQL из supabase_setup.sql.</div>`;
     const status=document.getElementById('jury-status');
     if(status) status.textContent=msg;
     if(!silent) toast(msg);
@@ -7326,8 +7943,67 @@ function selectPitchTeam(id){
   pitchState.selectedTeamId=id;
   renderPitchAdmin();
 }
+function selectedPitchTeam(){
+  return pitchState.teams.find(t=>String(t.id)===String(pitchState.selectedTeamId)) || null;
+}
 function togglePitchDetails(ideaId){
-  document.querySelector(`[data-pitch-idea="${ideaId}"]`)?.classList.toggle('open');
+  const key=String(ideaId);
+  if(pitchOpenDetails.has(key)) pitchOpenDetails.delete(key);
+  else pitchOpenDetails.add(key);
+  renderPitchAdmin();
+}
+async function deletePitchTeam(id){
+  const team=pitchState.teams.find(t=>String(t.id)===String(id));
+  if(!team) return;
+  if(!confirm(`Удалить команду «${team.name}» вместе с идеями и оценками?`)) return;
+  try{
+    const client=await ensurePitchClient();
+    const {error}=await client.from('pitch_teams').delete().eq('id',id);
+    if(error) throw error;
+    pitchOpenDetails.clear();
+    if(String(pitchState.selectedTeamId)===String(id)) pitchState.selectedTeamId='';
+    await loadPitchData(true);
+    toast('Команда удалена');
+  } catch(err){
+    console.error(err);
+    toast('Не удалось удалить команду');
+  }
+}
+async function resetPitchScores(teamId=''){
+  const scoped=!!teamId;
+  const team=teamId ? pitchState.teams.find(t=>String(t.id)===String(teamId)) : null;
+  const text=scoped ? `Сбросить оценки команды «${team?.name||''}»?` : 'Сбросить все оценки жюри? Команды и идеи останутся.';
+  if(!confirm(text)) return;
+  try{
+    const client=await ensurePitchClient();
+    let query=client.from('pitch_scores').delete().neq('id','00000000-0000-0000-0000-000000000000');
+    if(scoped) query=query.eq('team_id',teamId);
+    const {error}=await query;
+    if(error) throw error;
+    await loadPitchData(true);
+    toast(scoped ? 'Оценки команды сброшены' : 'Оценки сброшены');
+  } catch(err){
+    console.error(err);
+    toast('Не удалось сбросить оценки');
+  }
+}
+async function togglePitchTeamClosed(id){
+  const team=pitchState.teams.find(t=>String(t.id)===String(id));
+  if(!team) return;
+  const closing=!team.voting_closed;
+  try{
+    const client=await ensurePitchClient();
+    const {error}=await client.from('pitch_teams').update({
+      voting_closed:closing,
+      closed_at:closing ? new Date().toISOString() : null
+    }).eq('id',id);
+    if(error) throw error;
+    await loadPitchData(true);
+    toast(closing ? 'Голосование закрыто' : 'Голосование открыто');
+  } catch(err){
+    console.error(err);
+    toast('Не удалось изменить статус голосования');
+  }
 }
 function renderPitchAdmin(){
   const teamList=document.getElementById('pitch-team-list');
@@ -7342,13 +8018,14 @@ function renderPitchAdmin(){
       teamList.innerHTML=pitchState.teams.map(team=>{
         const ideas=pitchIdeasForTeam(team.id);
         const active=String(team.id)===String(pitchState.selectedTeamId);
-        return `<button class="pitch-team-btn ${active?'active':''}" type="button" onclick="selectPitchTeam('${team.id}')">
-          <span>${esc(team.name)}</span><span class="pitch-team-meta">${ideas.length} идей</span>
+        const closed=!!team.voting_closed;
+        return `<button class="pitch-team-btn ${active?'active':''} ${closed?'closed':''}" type="button" onclick="selectPitchTeam('${team.id}')">
+          <span>${esc(team.name)}</span><span class="pitch-team-meta">${closed?'закрыто · ':''}${ideas.length} идей</span>
         </button>`;
       }).join('');
     }
   }
-  const team=pitchState.teams.find(t=>String(t.id)===String(pitchState.selectedTeamId));
+  const team=selectedPitchTeam();
   if(title) title.textContent=team ? `Итоги · ${team.name}` : 'Итоги';
   if(!results) return;
   if(!team){
@@ -7360,15 +8037,27 @@ function renderPitchAdmin(){
     results.innerHTML='<div class="pitch-empty">У команды пока нет идей.</div>';
     return;
   }
-  results.innerHTML=ideas.map(idea=>{
+  const rankedIdeas=ideas
+    .map(pitchIdeaStats)
+    .filter(x=>x.avg!==null)
+    .sort((a,b)=>b.avg-a.avg || b.voteCount-a.voteCount)
+    .slice(0,3);
+  const topIdeaIds=new Map(rankedIdeas.map((x,i)=>[String(x.idea.id),i+1]));
+  const tools=`<div class="pitch-team-tools">
+    <button class="btn btn-ghost btn-sm" type="button" onclick="togglePitchTeamClosed('${team.id}')">${team.voting_closed?'Открыть голосование':'Закрыть голосование'}</button>
+    <button class="btn btn-ghost btn-sm" type="button" onclick="resetPitchScores('${team.id}')">Сбросить оценки команды</button>
+    <button class="btn btn-danger btn-sm" type="button" onclick="deletePitchTeam('${team.id}')">Удалить команду</button>
+  </div>`;
+  const cards=ideas.map(idea=>{
     const avg=pitchAverage(idea.id);
     const votes=pitchScoresForIdea(idea.id).sort((a,b)=>String(a.judge_name).localeCompare(String(b.judge_name),'ru'));
+    const topRank=topIdeaIds.get(String(idea.id));
     const breakdown=votes.length
       ? votes.map(v=>`<div class="pitch-vote-row"><span>${esc(v.judge_name)}</span><b>${+v.score||0}</b></div>`).join('')
       : '<div class="pitch-vote-row"><span>Пока нет голосов</span><b>—</b></div>';
-    return `<article class="pitch-result-card" data-pitch-idea="${idea.id}">
+    return `<article class="pitch-result-card ${topRank?'is-top-idea':''} ${pitchOpenDetails.has(String(idea.id))?'open':''}" data-pitch-idea="${idea.id}">
       <div class="pitch-result-head">
-        <div class="pitch-result-title">${esc(idea.title)}</div>
+        <div class="pitch-result-title">${topRank?`<span class="pitch-top-mark">#${topRank}</span>`:''}${esc(idea.title)}</div>
         <div class="pitch-result-score">${avg===null?'—':avg}</div>
         <div class="pitch-result-votes">${votes.length} голосов</div>
         <button class="pitch-detail-btn" type="button" onclick="togglePitchDetails('${idea.id}')">Подробнее</button>
@@ -7376,6 +8065,142 @@ function renderPitchAdmin(){
       <div class="pitch-breakdown">${breakdown}</div>
     </article>`;
   }).join('');
+  results.innerHTML=tools+cards;
+}
+function pitchScoreLabel(value){
+  if(value===null || value===undefined || Number.isNaN(+value)) return '—';
+  const rounded=Math.round((+value)*10)/10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+function pitchIdeaStats(idea){
+  const votes=pitchScoresForIdea(idea.id);
+  const avg=votes.length ? Math.round((votes.reduce((sum,v)=>sum+(+v.score||0),0)/votes.length)*10)/10 : null;
+  return {
+    idea,
+    avg,
+    votes,
+    voteCount:votes.length,
+    judges:new Set(votes.map(v=>(v.judge_name||'').trim()).filter(Boolean))
+  };
+}
+function pitchTeamStats(team){
+  const ideas=pitchIdeasForTeam(team.id).map(pitchIdeaStats);
+  const votedIdeas=ideas.filter(x=>x.avg!==null);
+  const avg=votedIdeas.length
+    ? Math.round((votedIdeas.reduce((sum,x)=>sum+x.avg,0)/votedIdeas.length)*10)/10
+    : null;
+  const allVotes=ideas.flatMap(x=>x.votes);
+  return {
+    team,
+    ideas,
+    avg,
+    totalVotes:allVotes.length,
+    judgeCount:new Set(allVotes.map(v=>(v.judge_name||'').trim()).filter(Boolean)).size,
+    votingClosed:!!team.voting_closed,
+    topIdea:votedIdeas.slice().sort((a,b)=>b.avg-a.avg || b.voteCount-a.voteCount)[0] || null
+  };
+}
+function renderPitchDashboard(){
+  const board=document.getElementById('pitchboard-inner');
+  const cnt=document.getElementById('pitchboard-cnt');
+  if(cnt) cnt.textContent=pitchState.teams.length ? pitchState.teams.length : '';
+  if(!board) return;
+  if(!pitchState.teams.length){
+    board.innerHTML='<div class="pitchboard-empty">Добавь команды во вкладке CRM «Оценки», и здесь появится live-дашборд для плазмы.</div>';
+    return;
+  }
+  const stats=pitchState.teams
+    .map(pitchTeamStats)
+    .sort((a,b)=>(b.avg ?? -1)-(a.avg ?? -1) || b.totalVotes-a.totalVotes || String(a.team.name).localeCompare(String(b.team.name),'ru'));
+  const votedTeams=stats.filter(x=>x.avg!==null);
+  const totalVotes=pitchState.scores.length;
+  const totalJudges=new Set(pitchState.scores.map(v=>(v.judge_name||'').trim()).filter(Boolean)).size;
+  const overall=votedTeams.length ? Math.round((votedTeams.reduce((sum,x)=>sum+x.avg,0)/votedTeams.length)*10)/10 : null;
+  const leader=votedTeams[0] || stats[0];
+  const updated=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  const leaderSub=leader?.topIdea
+    ? `Лучшая идея: ${leader.topIdea.idea.title} · ${pitchScoreLabel(leader.topIdea.avg)}`
+    : 'Ждём первые оценки жюри';
+  const cards=stats.map((item,index)=>{
+    const topIdeas=item.ideas
+      .filter(x=>x.avg!==null)
+      .sort((a,b)=>b.avg-a.avg || b.voteCount-a.voteCount)
+      .slice(0,3);
+    const ideasHtml=topIdeas.length
+      ? topIdeas.map((x,rank)=>`<div class="pitchboard-idea is-top">
+          <div class="pitchboard-idea-name"><span class="pitchboard-idea-rank">${rank+1}</span>${esc(x.idea.title)}</div>
+          <div class="pitchboard-idea-score">${pitchScoreLabel(x.avg)}</div>
+          <div class="pitchboard-bar"><span style="--w:${Math.max(3,Math.min(100,(x.avg||0)*10))}%"></span></div>
+        </div>`).join('')
+      : '<div class="pitchboard-card-meta">Пока нет оценок по идеям</div>';
+    return `<article class="pitchboard-card ${index===0 && item.avg!==null?'is-top':''} ${item.votingClosed?'is-closed':''}">
+      <div class="pitchboard-card-head">
+        <div class="pitchboard-card-rank">#${index+1}</div>
+        <div class="pitchboard-card-name">${esc(item.team.name)}</div>
+        <div class="pitchboard-card-score">${pitchScoreLabel(item.avg)}</div>
+      </div>
+      <div class="pitchboard-card-meta">${item.votingClosed?'закрыто · ':''}${item.totalVotes} оценок · ${item.judgeCount} жюри · ${item.ideas.length} идей</div>
+      <div class="pitchboard-idea-list">${ideasHtml}</div>
+    </article>`;
+  }).join('');
+  board.innerHTML=`<div class="pitchboard-top">
+    <div>
+      <div class="pitchboard-kicker">Фокус-группа · live</div>
+      <div class="pitchboard-title">Результаты идей</div>
+    </div>
+    <div class="pitchboard-live">обновлено ${updated}</div>
+  </div>
+  <div class="pitchboard-metrics">
+    <div class="pitchboard-metric"><b>${pitchState.teams.length}</b><span>команд</span></div>
+    <div class="pitchboard-metric"><b>${totalVotes}</b><span>оценок</span></div>
+    <div class="pitchboard-metric"><b>${totalJudges}</b><span>жюри</span></div>
+    <div class="pitchboard-metric"><b>${pitchScoreLabel(overall)}</b><span>средний балл</span></div>
+  </div>
+  <div class="pitchboard-leader">
+    <div class="pitchboard-rank">#1</div>
+    <div>
+      <div class="pitchboard-leader-name">${esc(leader?.team?.name||'—')}</div>
+      <div class="pitchboard-leader-sub">${esc(leaderSub)}</div>
+    </div>
+    <div class="pitchboard-leader-score">${pitchScoreLabel(leader?.avg)}</div>
+  </div>
+  <div class="pitchboard-grid">${cards}</div>`;
+}
+function csvCell(value){
+  const text=String(value ?? '');
+  return /[;"\n\r]/.test(text) ? `"${text.replace(/"/g,'""')}"` : text;
+}
+function exportPitchCsv(){
+  if(!pitchState.teams.length){
+    toast('Нет команд для экспорта');
+    return;
+  }
+  const rows=[['Команда','Статус','Идея','Средний балл','Голосов','Жюри','Оценки']];
+  pitchState.teams.forEach(team=>{
+    pitchIdeasForTeam(team.id).forEach(idea=>{
+      const votes=pitchScoresForIdea(idea.id).sort((a,b)=>String(a.judge_name).localeCompare(String(b.judge_name),'ru'));
+      const avg=pitchAverage(idea.id);
+      rows.push([
+        team.name,
+        team.voting_closed ? 'Голосование закрыто' : 'Открыто',
+        idea.title,
+        avg===null ? '' : pitchScoreLabel(avg),
+        votes.length,
+        votes.map(v=>v.judge_name).join(', '),
+        votes.map(v=>`${v.judge_name}: ${v.score}`).join(' | ')
+      ]);
+    });
+  });
+  const csv='\uFEFF'+rows.map(row=>row.map(csvCell).join(';')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  const date=new Date().toISOString().slice(0,10);
+  a.href=URL.createObjectURL(blob);
+  a.download='draft-pitch-results-'+date+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  toast('Итоговая таблица скачана');
 }
 function selectJuryTeam(id){
   pitchState.selectedTeamId=id;
@@ -7383,6 +8208,8 @@ function selectJuryTeam(id){
   renderJuryApp();
 }
 function setJuryScore(ideaId,score){
+  const team=selectedPitchTeam();
+  if(team?.voting_closed) return;
   pitchState.juryScores[String(ideaId)]=score;
   renderJuryApp();
 }
@@ -7391,6 +8218,7 @@ function renderJuryApp(){
   const nameInput=document.getElementById('jury-name');
   const teamSelect=document.getElementById('jury-team');
   const ideasEl=document.getElementById('jury-ideas');
+  const statusEl=document.getElementById('jury-status');
   if(nameInput && !nameInput.value) nameInput.value=localStorage.getItem(JURY_NAME_KEY)||'';
   if(!teamSelect || !ideasEl) return;
   if(!pitchState.teams.length){
@@ -7398,14 +8226,18 @@ function renderJuryApp(){
     ideasEl.innerHTML='<div class="pitch-empty">Попроси ведущего добавить команды в CRM.</div>';
     return;
   }
-  teamSelect.innerHTML=pitchState.teams.map(team=>`<option value="${team.id}" ${String(team.id)===String(pitchState.selectedTeamId)?'selected':''}>${esc(team.name)}</option>`).join('');
+  teamSelect.innerHTML=pitchState.teams.map(team=>`<option value="${team.id}" ${String(team.id)===String(pitchState.selectedTeamId)?'selected':''}>${esc(team.name)}${team.voting_closed?' · закрыто':''}</option>`).join('');
   const teamId=pitchState.selectedTeamId || pitchState.teams[0]?.id;
+  const team=pitchState.teams.find(t=>String(t.id)===String(teamId));
+  const closed=!!team?.voting_closed;
+  if(statusEl && closed) statusEl.textContent='Голосование по этой команде закрыто';
+  else if(statusEl && statusEl.textContent==='Голосование по этой команде закрыто') statusEl.textContent='';
   const ideas=pitchIdeasForTeam(teamId);
   ideasEl.innerHTML=ideas.map(idea=>{
     const selected=+pitchState.juryScores[String(idea.id)]||0;
     const buttons=Array.from({length:10},(_,i)=>{
       const score=i+1;
-      return `<button class="score-btn ${selected===score?'active':''}" type="button" onclick="setJuryScore('${idea.id}',${score})">${score}</button>`;
+      return `<button class="score-btn ${selected===score?'active':''}" type="button" ${closed?'disabled':''} onclick="setJuryScore('${idea.id}',${score})">${score}</button>`;
     }).join('');
     return `<div class="jury-idea">
       <div class="jury-idea-title">${esc(idea.title)}</div>
@@ -7416,6 +8248,8 @@ function renderJuryApp(){
 async function addJuryIdea(){
   const teamId=pitchState.selectedTeamId;
   if(!teamId){toast('Сначала выбери команду');return;}
+  const team=pitchState.teams.find(t=>String(t.id)===String(teamId));
+  if(team?.voting_closed){toast('Голосование по этой команде закрыто');return;}
   const ideas=pitchIdeasForTeam(teamId);
   if(ideas.length>=PITCH_MAX_IDEAS){toast('Максимум 10 идей на команду');return;}
   try{
@@ -7434,6 +8268,8 @@ async function submitJuryScores(){
   const teamId=pitchState.selectedTeamId;
   if(!judge){document.getElementById('jury-status').textContent='Введи имя и фамилию';return;}
   if(!teamId){document.getElementById('jury-status').textContent='Команда не выбрана';return;}
+  const team=pitchState.teams.find(t=>String(t.id)===String(teamId));
+  if(team?.voting_closed){document.getElementById('jury-status').textContent='Голосование по этой команде закрыто';return;}
   const ideas=pitchIdeasForTeam(teamId);
   const rows=ideas
     .map(idea=>({idea,score:+pitchState.juryScores[String(idea.id)]||0}))
@@ -7858,6 +8694,15 @@ function hideCtx(){
 }
 document.addEventListener('click',hideCtx);
 document.addEventListener('keydown',e=>{
+  const tag=(e.target?.tagName||'').toLowerCase();
+  const isTyping=['input','textarea','select'].includes(tag);
+  const splashVisible=document.getElementById('view-splash')?.classList.contains('active') || document.body.classList.contains('presentation-splash');
+  const splashFullscreen=!!document.fullscreenElement && (document.fullscreenElement.id==='splash-view' || document.fullscreenElement.closest?.('#view-splash'));
+  if(!isTyping && splashVisible && (document.body.classList.contains('presentation-splash') || splashFullscreen) && (e.key==='ArrowRight' || e.key==='ArrowLeft')){
+    e.preventDefault();
+    stepSplashTheme(e.key==='ArrowRight' ? 1 : -1);
+    return;
+  }
   if(e.key==='Escape'){
     hideCtx();
     if(document.getElementById('crop-overlay')?.classList.contains('open')) cancelCrop();
@@ -7868,7 +8713,6 @@ document.addEventListener('keydown',e=>{
     const cropOpen=document.getElementById('crop-overlay')?.classList.contains('open');
     const modalOpen=document.getElementById('overlay')?.classList.contains('open');
     const canSave=['participant','prospect','org'].includes(_modalType);
-    const tag=(e.target?.tagName||'').toLowerCase();
     const isTextarea=tag==='textarea';
     const isButton=tag==='button';
     if(cropOpen && !isButton){
