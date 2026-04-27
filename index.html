@@ -2571,8 +2571,8 @@ body.jury-mode .jury-app{
 }
 .score-btn{
   aspect-ratio:1;
-  border:1px solid rgba(255,255,255,.09);
-  background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.12),rgba(255,255,255,.025) 48%,rgba(0,0,0,.14));
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.035);
   color:var(--gray1);
   border-radius:50%;
   font-size:13px;
@@ -2580,36 +2580,36 @@ body.jury-mode .jury-app{
   cursor:pointer;
   position:relative;
   overflow:hidden;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 18px rgba(0,0,0,.18);
-  transition:transform .16s ease,border-color .16s ease,color .16s ease,background .16s ease,box-shadow .16s ease;
+  box-shadow:none;
+  transition:transform .14s ease,border-color .14s ease,color .14s ease,background .14s ease;
 }
 .score-btn::after{
   content:'';
   position:absolute;
   inset:-35%;
-  background:linear-gradient(115deg,transparent 34%,rgba(255,255,255,.55) 48%,transparent 62%);
+  background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.28) 50%,transparent 64%);
   transform:translateX(-130%) rotate(8deg);
   opacity:0;
   pointer-events:none;
 }
 .score-btn:hover{
   color:var(--white);
-  border-color:rgba(144,217,123,.36);
-  transform:translateY(-1px);
+  border-color:rgba(144,217,123,.34);
+  background:rgba(98,191,74,.08);
 }
 .score-btn:hover::after{
-  opacity:.45;
+  opacity:.35;
   animation:scoreShine .72s ease-out 1;
 }
 .score-btn.active{
   color:#081006;
-  background:radial-gradient(circle at 34% 24%,#d7ffca 0%,var(--green-lt) 48%,var(--green) 100%);
+  background:var(--green-lt);
   border-color:var(--green-lt);
-  box-shadow:0 0 0 3px rgba(144,217,123,.11),0 0 24px rgba(98,191,74,.28),inset 0 1px 0 rgba(255,255,255,.45);
-  transform:translateY(-1px) scale(1.03);
+  box-shadow:none;
+  transform:none;
 }
 .score-btn.active::after{
-  opacity:.55;
+  opacity:.36;
   animation:scoreShine .9s ease-out 1;
 }
 .score-btn:disabled{
@@ -2626,7 +2626,15 @@ body.jury-mode .jury-app{
   flex-wrap:wrap;
   margin-top:16px;
 }
-.jury-actions .btn{min-height:44px}
+.jury-actions .btn{
+  min-height:46px;
+  border-radius:999px;
+  padding:0 20px;
+  justify-content:center;
+}
+.jury-actions .btn-solid{
+  min-width:210px;
+}
 .jury-status{
   margin-top:12px;
   min-height:18px;
@@ -8022,6 +8030,7 @@ function makeSyncClient(){ if(!canUseSupabase()) return null; return window.supa
 // ─── PITCH / JURY SCORES ───────────────────────────────────────────────
 const JURY_APP_URL = 'https://draft-crm-jury.vercel.app/';
 const JURY_NAME_KEY = 'draft_jury_name_v1';
+const PITCH_PUBLIC_CACHE_KEY = 'draft_pitch_public_cache_v1';
 const PITCH_MAX_IDEAS = 10;
 let pitchState = {teams:[], ideas:[], scores:[], selectedTeamId:'', juryScores:{}};
 let pitchRefreshTimer = null;
@@ -8035,6 +8044,32 @@ function isJuryHost(){
 }
 function openJurySite(){
   window.open(JURY_APP_URL,'_blank','noopener');
+}
+function hydratePitchPublicCache(){
+  try{
+    const cached=JSON.parse(localStorage.getItem(PITCH_PUBLIC_CACHE_KEY)||'null');
+    if(!cached || !Array.isArray(cached.teams) || !Array.isArray(cached.ideas)) return false;
+    pitchState.teams=cached.teams;
+    pitchState.ideas=cached.ideas;
+    if(!pitchState.selectedTeamId || !pitchState.teams.some(t=>String(t.id)===String(pitchState.selectedTeamId))){
+      pitchState.selectedTeamId=pitchState.teams[0]?.id || '';
+    }
+    renderJuryApp();
+    renderPitchAdmin();
+    renderPitchDashboard();
+    return true;
+  }catch{
+    return false;
+  }
+}
+function cachePitchPublicData(){
+  try{
+    localStorage.setItem(PITCH_PUBLIC_CACHE_KEY,JSON.stringify({
+      teams:pitchState.teams,
+      ideas:pitchState.ideas,
+      savedAt:Date.now()
+    }));
+  }catch{}
 }
 async function fullscreenPitchboard(){
   try{
@@ -8078,6 +8113,7 @@ function enterJuryMode(){
   document.body.classList.remove('mode-gate-active','event-mode','presentation-mode','presentation-randomizer','presentation-splash','presentation-timer','presentation-pitchboard');
   document.body.classList.add('jury-mode');
   document.title='Оценка идей · драфт';
+  hydratePitchPublicCache();
   loadPitchData(true);
   startPitchAutoRefresh();
 }
@@ -8104,51 +8140,58 @@ function pitchAverage(ideaId){
   const avg=votes.reduce((sum,v)=>sum+(+v.score||0),0)/votes.length;
   return Math.round(avg*10)/10;
 }
+async function fetchPitchTeams(client){
+  let teamsRes=await supabaseQuery(
+    client.from('pitch_teams').select('id,name,sort_order,voting_closed,closed_at,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
+    'Данные долго грузятся'
+  );
+  if(teamsRes.error && isPitchSchemaMissing(teamsRes.error)){
+    teamsRes=await supabaseQuery(
+      client.from('pitch_teams').select('id,name,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
+      'Данные долго грузятся'
+    );
+    if(!teamsRes.error) teamsRes.data=(teamsRes.data||[]).map(team=>({voting_closed:false,closed_at:null,...team}));
+  }
+  return teamsRes;
+}
 async function loadPitchData(silent=true){
   try{
     const client=await ensurePitchClient();
     const includeScores=!document.body.classList.contains('jury-mode');
-    let teamsRes=await supabaseQuery(
-      client.from('pitch_teams').select('id,name,sort_order,voting_closed,closed_at,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
-      'Оценки долго грузятся'
-    );
-    if(teamsRes.error && isPitchSchemaMissing(teamsRes.error)){
-      teamsRes=await supabaseQuery(
-        client.from('pitch_teams').select('id,name,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),
-        'Оценки долго грузятся'
-      );
-      if(!teamsRes.error) teamsRes.data=(teamsRes.data||[]).map(team=>({voting_closed:false,closed_at:null,...team}));
-    }
+    const firstRequests=[
+      fetchPitchTeams(client),
+      supabaseQuery(client.from('pitch_ideas').select('id,team_id,title,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),'Данные долго грузятся')
+    ];
+    const [teamsRes,ideasRes]=await Promise.all(firstRequests);
     if(teamsRes.error) throw teamsRes.error;
+    if(ideasRes.error) throw ideasRes.error;
     pitchState.teams=teamsRes.data||[];
+    pitchState.ideas=ideasRes.data||[];
     if(!pitchState.selectedTeamId || !pitchState.teams.some(t=>String(t.id)===String(pitchState.selectedTeamId))){
       pitchState.selectedTeamId=pitchState.teams[0]?.id || '';
     }
+    cachePitchPublicData();
     renderJuryApp();
     renderPitchAdmin();
     renderPitchDashboard();
-
-    const requests=[
-      supabaseQuery(client.from('pitch_ideas').select('id,team_id,title,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true}),'Идеи долго грузятся')
-    ];
-    if(includeScores) requests.push(supabaseQuery(client.from('pitch_scores').select('id,team_id,idea_id,judge_name,score,updated_at').order('updated_at',{ascending:false}),'Оценки долго грузятся'));
-    const [ideasRes,scoresRes]=await Promise.all(requests);
-    if(ideasRes.error) throw ideasRes.error;
-    if(scoresRes?.error) throw scoresRes.error;
-    pitchState.ideas=ideasRes.data||[];
-    if(includeScores) pitchState.scores=scoresRes?.data||[];
-    renderPitchAdmin();
-    renderJuryApp();
-    renderPitchDashboard();
+    if(includeScores){
+      const scoresRes=await supabaseQuery(client.from('pitch_scores').select('id,team_id,idea_id,judge_name,score,updated_at').order('updated_at',{ascending:false}),'Данные долго грузятся');
+      if(scoresRes.error) throw scoresRes.error;
+      pitchState.scores=scoresRes.data||[];
+      renderPitchAdmin();
+      renderPitchDashboard();
+    }
     subscribePitchChanges();
     if(!silent) toast('Оценки обновлены');
   } catch(err){
     console.error(err);
-    const msg=String(err?.message||'').includes('долго') ? 'Supabase долго отвечает, пробую ещё' : 'Нужны таблицы оценок в Supabase';
+    const isSlow=String(err?.message||'').includes('долго');
+    const publicMode=document.body.classList.contains('jury-mode');
+    const msg=isSlow ? 'Связь медленная, пробую ещё' : publicMode ? 'Данные пока недоступны' : 'Нужны таблицы оценок в Supabase';
     const res=document.getElementById('pitch-results');
-    if(res) res.innerHTML=`<div class="pitch-empty">${msg}. Прогони блок SQL из supabase_setup.sql.</div>`;
+    if(res) res.innerHTML=`<div class="pitch-empty">${msg}${isSlow?'':'. Прогони блок SQL из supabase_setup.sql.'}</div>`;
     const board=document.getElementById('pitchboard-inner');
-    if(board) board.innerHTML=`<div class="pitchboard-empty">${msg}. Прогони блок SQL из supabase_setup.sql.</div>`;
+    if(board) board.innerHTML=`<div class="pitchboard-empty">${msg}${isSlow?'':'. Прогони блок SQL из supabase_setup.sql.'}</div>`;
     const status=document.getElementById('jury-status');
     if(status) status.textContent=msg;
     if(!silent) toast(msg);
